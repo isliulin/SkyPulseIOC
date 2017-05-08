@@ -1,0 +1,98 @@
+-l d0,d1,d2,d3,,d4,d5,d6,d7
+-l
+x
+
+0:/t lm.ini
+
+   10                   /.. pyro
+   35,   95,   30,   40 /.. pump
+   10,   95,   30,   40 /.. fan
+13520,12524,16384,16384 /.. offset
+10500,14999,16384,32768 /.. gain
+    0,    0             /.. air, H2O
+  600,  350,    2       /.. flash
+
+- can filter za EC20sync (0x42), msg postavi sync flag v _CAN objektu
+- loceni enum za can <> konzolni dostop EC20 in IOC
+
+18.11.2015, napake pri HW V2
+
+- zamenjana rx, tx od FTD na CPU
+- na FTD je VCCIO v zraku - povezava ns 3V3OUT
+- mogoce bi pri reset pomagal pulldown na fan rpm liniji ???
+
+----------------------------------------------------------------
+5.5.16
+----------------------------------------------------------------
+- error handling
+- error mask +/-E
+- error messages
+- blokada fit za pumpo in fan med spreminjanjem nastavitev
+
+----------------------------------------------------------------
+11.5.16
+----------------------------------------------------------------
+- bug: sprememba vrsne napetosti na 4200 ( po 0.1 V), Fo je v kHz !!!, problem pretvorb za izpis in ob snifanju paketov...
+- lucke,lucke --- stanja niso ok, problem Submit je treba bolj razdelat !~
+
+----------------------------------------------------------------
+19.5.16
+----------------------------------------------------------------
+- pyro isr, thermopile output, shift 15x, odstet treba offset bit (28)
+----------------------------------------------------------------
+11.7.16
+----------------------------------------------------------------
+- pulse shaping :)
+  predgretje pred vsakim pulzom
+----------------------------------------------------------------
+1.9.16
+----------------------------------------------------------------
+- dodatek za LW energometer
+----------------------------------------------------------------
+6.9.16
+----------------------------------------------------------------
+- barvne nastavitve 
+----------------------------------------------------------------
+f inserted.led
+-c r,0,5
+=c 0,180,50,50
+=c 5,180,50,50
++c r,0,5
+
+f ejected.led
+=c 0,1,255,50
+=c 5,1,255,50
++c r,0,5
+
+f onoff.led
+=c t,20
+=c 0,180,180,50
+=c 1,180,180,50
+=c 2,1,255,50
+=c 3,1,255,50
+=c 4,180,180,50
+=c 5,180,180,50
++c r,0,1,4,5
++c r,2
++c l,3
+w 1000
+-c l,2
+-c r,3
+
+f standby.led
+-c l,2
+-c r,3
+
+f ready.led
++c r,2
++c l,3
+----------------------------------------------------------------
+8.9.16
+----------------------------------------------------------------
+- == in != operator overload za HSV strukturo, popravki v run left & right  FILL_RIGHT_OFF
+
+21.4.2017
+- sprememba pri realizaciji F12, ne preide vec v lib ampak klice nov DecodeCom
+- sprememba pri realizaciji CAN konzole, ne klice DecodeCom ampak zamenja io od stdin
+
+
