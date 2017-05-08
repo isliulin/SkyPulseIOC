@@ -21,8 +21,7 @@
 #include 				"usbh_core.h"
 #include				<stdint.h>
 
-#define 				SW_version		0x100    
-
+#define 				SW_version		100  
 #define					_uS						60
 #define					_mS						(1000*_uS)
 void						_led(int, int),
