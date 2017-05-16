@@ -71,17 +71,17 @@ _LM::_LM() {
 //			}	else				
 //				printf("\r\n fitting not active...\r\n:");
 
-			printf("\r\n[F1]  - thermopile");
+//			printf("\r\n[F1]  - thermopile");
 //			printf("\r\n[F2]  - pilot");
 			printf("\r\n[F4]  - spray on/off");
 			printf("\r\n[F5]  - pump");
 			printf("\r\n[F6]  - fan");
 			printf("\r\n[F7]  - spray");
-			printf("\r\n[F8]  - EC20 console");
+//			printf("\r\n[F8]  - EC20 console");
 			printf("\r\n[F11] - save settings");	
 			printf("\r\n[F12] - exit app.    ");	
 			printf("\r\n");	
-			printf("\r\nCtrlE - EC20 console ");	
+//			printf("\r\nCtrlE - EC20 console ");	
 			printf("\r\nCtrlY - reset");	
 			printf("\r\n:");	
 
@@ -147,8 +147,8 @@ void	_LM::ErrParse(int e) {
 //					if(e & error_mask) {								// mask off inactive errors...
 //						Submit("@error.led");
 						_SYS_SHG_DISABLE;
-						IOC2SYS_State.Error=(_Error)_LM::error;
-						IOC2SYS_State.Send();
+						IOC_State.Error=(_Error)_LM::error;
+						IOC_State.Send();
 //					}
 
 				} else {
@@ -753,7 +753,7 @@ bool	_LM::Parse(int i) {
 					Select(CTRL_D);
 					break;
 				case __CtrlE: 
-					RemoteConsole(idCAN2COM,__CtrlE);
+					CanConsole(idCAN2COM,__CtrlE);
 					break;	
 				case __CtrlV:
 					if(spray.vibrate)
@@ -794,32 +794,32 @@ bool	_LM::Parse(int i) {
 					break;
 					
 				case __FOOT_OFF:
-					IOC2SYS_Footsw.State=_OFF;
-					IOC2SYS_Footsw.Send();
+					IOC_Footsw.State=_OFF;
+					IOC_Footsw.Send();
 					if(_BIT(_LM::debug, DBG_INFO))
 						printf("\r\n:\r\n:footswitch disconnected \r\n:");					
 					break;
 				case __FOOT_1:
-					IOC2SYS_Footsw.State=_1;
-					IOC2SYS_Footsw.Send();
+					IOC_Footsw.State=_1;
+					IOC_Footsw.Send();
 					if(_BIT(_LM::debug, DBG_INFO))
 						printf("\r\n:\r\n:footswitch state 1\r\n:");					
 					break;
 				case __FOOT_2:
-					IOC2SYS_Footsw.State=_2;
-					IOC2SYS_Footsw.Send();
+					IOC_Footsw.State=_2;
+					IOC_Footsw.Send();
 					if(_BIT(_LM::debug, DBG_INFO))
 						printf("\r\n:\r\n:footswitch state 2\r\n:");					
 					break;
 				case __FOOT_3:
-					IOC2SYS_Footsw.State=_3;
-					IOC2SYS_Footsw.Send();
+					IOC_Footsw.State=_3;
+					IOC_Footsw.Send();
 					if(_BIT(_LM::debug, DBG_INFO))
 						printf("\r\n:\r\n:footswitch state 3\r\n:");					
 					break;
 				case __FOOT_4:
-					IOC2SYS_Footsw.State=_4;
-					IOC2SYS_Footsw.Send();
+					IOC_Footsw.State=_4;
+					IOC_Footsw.Send();
 					if(_BIT(_LM::debug, DBG_INFO))
 						printf("\r\n:\r\n:footswitch state 4\r\n:");					
 					break;
@@ -897,29 +897,33 @@ _io*	temp=_stdio(me->io);
 			_stdio(temp);
 }
 /*******************************************************************************
-* Function Name	: 
-* Description		: 
-* Output				:
-* Return				:
+* Function Name : batch
+* Description   :	ADP1047 output voltage setup, using the default format
+* Input         :
+* Output        :
+* Return        :
 *******************************************************************************/
-void	_LM::RemoteConsole(int k, int ctrl) {
-int		i,j;
-char	c[128];
-			Select(REMOTE_CONSOLE);
-			sprintf(c,"%02X%02X%02X",k,'v','\r');
-			can.Send(c);
-			do {
-				for(i=0; i<8; ++i) {
+void	_LM::CanConsole(int k, int __ctrl) {
+CanTxMsg	m={idCAN2COM,0,CAN_ID_STD,CAN_RTR_DATA,2,'v','\r',0,0,0,0,0};
+int		j;
+			printf(" Remote console open... \r\n>");
+			Select(CAN_CONSOLE);															// Select operation mode
+			can.Send(&m);																			// send initial string
+			do {																							// pull max. 8 characters from stdio
+				for(m.DLC=0; m.DLC<8; ++m.DLC) {
 					j=getchar();
-					if(j == EOF || j == ctrl)
+					if(j == EOF || j == __ctrl)										// break if none or exit command
 						break;
-					sprintf(&c[2*i+2],"%02X",j);
+					m.Data[m.DLC]=j;															// else fill the can buffer
 				}
-				if(i > 0)
-					can.Send(c);
-				_thread_loop();
-			} while (j != ctrl);
-			Select(NONE);
+				if(m.DLC > 0)																		// send if payload is there...
+					can.Send(&m);
+				_thread_loop();																	// call system loop
+			} while (j != __ctrl);														// repeat until exit call
+			m.DLC=0;																					// set empty payload
+			can.Send(&m);																			// and send
+			Select(NONE);																			// Close operation mode
+			printf(" ...Remote console closed\r\n>");
 }
 /*******************************************************************************
 * Function Name	: 

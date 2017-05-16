@@ -36,7 +36,7 @@
 
 typedef enum		{DBG_CAN_TX, DBG_CAN_RX, DBG_ERR, DBG_INFO, DBG_CAN_COM=21, DBG_EC_SIM=22, DBG_ENRG=23}	_DEBUG_;
 typedef enum		{PYRO, PYROnew, PILOT, PLOT_OFFSET, PLOT_SCALE, PUMP, FAN, SPRAY, 
-									EC20 ,EC20bias, CTRL_A, CTRL_B, CTRL_C, CTRL_D, REMOTE_CONSOLE, NONE} _SELECTED_;
+									EC20 ,EC20bias, CTRL_A, CTRL_B, CTRL_C, CTRL_D, CAN_CONSOLE, NONE} _SELECTED_;
 //_____________________________________________________________________________
 class	_LM {
 
@@ -66,9 +66,9 @@ class	_LM {
 		_PUMP				pump;
 		_FAN				fan;
 		_WS2812			ws;
-		_IOC2SYS_State	IOC2SYS_State;
-		_IOC2SYS_Footsw	IOC2SYS_Footsw;
-		_IOC2SYS_Spray	IOC2SYS_Spray;
+		_IOC_State	IOC_State;
+		_IOC_Footsw	IOC_Footsw;
+		_IOC_Spray	IOC_Spray;
 	
 #ifdef	USE_LCD
 		_LCD				lcd;
@@ -88,7 +88,7 @@ class	_LM {
 		void				ErrParse(int);
 		
 		bool				Parse(int);
-		void				RemoteConsole(int, int);
+		void				CanConsole(int, int);
 		
 		static void	Poll(void *),
 								Print(void *),

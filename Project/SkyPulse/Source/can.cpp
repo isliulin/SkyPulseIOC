@@ -83,14 +83,14 @@ GPIO_InitTypeDef				GPIO_InitStructure;
 					CAN_FilterInitStructure.CAN_FilterActivation=ENABLE;
 					CAN_FilterInitStructure.CAN_FilterFIFOAssignment=CAN_FIFO0;
 
-					CAN_FilterInitStructure.CAN_FilterIdHigh=idSYS2IOC_State<<5;
+					CAN_FilterInitStructure.CAN_FilterIdHigh=idIOC_State<<5;
 					CAN_FilterInitStructure.CAN_FilterMaskIdHigh=0x7f0<<5;
 					CAN_FilterInitStructure.CAN_FilterIdLow = 0;
 					CAN_FilterInitStructure.CAN_FilterMaskIdLow = 0;
 					CAN_FilterInitStructure.CAN_FilterNumber=__FILT_BASE__+0;
 					CAN_FilterInit(&CAN_FilterInitStructure);
 
-					CAN_FilterInitStructure.CAN_FilterIdHigh=idIOC2SYS_State<<5;
+					CAN_FilterInitStructure.CAN_FilterIdHigh=idIOC_State_Ack<<5;
 					CAN_FilterInitStructure.CAN_FilterMaskIdHigh=0x7f0<<5;
 					CAN_FilterInitStructure.CAN_FilterNumber=__FILT_BASE__+1;
 					CAN_FilterInit(&CAN_FilterInitStructure);
@@ -116,7 +116,7 @@ GPIO_InitTypeDef				GPIO_InitStructure;
 					NVIC_Init(&NVIC_InitStructure);
 					
 					CAN_ITConfig(__CAN__, CAN_IT_FMP0, ENABLE);
-					com=NULL;
+					com=oldcom=NULL;
 				}
 }
 /*******************************************************************************
@@ -174,11 +174,29 @@ void			_CAN::Send(CanTxMsg *msg) {
 void			_CAN::Send(char *msg) {	
 CanTxMsg	buf={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 					buf.StdId=strtol(msg,&msg,16);
-//					sscanf(msg,"%02X",&buf.StdId);	
 					do {
-						while(*msg && buf.DLC < 8)
-							buf.Data[buf.DLC++]=strtol(msg,&msg,16);
+						while(*msg == ' ') ++msg;
+						for(buf.DLC=0; *msg && buf.DLC < 8; ++buf.DLC)
+							buf.Data[buf.DLC]=strtol(msg,&msg,16);
 						Send(&buf);
+					} while(*msg);
+}
+/*******************************************************************************
+* Function Name	: 
+* Description		: 
+* Output				:
+* Return				:
+*******************************************************************************/
+void			_CAN::Recv(char *msg) {	
+CanRxMsg	buf={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
+					buf.StdId=strtol(msg,&msg,16);
+					do {
+						while(*msg == ' ') ++msg;
+						for(buf.DLC=0; *msg && buf.DLC < 8; ++buf.DLC)
+							buf.Data[buf.DLC]=strtol(msg,&msg,16);
+						CAN_ITConfig(__CAN__, CAN_IT_FMP0, DISABLE);
+						_buffer_push(io->rx,&buf,sizeof(buf));
+						CAN_ITConfig(__CAN__, CAN_IT_FMP0, ENABLE);
 					} while(*msg);
 }
 /*******************************************************************************
@@ -213,12 +231,12 @@ CanTxMsg		txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 						}
 //______________________________________________________________________________________
 						switch(rxm.StdId) {
-							case idSYS2IOC_State:
+							case idIOC_State:
 								if(rxm.DLC)
-									lm->IOC2SYS_State.State=(_State)rxm.Data[0];
-								lm->IOC2SYS_State.Send();
+									lm->IOC_State.State=(_State)rxm.Data[0];
+								lm->IOC_State.Send();
 								break;
-							case idSYS2IOC_Spray:
+							case idIOC_Cmd:
 								lm->spray.AirLevel 		= __min(rxm.Data[0],10);
 								lm->spray.WaterLevel 	= __min(rxm.Data[1],10);
 							break;
@@ -235,29 +253,16 @@ CanTxMsg		txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 									com=_io_close(com);
 								}
 								break;
-//______________________________________________________________________________________					
+//______________________________________________________________________________________							
+							case idCOM2CAN: 
+								if(lm->Active() == CAN_CONSOLE)
+									for(int i=0; i<rxm.DLC; ++i)
+										putchar(rxm.Data[i]);
+							break;//______________________________________________________________________________________					
 							default:
 							break;
 						}
 					}
-}
-/*******************************************************************************
-* Function Name	: 
-* Description		: 
-* Output				:
-* Return				:
-*******************************************************************************/
-void			_CAN::Recv(char *msg) {	
-int				n;
-CanRxMsg	rxbuf={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
-					sscanf(msg,"%02X",&rxbuf.StdId);	
-					++msg,++msg;
-					do {
-						for(n=0; *msg && n<16; ++n,++n,++msg,++msg)
-							sscanf(msg,"%02X",(unsigned int *)&rxbuf.Data[n/2]);
-						rxbuf.DLC=n/2;
-						_buffer_push(io->rx,&rxbuf,sizeof(rxbuf));
-					} while(*msg);
 }
 /*******************************************************************************
 * Function Name	: 

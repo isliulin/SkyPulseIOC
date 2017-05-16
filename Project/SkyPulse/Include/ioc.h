@@ -4,9 +4,6 @@
 #include						<string.h>
 #include						"can.h"
 
-
-
-
 typedef	enum {
 	_NOERR						=0,
 	_V5								=0x0001,
@@ -24,13 +21,12 @@ typedef	enum {
 } _Error;           
                   
 typedef enum {    
-	idSYS2IOC_State		=0x200,
-	idSYS2IOC_Spray		=0x201,
-	idIOC2SYS_State		=0x240,
-	idIOC2SYS_Footsw	=0x241,
-	idIOC2SYS_Spray		=0x242,
-	idCAN2COM					=0x0B0,
-  idCOM2CAN					=0x0B1
+	idIOC_State				=0x200,
+	idIOC_State_Ack		=0x240,
+	idIOC_Cmd					=0x201,
+	idIOC_Footsw			=0x241,
+	idCAN2COM					=0xB0,
+  idCOM2CAN					=0xB1
 } _StdId;
 
 typedef enum {
@@ -59,36 +55,31 @@ IOC status report, send on:
 	- on change of one of its members ...TBDF !!!
 	- after report from ENG; laser loop control !!!
 */
-typedef __packed struct _IOC2SYS_State {
+typedef __packed struct _IOC_State {
 	_State 	State;
 	_Error	Error;	
-	_IOC2SYS_State() : State(_STANDBY),Error(_NOERR)	{}
+	_IOC_State() : State(_STANDBY),Error(_NOERR)	{}
 	void	Send() {
-		CanTxMsg	m={idIOC2SYS_State,0,CAN_ID_STD,CAN_RTR_DATA,sizeof(_IOC2SYS_State),0,0,0,0,0,0,0,0};
-		memcpy(m.Data,(const void *)&State,sizeof(_IOC2SYS_State));
+		CanTxMsg	m={idIOC_State_Ack,0,CAN_ID_STD,CAN_RTR_DATA,sizeof(_IOC_State),0,0,0,0,0,0,0,0};
+		memcpy(m.Data,(const void *)&State,sizeof(_IOC_State));
 		_CAN::Instance()->Send(&m);
 	}
 } _IOCstatus;
 //_____________________________________________________________________
-typedef __packed struct _IOC2SYS_Footsw {
+typedef __packed struct _IOC_Footsw {
 	_Footsw State;
-	_IOC2SYS_Footsw() : State(_OFF)	{}	
+	_IOC_Footsw() : State(_OFF)	{}	
 	void	Send() {
-		CanTxMsg	m={idIOC2SYS_Footsw,0,CAN_ID_STD,CAN_RTR_DATA,sizeof(_IOC2SYS_Footsw),0,0,0,0,0,0,0,0};
-		memcpy(m.Data,(const void *)&State,sizeof(_IOC2SYS_Footsw));
+		CanTxMsg	m={idIOC_Footsw,0,CAN_ID_STD,CAN_RTR_DATA,sizeof(_IOC_Footsw),0,0,0,0,0,0,0,0};
+		memcpy(m.Data,(const void *)&State,sizeof(_IOC_Footsw));
 		_CAN::Instance()->Send(&m);
 	}
-} _IOC2SYS_Footsw;
+} _IOC_Footsw;
 //_____________________________________________________________________
-typedef __packed struct _IOC2SYS_Spray {
+typedef __packed struct _IOC_Cmd {
 	_Spray	Spray;
-	_IOC2SYS_Spray() : Spray(_SPRAY_NOT_READY)	{}	
-	void	Send() {
-		CanTxMsg	m={idIOC2SYS_Spray,0,CAN_ID_STD,CAN_RTR_DATA,sizeof(_IOC2SYS_Footsw),0,0,0,0,0,0,0,0};
-		memcpy(m.Data,(const void *)&Spray,sizeof(_IOC2SYS_Spray));
-		_CAN::Instance()->Send(&m);
-	}
-} _IOC2SYS_Spray;
+	_IOC_Cmd() : Spray(_SPRAY_NOT_READY)	{}	
+} _IOC_Spray;
 //_____________________________________________________________________
 
 
