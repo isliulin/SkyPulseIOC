@@ -121,7 +121,7 @@ typedef __packed struct _ENGtrigger {
 	void	Send()																								{ Send2Can(ErgmTrigger,NULL,0); };
 } _ENGtrigger;
 
-
+//
 // ec20 command bits as per _EC20Cmd.Cmd parameter
 //
 

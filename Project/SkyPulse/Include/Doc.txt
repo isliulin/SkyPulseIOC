@@ -95,4 +95,6 @@ f ready.led
 - sprememba pri realizaciji F12, ne preide vec v lib ampak klice nov DecodeCom
 - sprememba pri realizaciji CAN konzole, ne klice DecodeCom ampak zamenja io od stdin
 
+15.5.2017
 
+- remove ee,ec20,pyro.....

@@ -230,10 +230,10 @@ int wcard(char *t, char *s)
 //___________________________________________________________________________
 void			PrintVersion(int v) {
 //	int i=-1,
-//			*p=(int *)__Vectors,
-//			n=(FATFS_ADDRESS-(int)__Vectors)/sizeof(int);
-//			while(n--)
-//				i=crc(i,*p++);
+//	*p=(int *)__Vectors,
+//	n=(FATFS_ADDRESS-(int)__Vectors)/sizeof(int);
+//	while(n--)
+//	i=crc(i,*p++);
 	
 					RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC, ENABLE);
 					CRC_ResetDR();

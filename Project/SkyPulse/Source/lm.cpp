@@ -14,16 +14,17 @@ string _LM::ErrMsg[] = {
 				"5V  supply",
 				"12V supply",
 				"24V supply",
-				"spray air pressure too low",
-				"cooler overheated",
-				"pump tacho out of range",
+				"spray input pressure",
+				"cooler temperature",
+				"pump speed out of range",
 				"pump pressure out of range",
 				"pump current out of range",
-				"fan tacho out of range",
+				"fan speed out of range",
 				"emergency button pressed",
 				"handpiece ejected",
 				"EC20 not responding"
 };
+
 int			_LM::debug=0,
 				_LM::error=0,
 				_LM::error_mask=EOF;
@@ -34,7 +35,8 @@ int			_LM::debug=0,
 	* @retval : None
 	*/
 /*******************************************************************************/
-_LM::_LM() : ec20(this) {
+//_LM::_LM() : ec20(this) {
+_LM::_LM() {
 			_thread_add((void *)Poll,this,(char *)"lm",1);
 			_thread_add((void *)Display,this,(char *)"plot",1);			
 	
@@ -42,12 +44,12 @@ _LM::_LM() : ec20(this) {
 			if(f_open(&f,"0:/lm.ini",FA_READ) == FR_OK) {
 				
 // periph. settings
-				pyro.LoadSettings((FILE *)&f);
+//				pyro.LoadSettings((FILE *)&f);
 				pump.LoadSettings((FILE *)&f);
 				fan.LoadSettings((FILE *)&f);
 				spray.LoadSettings((FILE *)&f);
-				ec20.LoadSettings((FILE *)&f);
-				pilot.LoadSettings((FILE *)&f);
+//				ec20.LoadSettings((FILE *)&f);
+//				pilot.LoadSettings((FILE *)&f);
 				
 // add. settings parsing
 				while(!f_eof(&f))
@@ -63,14 +65,14 @@ _LM::_LM() : ec20(this) {
 			}	else				
 				printf("\r\n limits not active...\r\n:");
 			
-			if(f_open(&f,"0:/pw.ini",FA_READ) == FR_OK) {
-				pyro.LoadFit((FILE *)&f);
-				f_close(&f);	
-			}	else				
-				printf("\r\n fitting not active...\r\n:");
+//			if(f_open(&f,"0:/pw.ini",FA_READ) == FR_OK) {
+//				pyro.LoadFit((FILE *)&f);
+//				f_close(&f);	
+//			}	else				
+//				printf("\r\n fitting not active...\r\n:");
 
 			printf("\r\n[F1]  - thermopile");
-			printf("\r\n[F2]  - pilot");
+//			printf("\r\n[F2]  - pilot");
 			printf("\r\n[F4]  - spray on/off");
 			printf("\r\n[F5]  - pump");
 			printf("\r\n[F6]  - fan");
@@ -125,21 +127,15 @@ void	_LM::ErrParse(int e) {
 	
 			e &= error_mask;
 			e ? _RED1(200): _GREEN1(20);
-	
-			if(ec20.Timeout()) {
-				_SET_BIT(e,ec20noresp);
-				ec20.Timeout(EOF);
-			}
-
 			if(e ^ _LM::error) {
-				if(_BIT(e,pyroNoresp)) {
-					pump.Disable();
-					Submit("@ejected.led");
-				} else {
-					pump.Enable();
-					Submit("@inserted.led");
-					_CLEAR_BIT(_LM::error,pyroNoresp);
-				}
+//				if(_BIT(e,pyroNoresp)) {
+//					pump.Disable();
+//					Submit("@ejected.led");
+//				} else {
+//					pump.Enable();
+//					Submit("@inserted.led");
+//					_CLEAR_BIT(_LM::error,pyroNoresp);
+//				}
 			}
 
 			e = (e ^ _LM::error) & e;									// extract the rising edge only 
@@ -151,6 +147,8 @@ void	_LM::ErrParse(int e) {
 //					if(e & error_mask) {								// mask off inactive errors...
 //						Submit("@error.led");
 						_SYS_SHG_DISABLE;
+						IOC2SYS_State.Error=(_Error)_LM::error;
+						IOC2SYS_State.Send();
 //					}
 
 				} else {
@@ -178,11 +176,11 @@ int		err  = _ADC::Status();								// collecting error data
 			err |= lm->pump.Poll();
 			err |= lm->fan.Poll();
 			err |= lm->spray.Poll();
-			err |= lm->pyro.Error();
+//			err |= lm->pyro.Error();
 			lm->ErrParse(err);										// parsing error data
 	
 			lm->can.Parse(lm);										
-			lm->pilot.Poll();
+//			lm->pilot.Poll();
 			_TIM::Instance()->Poll();
 
 
@@ -232,33 +230,33 @@ void	_LM::Increment(int i, int j) {
 					break;
 				
 				case EC20:
-					ec20.Increment(i,j);
+//					ec20.Increment(i,j);
 					break;
 
 				case EC20bias:
-					ec20.IncrementBias(i,j);
+//					ec20.IncrementBias(i,j);
 					break;
 				
 				case PILOT:
-					pilot.Increment(i,j);
+//					pilot.Increment(i,j);
 					break;
 				
 				case PYRO:
-					if(i || j || pyro.Enabled) {
-						pyro.Enabled=false;
-						pyro.Increment(i,j);
-					}	else {
-						pyro.Enabled=true;
-						printf("\r\n");
-						plot.Clear();
-						plot.Add(&plotA,0,1, LCD_COLOR_YELLOW);
-						plot.Add(&plotB,2813,10, LCD_COLOR_CYAN);
-						plot.Add(&plotC,0,1, LCD_COLOR_YELLOW);
-					}
+//					if(i || j || pyro.Enabled) {
+//						pyro.Enabled=false;
+//						pyro.Increment(i,j);
+//					}	else {
+//						pyro.Enabled=true;
+//						printf("\r\n");
+//						plot.Clear();
+//						plot.Add(&plotA,0,1, LCD_COLOR_YELLOW);
+//						plot.Add(&plotB,2813,10, LCD_COLOR_CYAN);
+//						plot.Add(&plotC,0,1, LCD_COLOR_YELLOW);
+//					}
 					break;
 
 				case PYROnew:
-					pyro.Enabled=true;
+//					pyro.Enabled=true;
 					break;
 
 				case CTRL_A:
@@ -317,7 +315,7 @@ int		_LM::DecodePlus(char *c) {
 						_SET_BIT(error_mask,strtoul(++c,&c,10));
 					break;
 				case 'f':
-					pyro.addFilter(++c);
+//					pyro.addFilter(++c);
 					break;
 				case 'c':
 					return ws.ColorOn(strchr(c,' '));
@@ -348,7 +346,7 @@ int		_LM::DecodeMinus(char *c) {
 						_CLEAR_BIT(error_mask,strtoul(++c,&c,10));
 					break;
 				case 'f':
-					pyro.initFilter();
+//					pyro.initFilter();
 					break;
 				case 'c':
 					return ws.ColorOff(strchr(c,' '));
@@ -389,7 +387,7 @@ int		_LM::DecodeWhat(char *c) {
 						printf("\r\nerror mask=%08X\r\n:",error_mask);	
 					break;
 				case 'f':
-					pyro.printFilter();
+//					pyro.printFilter();
 					break;
 				case 'c':
 					return ws.GetColor(atoi(strchr(c,' ')));
@@ -501,117 +499,117 @@ int		_LM::Decode(char *c) {
 					can.Recv(++c);
 					break;
 				case 'e':
-					char s[128];
-					if(*++c) {
-					int i=strtoul(c,&c,0);
-					if(*c) {
-						for(int j=0; *c++; s[j]=strtoul(c,&c,0), ++j);
-						ee.putPage(i,s);
-					} else
-						printf("   %s",ee.getPage(i,s));
-					} else
-						printf("   %s",ee.getSerial(s));
+//					char s[128];
+//					if(*++c) {
+//					int i=strtoul(c,&c,0);
+//					if(*c) {
+//						for(int j=0; *c++; s[j]=strtoul(c,&c,0), ++j);
+//						ee.putPage(i,s);
+//					} else
+//						printf("   %s",ee.getPage(i,s));
+//					} else
+//						printf("   %s",ee.getSerial(s));
 					break;
 				case '!': {
-					FIL 									f;
-					WAVE_FormatTypeDef		w;
-					short									nbytes, sample;
-					char									flag=0;
-					
-#ifdef	USE_LCD
-int					to=0;
-//int					pref=0,
-//						peak=0;
-#endif
-					plot.Clear();
-					plot.Add(&plotA,0,5, LCD_COLOR_YELLOW);
-					plot.Add(&plotB,0,10, LCD_COLOR_CYAN);
-//				plot.Add(&plotC,0,1, LCD_COLOR_YELLOW);
+//					FIL 									f;
+//					WAVE_FormatTypeDef		w;
+//					short									nbytes, sample;
+//					char									flag=0;
+//					
+//#ifdef	USE_LCD
+//int					to=0;
+////int					pref=0,
+////						peak=0;
+//#endif
+//					plot.Clear();
+//					plot.Add(&plotA,0,5, LCD_COLOR_YELLOW);
+//					plot.Add(&plotB,0,10, LCD_COLOR_CYAN);
+////				plot.Add(&plotC,0,1, LCD_COLOR_YELLOW);
 
-					if(f_open(&f,"0:/3.wav",FA_READ) == FR_OK) {
-						if(f_read (&f, &w, sizeof(w), (UINT *)&nbytes)==FR_OK) {
-							while(!f_eof(&f)) {
-								_wait(3,_thread_loop);
-								if(!flag) {
-									f_read (&f, &sample, sizeof(sample),(UINT *)&nbytes);
-									plotA=sample-6767;
-									plotB=pyro.addSample(plotA);
+//					if(f_open(&f,"0:/3.wav",FA_READ) == FR_OK) {
+//						if(f_read (&f, &w, sizeof(w), (UINT *)&nbytes)==FR_OK) {
+//							while(!f_eof(&f)) {
+//								_wait(3,_thread_loop);
+//								if(!flag) {
+//									f_read (&f, &sample, sizeof(sample),(UINT *)&nbytes);
+//									plotA=sample-6767;
+//									plotB=pyro.addSample(plotA);
 
-//									if(peak==0) {															// falling..
-//										if(plotB < pref) {
-//											if(plotB < pref-50) {
-//												peak=pref;
-//												plotC=0;
-//												printf("%d,%d\r\n",to,peak);
-//											}
-//										}
-//										else
-//											pref=plotB;
-//									} else {																	// rising...
-//										if(plotB > pref) {
-//											if(plotB > pref + 50)
-//												if(peak > 5) {
-//													peak=0;
-//													plotC=50;
-//												}
-//										}
-//										else {
-//											pref=plotB;
-//										}
-//									}	
+////									if(peak==0) {															// falling..
+////										if(plotB < pref) {
+////											if(plotB < pref-50) {
+////												peak=pref;
+////												plotC=0;
+////												printf("%d,%d\r\n",to,peak);
+////											}
+////										}
+////										else
+////											pref=plotB;
+////									} else {																	// rising...
+////										if(plotB > pref) {
+////											if(plotB > pref + 50)
+////												if(peak > 5) {
+////													peak=0;
+////													plotC=50;
+////												}
+////										}
+////										else {
+////											pref=plotB;
+////										}
+////									}	
 
-#ifdef	USE_LCD
-									to=(f_tell(&f)-sizeof(w))*3/2;
-									if(plot.Refresh()) {
-char								str[16];
-										lcd.Grid();
-										sprintf(str,"%d",to/1000);
-										LCD_SetFont(&Font8x12);
-										sFONT *fnt = LCD_GetFont();
-										LCD_SetTextColor(LCD_COLOR_GREY);
-										LCD_DisplayStringLine(1, (uint8_t *)str);
-									}
-#endif
-								}
-								switch(VT100.Escape()) {
-									case EOF:
-										break;
-									case ' ':
-										flag ^= 1;
-										break;
-									case 'l':
-										f_lseek(&f, f_tell(&f) - 320);
-										break;
-									case 'r':
-										f_lseek(&f, f_tell(&f) + 320);
-										break;
-									case 0x1b:
-										f_lseek (&f, f.fsize);
-										break;
-									case __F2:case __f2:
-										Select(PLOT_OFFSET);
-										break;
-									case __F3:case __f3:
-										Select(PLOT_SCALE);
-										break;
-									case __Up:
-										Increment(1, 0);
-										break;				
-									case __Down:
-										Increment(-1, 0);
-										break;	
-									case __Left:
-										Increment(0, -1);
-										break;				
-									case __Right:
-										Increment(0, 1);
-										break;	
-								}
-							}
-						f_close(&f);
-						}
-					} else
-						printf("\r\n file not found...\r\n:");
+//#ifdef	USE_LCD
+//									to=(f_tell(&f)-sizeof(w))*3/2;
+//									if(plot.Refresh()) {
+//char								str[16];
+//										lcd.Grid();
+//										sprintf(str,"%d",to/1000);
+//										LCD_SetFont(&Font8x12);
+//										sFONT *fnt = LCD_GetFont();
+//										LCD_SetTextColor(LCD_COLOR_GREY);
+//										LCD_DisplayStringLine(1, (uint8_t *)str);
+//									}
+//#endif
+//								}
+//								switch(VT100.Escape()) {
+//									case EOF:
+//										break;
+//									case ' ':
+//										flag ^= 1;
+//										break;
+//									case 'l':
+//										f_lseek(&f, f_tell(&f) - 320);
+//										break;
+//									case 'r':
+//										f_lseek(&f, f_tell(&f) + 320);
+//										break;
+//									case 0x1b:
+//										f_lseek (&f, f.fsize);
+//										break;
+//									case __F2:case __f2:
+//										Select(PLOT_OFFSET);
+//										break;
+//									case __F3:case __f3:
+//										Select(PLOT_SCALE);
+//										break;
+//									case __Up:
+//										Increment(1, 0);
+//										break;				
+//									case __Down:
+//										Increment(-1, 0);
+//										break;	
+//									case __Left:
+//										Increment(0, -1);
+//										break;				
+//									case __Right:
+//										Increment(0, 1);
+//										break;	
+//								}
+//							}
+//						f_close(&f);
+//						}
+//					} else
+//						printf("\r\n file not found...\r\n:");
 }
 					break;
 
@@ -691,11 +689,11 @@ bool	_LM::Parse(int i) {
 					break;
 				case __F8:
 				case __f8:
-				{
-					_EC20Status		m;
+//				{
+//					_EC20Status		m;
 					Select(EC20);
-					m.Send(Sys2Ec);
-				}
+//					m.Send(Sys2Ec);
+//				}
 					break;
 				case __F9:
 				case __f9:
@@ -708,12 +706,12 @@ bool	_LM::Parse(int i) {
 				case __f11:
 					FIL f;
 					if(f_open(&f,"0:/lm.ini",FA_WRITE | FA_OPEN_ALWAYS) == FR_OK) {
-						pyro.SaveSettings((FILE *)&f);
+//						pyro.SaveSettings((FILE *)&f);
 						pump.SaveSettings((FILE *)&f);
 						fan.SaveSettings((FILE *)&f);
 						spray.SaveSettings((FILE *)&f);
-						ec20.SaveSettings((FILE *)&f);
-						pilot.SaveSettings((FILE *)&f);
+//						ec20.SaveSettings((FILE *)&f);
+//						pilot.SaveSettings((FILE *)&f);
 						ws.SaveSettings((FILE *)&f);
 						f_sync(&f);
 						f_close(&f);							
@@ -755,10 +753,7 @@ bool	_LM::Parse(int i) {
 					Select(CTRL_D);
 					break;
 				case __CtrlE: 
-					RemoteConsole(Can2ComEc20,__CtrlE);
-					break;
-				case __CtrlF: 
-					RemoteConsole(Can2ComIoc,__CtrlF);
+					RemoteConsole(idCAN2COM,__CtrlE);
 					break;	
 				case __CtrlV:
 					if(spray.vibrate)
@@ -799,28 +794,34 @@ bool	_LM::Parse(int i) {
 					break;
 					
 				case __FOOT_OFF:
+					IOC2SYS_Footsw.State=_OFF;
+					IOC2SYS_Footsw.Send();
 					if(_BIT(_LM::debug, DBG_INFO))
-						printf("\r\n:\r\n:footswitch disconnected \r\n:");
-					spray.mode.On=false;
-					ec20.FootSwEvent(__FOOT_OFF);
+						printf("\r\n:\r\n:footswitch disconnected \r\n:");					
 					break;
-				case __FOOT_IDLE:
+				case __FOOT_1:
+					IOC2SYS_Footsw.State=_1;
+					IOC2SYS_Footsw.Send();
 					if(_BIT(_LM::debug, DBG_INFO))
-						printf("\r\n:\r\n:footswitch idle \r\n:");
-					spray.mode.On=false;
-					ec20.FootSwEvent(__FOOT_IDLE);
+						printf("\r\n:\r\n:footswitch state 1\r\n:");					
 					break;
-				case __FOOT_MID:
+				case __FOOT_2:
+					IOC2SYS_Footsw.State=_2;
+					IOC2SYS_Footsw.Send();
 					if(_BIT(_LM::debug, DBG_INFO))
-						printf("\r\n:\r\n:footswitch middle \r\n:");
-					spray.mode.On=true;
-					ec20.FootSwEvent(__FOOT_MID);
+						printf("\r\n:\r\n:footswitch state 2\r\n:");					
 					break;
-				case __FOOT_ON:		
+				case __FOOT_3:
+					IOC2SYS_Footsw.State=_3;
+					IOC2SYS_Footsw.Send();
 					if(_BIT(_LM::debug, DBG_INFO))
-						printf("\r\n:\r\n:footswitch on \r\n:");
-					spray.mode.On=true;
-					ec20.FootSwEvent(__FOOT_ON);
+						printf("\r\n:\r\n:footswitch state 3\r\n:");					
+					break;
+				case __FOOT_4:
+					IOC2SYS_Footsw.State=_4;
+					IOC2SYS_Footsw.Send();
+					if(_BIT(_LM::debug, DBG_INFO))
+						printf("\r\n:\r\n:footswitch state 4\r\n:");					
 					break;
 				case __CtrlY:
 					NVIC_SystemReset();
@@ -847,52 +848,52 @@ bool	_LM::Parse(int i) {
 void	_LM::Display(void *v) {
 _LM 	*me = static_cast<_LM *>(v);	
 _io*	temp=_stdio(me->io);
-			while(_buffer_count(me->pyro.buffer) >= 3*sizeof(short)) {
-				short 	ta,tp,t;
-//______ buffer pull from ISR __________________________________________________					
-				_buffer_pull(me->pyro.buffer,&t,sizeof(short));							
-				_buffer_pull(me->pyro.buffer,&ta,sizeof(short));
-				_buffer_pull(me->pyro.buffer,&tp,sizeof(short));
-//______ filter ________________________________________________________________			
-				me->plotA=ta;
-				me->plotB=me->pyro.addSample(ta+tp);
-//______ print at F1____________________________________________________________							
-				if(me->pyro.Enabled && me->item == PYRO) {
-//					printf("%4d,%5d,%3.1lf,%hu,%u",ta,(int)tp+0x8000,(double)_ADC::Instance()->Th2o/100,t,me->pyro.sync);
-					printf("%4d,%5d,%3.1lf,%hu",ta,(int)tp+0x8000,(double)_ADC::Th2o()/100,t);
-					printf("\r\n");
-				}
-				
-				if(me->pyro.Enabled && me->item == PYROnew) {
-static int		offs=0,cnt=0,sum=0;	
-	
-							if(t > 10000) {
-								t=10000;
-								 me->pyro.sync=__time__ - 10000;
-							}
+//			while(_buffer_count(me->pyro.buffer) >= 3*sizeof(short)) {
+//				short 	ta,tp,t;
+////______ buffer pull from ISR __________________________________________________					
+//				_buffer_pull(me->pyro.buffer,&t,sizeof(short));							
+//				_buffer_pull(me->pyro.buffer,&ta,sizeof(short));
+//				_buffer_pull(me->pyro.buffer,&tp,sizeof(short));
+////______ filter ________________________________________________________________			
+//				me->plotA=ta;
+//				me->plotB=me->pyro.addSample(ta+tp);
+////______ print at F1____________________________________________________________							
+//				if(me->pyro.Enabled && me->item == PYRO) {
+////					printf("%4d,%5d,%3.1lf,%hu,%u",ta,(int)tp+0x8000,(double)_ADC::Instance()->Th2o/100,t,me->pyro.sync);
+//					printf("%4d,%5d,%3.1lf,%hu",ta,(int)tp+0x8000,(double)_ADC::Th2o()/100,t);
+//					printf("\r\n");
+//				}
+//				
+//				if(me->pyro.Enabled && me->item == PYROnew) {
+//static int		offs=0,cnt=0,sum=0;	
+//	
+//							if(t > 10000) {
+//								t=10000;
+//								 me->pyro.sync=__time__ - 10000;
+//							}
 
-							if(t < 20*me->pyro.Period) {
-								if((cnt && t <= me->pyro.Period)) {
-									printf(":%d\r\n",sum);
-									cnt=sum=0;
-								} else {
-									sum += (ta/2+tp-offs);
-									++cnt;
-								}
-							} else {
-								if(cnt) {
-									printf(":%d\r\n",sum);
-									cnt=sum=0;
-								} else
-										offs=ta/2+tp;
-							}								
-				}
-//______________________________________________________________________________							
-#ifdef	USE_LCD
-				if(me->plot.Refresh())
-					me->lcd.Grid();				
-#endif
-			}
+//							if(t < 20*me->pyro.Period) {
+//								if((cnt && t <= me->pyro.Period)) {
+//									printf(":%d\r\n",sum);
+//									cnt=sum=0;
+//								} else {
+//									sum += (ta/2+tp-offs);
+//									++cnt;
+//								}
+//							} else {
+//								if(cnt) {
+//									printf(":%d\r\n",sum);
+//									cnt=sum=0;
+//								} else
+//										offs=ta/2+tp;
+//							}								
+//				}
+////______________________________________________________________________________							
+//#ifdef	USE_LCD
+//				if(me->plot.Refresh())
+//					me->lcd.Grid();				
+//#endif
+//			}
 			_stdio(temp);
 }
 /*******************************************************************************
@@ -984,3 +985,4 @@ _LM 	lm;
 +f 1.0,-1.95436818551, 0.954558994233, 1.26044681223,  -0.309037826299
 +f 132.819471678, -224.031891995, 94.1796821905, 0.0,   0.0
 */
+

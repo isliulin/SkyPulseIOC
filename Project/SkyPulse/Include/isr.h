@@ -143,19 +143,4 @@ int 		crc(int, int);
 #define	_CLEAR_BIT(p,a)		(*(char *)(0x22000000 + ((int)&p - 0x20000000) * 32 + 4*a)) = 0
 #define	_BIT(p,a)					(*(char *)(0x22000000 + ((int)&p - 0x20000000) * 32 + 4*a))
 
-typedef	enum {
-	V5,
-	V12,
-	V24,
-	InputPressure,
-	sysOverheat,
-	pumpTacho,
-	pumpPressure,
-	pumpCurrent,
-	fanTacho,
-	emgDisabled,
-	pyroNoresp,
-	ec20noresp
-}	ErrNo;
-
 #endif

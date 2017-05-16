@@ -14,6 +14,7 @@
 #include	"fan.h"
 #include	"limits.h"
 #include	"math.h"
+#include	"ioc.h"
 /*******************************************************************************/
 /**
 	* @brief	TIM3 IC2 ISR
@@ -37,14 +38,14 @@ _FAN::_FAN() :_TIM3(1) {
 * Return				: None
 *******************************************************************************/
 int			_FAN::Poll() {
-int			e=0;
+int			e=_NOERR;
 				if(timeout==INT_MAX)
 					TIM4->CCR1=TIM4->ARR;
 				else {
 					TIM4->CCR1=(int)((TIM4->ARR*__ramp(Th2o(),ftl*100,fth*100,fpl,fph))/100);
 					if(tacho && __time__ > timeout) {
 						if(abs(tacho->Eval(Rpm()) - Tau()) > Tau()/10)
-							_SET_BIT(e,fanTacho);
+							e |= _fanTacho;
 					}
 					if(__time__ % (5*(Tau()/100)) == 0)
 						_YELLOW2(20);

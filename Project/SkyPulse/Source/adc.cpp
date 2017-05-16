@@ -1,5 +1,5 @@
 #include	"adc.h"
-#include	"isr.h"
+#include	"ioc.h"
 #include	<stdlib.h>
 /**
   ******************************************************************************
@@ -127,7 +127,7 @@ int		_ADC::Th2o() {
 * Return				: None
 *******************************************************************************/
 int			_ADC::Status() {
-int			e=0;
+int			e=_NOERR;
 
 				adf.T2					+= (buffer.T2					- adf.T2)/16;
 				adf.T3					+= (buffer.T3					- adf.T3)/16;
@@ -141,16 +141,16 @@ int			e=0;
 				adf.Ipump				+= (buffer.Ipump			- adf.Ipump)/16;
 
 				if(abs(adf.V5  - _V5to16X)	> _V5to16X/10)
-					_SET_BIT(e,V5);
+					e |= _V5;
 				if(abs(adf.V12 - _V12to16X) > _V12to16X/5)
-					_SET_BIT(e,V12);
+					e |= _V12;
 				if(abs(adf.V24 - _V24to16X) > _V24to16X/10)
-					_SET_BIT(e,V24);
+					e |= _V24;
 
 				if(Th2o() > 50*100)
-					_SET_BIT(e,sysOverheat);
+					e |= _sysOverheat;
 				if(_EMG_DISABLED && _SYS_SHG_ENABLED)
-					_SET_BIT(e,emgDisabled);
+					e |= _emgDisabled;
 				return e;
 }
 /**

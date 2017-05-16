@@ -79,7 +79,7 @@ _EC20Cmd		cmd=EC20Cmd;
 					default:
 					case __FOOT_OFF:
 					case __FOOT_IDLE:
-						lm->pilot.Off();
+//						lm->pilot.Off();
 						lm->Submit("@standby.led");
 						bias_cnt=biasNo+biasN;
 						cmd.Cmd =0;
@@ -87,7 +87,7 @@ _EC20Cmd		cmd=EC20Cmd;
 						break;
 
 					case __FOOT_MID:
-						lm->pilot.On();
+//						lm->pilot.On();
 						lm->Submit("@ready.led");
 						cmd.Cmd =_HV1_EN;
 						cmd.Send(Sys2Ec);
@@ -183,7 +183,7 @@ char 			c[128];
 						default:
 							lm->Submit("@standby.led");
 							sprintf(strchr(c,'\0')," wait...");							// cakanje na ec20
-							lm->pilot.Off();
+//							lm->pilot.Off();
 							break;
 						}
 					
@@ -204,7 +204,7 @@ char 			c[128];
 																														
 						}
 													
-						if(lm->Selected() == EC20) {
+						if(lm->Active() == EC20) {
 							printf("\r%s",c);
 							int i=strlen(c)-(18+idx*7);
 							while(--i)
@@ -245,7 +245,7 @@ char 			c[128];
 
 					sprintf(c,":EC20 bias    %3.1lf%c,%4dus,%4dHz,1st%3d,nxt%3d",((double)biasPw)/10,'%', biasT, biasF, biasNo, biasN);
 								
-					if(lm->Selected() == EC20bias) {
+					if(lm->Active() == EC20bias) {
 						printf("\r%s",c);
 						int i=strlen(c)-(18+idx*7);
 						while(--i)
@@ -324,7 +324,7 @@ _LM 				*lm = static_cast<_LM *>(parent);
 //____________EC20 to Sys status  ______________________________________________________
 									case Id_EC20Status:
 										memcpy(&EC20Status, msg->Data, msg->DLC);
-										if(lm->Selected() == EC20)
+										if(lm->Active() == EC20)
 											lm->Refresh();
 									break;	
 //____________EC20 to Sys energy  ______________________________________________________
@@ -332,7 +332,7 @@ _LM 				*lm = static_cast<_LM *>(parent);
 										lm->Submit("@energy.led");
 										FootSwEvent(__FOOT_ACK);
 										memcpy(&EC20Eo, msg->Data, msg->DLC);
-										if(lm->pyro.Enabled && lm->Selected() == EC20)
+										if(lm->pyro.Enabled && lm->Active() == EC20)
 											lm->Refresh();
 									break;
 								}

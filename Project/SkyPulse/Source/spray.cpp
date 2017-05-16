@@ -16,6 +16,7 @@
 #include	<algorithm>
 #include	"spray.h"
 #include	"lcd.h"
+#include	"ioc.h"
 /*******************************************************************************
 * Function Name	:
 * Description		: 
@@ -63,7 +64,7 @@ _SPRAY::_SPRAY() {
 int				_SPRAY::Poll() {
 
 static int acc=0,accin=0,accout=0;
-int		err=0;
+int		e=_NOERR;
 
 					if(AirLevel) {
 						Bottle_P += (Bottle_ref - (int)buffer.bottle)/16;
@@ -86,8 +87,10 @@ int		err=0;
 							BottleOut->Off();
 					}
 					
-					Air_ref			= offset.air + AirLevel*gain.air/10;
-					Bottle_ref	= offset.bottle + AirLevel*gain.bottle*(100+4*WaterLevel)/100/10;
+					Air_ref			= offset.air + AirLevel*gain.air/10;																				// AirLevel od 0-10
+					Bottle_ref	= offset.bottle + AirLevel*gain.bottle*(100+4*WaterLevel)/100/10;						// WaterLevel od 0,10
+
+					Bottle_ref	= offset.bottle + AirLevel*gain.bottle/10 + 4*WaterLevel/100/10;
 					
 
 					if(!BottleIn->Busy() && !BottleOut->Busy()) {
@@ -116,11 +119,11 @@ int		err=0;
 							Air->Set(Air_P/_A_THRESHOLD);
 						
 						if(abs(adf.compressor - 4*offset.compressor) > offset.compressor/2)
-							_SET_BIT(err,InputPressure);
+							e |= _sprayInPressure;
 					}
 					else
 						Air->Off();
-					return err;
+					return e;
 }
 /*******************************************************************************/
 /**

@@ -21,17 +21,18 @@
 #include				"spray.h"
 #include				"pump.h"
 #include				"fan.h"
-#include				"ec20.h"
-#include				"ee.h"
+//#include				"ec20.h"
+//#include				"ee.h"
 #include				"adc.h"
 #include				"tim.h"
 #include				"dac.h"
 #include				"can.h"
-#include				"pyro.h"
-#include				"pilot.h"
+//#include				"pyro.h"
+//#include				"pilot.h"
 #include				"ws2812.h"
+#include				"ioc.h"
 
-#define					SW_version	10
+#define					SW_version	11
 
 typedef enum		{DBG_CAN_TX, DBG_CAN_RX, DBG_ERR, DBG_INFO, DBG_CAN_COM=21, DBG_EC_SIM=22, DBG_ENRG=23}	_DEBUG_;
 typedef enum		{PYRO, PYROnew, PILOT, PLOT_OFFSET, PLOT_SCALE, PUMP, FAN, SPRAY, 
@@ -49,11 +50,11 @@ class	_LM {
 		int					DecodeWhat(char *c);
 		int					DecodeEq(char *c);
 		int					errT;
-
+	
 	public:
 		_LM();
 		~_LM();
-	
+
 		_io					*io;
 		static int	debug, error, error_mask;
 		static 			string ErrMsg[];
@@ -62,22 +63,21 @@ class	_LM {
 		_PLOT<double> plot;	
 		_SPRAY			spray;
 		_CAN				can;
-		_PYRO				pyro;
 		_PUMP				pump;
 		_FAN				fan;
-		_EE					ee;
-		_EC20				ec20;
-		_PILOT			pilot;
 		_WS2812			ws;
-
-#ifdef	__DISCO__
+		_IOC2SYS_State	IOC2SYS_State;
+		_IOC2SYS_Footsw	IOC2SYS_Footsw;
+		_IOC2SYS_Spray	IOC2SYS_Spray;
+	
+#ifdef	USE_LCD
 		_LCD				lcd;
 #endif
 
 		void 				Increment(int, int);
 		void 				Select(_SELECTED_);
 		void 				Submit(string);
-		_SELECTED_	Selected(void)		{	return item;	}
+		_SELECTED_	Active(void)			{	return item;	}
 		
 		void 				Refresh(void)			{	Increment(0,0);	}
 		bool				Parse(FILE *);

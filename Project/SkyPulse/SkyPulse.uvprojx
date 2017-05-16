@@ -10,12 +10,12 @@
       <TargetName>IOC_V2</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060183::V5.06 update 2 (build 183)::ARMCC</pCCUsed>
+      <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F207VG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F2xx_DFP.2.6.0</PackID>
+          <PackID>Keil.STM32F2xx_DFP.2.3.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IROM(0x08000000,0x100000) IRAM(0x20000000,0x20000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -330,6 +330,7 @@
             <vShortWch>1</vShortWch>
             <v6Lto>0</v6Lto>
             <v6WtE>0</v6WtE>
+            <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--exceptions</MiscControls>
               <Define>USE_STDPERIPH_DRIVER, ARM_MATH_CM3,__IOC_V2__</Define>
@@ -347,6 +348,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
+            <uClangAs>0</uClangAs>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -383,11 +385,6 @@
               <FilePath>.\Source\lm.cpp</FilePath>
             </File>
             <File>
-              <FileName>pyro.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\pyro.cpp</FilePath>
-            </File>
-            <File>
               <FileName>pump.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Source\pump.cpp</FilePath>
@@ -401,16 +398,6 @@
               <FileName>spray.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Source\spray.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>ec20.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\ec20.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>ee.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\ee.cpp</FilePath>
             </File>
             <File>
               <FileName>ws2812.cpp</FileName>
@@ -448,68 +435,9 @@
               <FilePath>.\Source\dac.cpp</FilePath>
             </File>
             <File>
-              <FileName>lcd.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\lcd.cpp</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>0</vShortEn>
-                    <vShortWch>0</vShortWch>
-                    <v6Lto>0</v6Lto>
-                    <v6WtE>0</v6WtE>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath>..\..\Utilities\STM32F4-Discovery</IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
-            <File>
               <FileName>gpio.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Source\gpio.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>pilot.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\pilot.cpp</FilePath>
             </File>
             <File>
               <FileName>term.cpp</FileName>
@@ -583,7 +511,7 @@
         <TargetCommonOption>
           <Device>STM32F207VG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F2xx_DFP.2.6.0</PackID>
+          <PackID>Keil.STM32F2xx_DFP.2.3.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IROM(0x08000000,0x100000) IRAM(0x20000000,0x20000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -898,6 +826,7 @@
             <vShortWch>1</vShortWch>
             <v6Lto>0</v6Lto>
             <v6WtE>0</v6WtE>
+            <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--exceptions</MiscControls>
               <Define>USE_STDPERIPH_DRIVER, ARM_MATH_CM3,__IOC_V1__</Define>
@@ -915,6 +844,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
+            <uClangAs>0</uClangAs>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -951,11 +881,6 @@
               <FilePath>.\Source\lm.cpp</FilePath>
             </File>
             <File>
-              <FileName>pyro.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\pyro.cpp</FilePath>
-            </File>
-            <File>
               <FileName>pump.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Source\pump.cpp</FilePath>
@@ -969,16 +894,6 @@
               <FileName>spray.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Source\spray.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>ec20.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\ec20.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>ee.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\ee.cpp</FilePath>
             </File>
             <File>
               <FileName>ws2812.cpp</FileName>
@@ -1016,68 +931,9 @@
               <FilePath>.\Source\dac.cpp</FilePath>
             </File>
             <File>
-              <FileName>lcd.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\lcd.cpp</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>0</vShortEn>
-                    <vShortWch>0</vShortWch>
-                    <v6Lto>0</v6Lto>
-                    <v6WtE>0</v6WtE>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath>..\..\Utilities\STM32F4-Discovery</IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
-            <File>
               <FileName>gpio.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Source\gpio.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>pilot.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\pilot.cpp</FilePath>
             </File>
             <File>
               <FileName>term.cpp</FileName>
@@ -1146,12 +1002,12 @@
       <TargetName>IOC_Discovery</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060183::V5.06 update 2 (build 183)::ARMCC</pCCUsed>
+      <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F207VG</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F2xx_DFP.2.6.0</PackID>
+          <PackID>Keil.STM32F2xx_DFP.2.3.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IROM(0x08000000,0x100000) IRAM(0x20000000,0x20000) CPUTYPE("Cortex-M3") CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1269,10 +1125,10 @@
             <RunIndependent>0</RunIndependent>
             <UpdateFlashBeforeDebugging>1</UpdateFlashBeforeDebugging>
             <Capability>1</Capability>
-            <DriverSelection>4100</DriverSelection>
+            <DriverSelection>4103</DriverSelection>
           </Flash1>
-          <bUseTDR>1</bUseTDR>
-          <Flash2>BIN\UL2CM3.DLL</Flash2>
+          <bUseTDR>0</bUseTDR>
+          <Flash2>STLink\ST-LINKIII-KEIL_SWO.dll</Flash2>
           <Flash3>"" ()</Flash3>
           <Flash4></Flash4>
           <pFcarmOut></pFcarmOut>
@@ -1408,7 +1264,7 @@
               </OCR_RVCT3>
               <OCR_RVCT4>
                 <Type>1</Type>
-                <StartAddress>0x8008000</StartAddress>
+                <StartAddress>0x8000000</StartAddress>
                 <Size>0x100000</Size>
               </OCR_RVCT4>
               <OCR_RVCT5>
@@ -1466,9 +1322,10 @@
             <vShortWch>1</vShortWch>
             <v6Lto>0</v6Lto>
             <v6WtE>0</v6WtE>
+            <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--exceptions</MiscControls>
-              <Define>USE_STDPERIPH_DRIVER,__DISCO__,__SIMULATION__,USE_LCD,ARM_MATH_CM3</Define>
+              <Define>USE_STDPERIPH_DRIVER,__DISCO__,__SIMULATION__,ARM_MATH_CM3</Define>
               <Undefine></Undefine>
               <IncludePath>..\lib\inc;.\Include;..\..\Libraries\CMSIS\Include;..\..\Libraries\CMSIS\Device\ST\STM32F2xx\Include;..\..\Libraries\STM32F2xx_StdPeriph_Driver\inc;..\..\Utilities\STM32F4-Discovery;..\..\Utilities\FatFs_R0.10b\src</IncludePath>
             </VariousControls>
@@ -1483,6 +1340,7 @@
             <NoWarn>0</NoWarn>
             <uSurpInc>0</uSurpInc>
             <useXO>0</useXO>
+            <uClangAs>0</uClangAs>
             <VariousControls>
               <MiscControls></MiscControls>
               <Define></Define>
@@ -1519,11 +1377,6 @@
               <FilePath>.\Source\lm.cpp</FilePath>
             </File>
             <File>
-              <FileName>pyro.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\pyro.cpp</FilePath>
-            </File>
-            <File>
               <FileName>pump.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Source\pump.cpp</FilePath>
@@ -1537,16 +1390,6 @@
               <FileName>spray.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Source\spray.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>ec20.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\ec20.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>ee.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\ee.cpp</FilePath>
             </File>
             <File>
               <FileName>ws2812.cpp</FileName>
@@ -1584,19 +1427,9 @@
               <FilePath>.\Source\dac.cpp</FilePath>
             </File>
             <File>
-              <FileName>lcd.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\lcd.cpp</FilePath>
-            </File>
-            <File>
               <FileName>gpio.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Source\gpio.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>pilot.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\pilot.cpp</FilePath>
             </File>
             <File>
               <FileName>term.cpp</FileName>
@@ -1662,5 +1495,11 @@
       </Groups>
     </Target>
   </Targets>
+
+  <RTE>
+    <apis/>
+    <components/>
+    <files/>
+  </RTE>
 
 </Project>

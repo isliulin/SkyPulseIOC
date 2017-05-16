@@ -14,7 +14,7 @@
 #include	"pump.h"
 #include	"fit.h"
 #include	"term.h"
-#include	"isr.h"
+#include	"ioc.h"
 #include	"math.h"
 #include	"limits.h"
 /*******************************************************************************/
@@ -45,18 +45,18 @@ _PUMP::_PUMP() :_TIM3(0)  {
 	*/
 /*******************************************************************************/
 int			_PUMP::Poll(void) {
-int			e=0;
+int			e=_NOERR;
 				if(timeout==INT_MAX)
 					DAC_SetChannel1Data(DAC_Align_12b_R,0);
 				else {
 					DAC_SetChannel1Data(DAC_Align_12b_R,__ramp(Th2o(),ftl*100,fth*100,fpl*0xfff/100,fph*0xfff/100));
 					if(tacho && pressure && current && __time__ > timeout) {
 						if(abs(tacho->Eval(Rpm()) - Tau()) > Tau()/10)    
-							_SET_BIT(e,pumpTacho);
+							e |= _pumpTacho;
 						if(abs(pressure->Eval(Rpm()) - adf.cooler) > adf.cooler/10)
-							_SET_BIT(e,pumpPressure);
+							e |= _pumpPressure;
 						if(abs(current->Eval(Rpm()) - adf.Ipump) > adf.Ipump/10)
-							_SET_BIT(e,pumpCurrent);
+							e |= _pumpCurrent;
 					}
 					if(__time__ % (5*(Tau()/100)) == 0)
 						_BLUE2(20);
