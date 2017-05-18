@@ -21,7 +21,7 @@
 * Output				:
 * Return				:
 *******************************************************************************/
-void	_TERM::Repeat(int t) {
+void	_TERM::Refresh(int t) {
 			timeout = -(__time__ + t);
 }
 /*******************************************************************************
@@ -30,7 +30,7 @@ void	_TERM::Repeat(int t) {
 * Output				:
 * Return				:
 *******************************************************************************/
-char	*_TERM::Line(void) {
+char	*_TERM::Cmd(void) {
 			return lp;
 }
 /*******************************************************************************
@@ -39,7 +39,7 @@ char	*_TERM::Line(void) {
 * Output				:
 * Return				:
 *******************************************************************************/
-char	*_TERM::Line(char c) {
+char	*_TERM::Cmd(char c) {
 			switch(c) {
 				case 0x08:
 				case 0x7f:
@@ -74,7 +74,7 @@ char	*_TERM::Line(char c) {
 * Output				:
 * Return				:
 *******************************************************************************/
-int		_TERM::Escape(int i) {
+int		_TERM::Esc(int i) {
 			if(i==EOF) {
 				if(timeout && (__time__ > abs(timeout))) {
 					timeout=0;

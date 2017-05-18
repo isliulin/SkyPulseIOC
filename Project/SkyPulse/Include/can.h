@@ -37,7 +37,9 @@ class	_CAN {
 #else
 		_CAN	(bool=false);
 #endif
-		static _CAN *Instance(void);
+		static _CAN	*Instance(void);
+		static void	Console(void *);
+
 	
 		void	ISR_rx(void), ISR_tx(void);
 		void 	Parse(void *);

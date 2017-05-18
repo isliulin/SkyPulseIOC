@@ -205,23 +205,31 @@ CanRxMsg	buf={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 * Output				:
 * Return				:
 *******************************************************************************/
+void			_CAN::Console(void *v) {	
+_LM				*lm = (_LM *)v;
+					if(lm->can.com) {
+_io*				io=_stdio(lm->can.com);
+						lm->Parse(getchar());
+						_stdio(io);			
+					}
+}
+/*******************************************************************************
+* Function Name	: 
+* Description		: 
+* Output				:
+* Return				:
+*******************************************************************************/
 void			_CAN::Parse(void *v) {	
 _LM				*lm = (_LM *)v;
 CanRxMsg	rxm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};		
-
-					if(com) {
-_io*				io=_stdio(com);
-						lm->Parse(getchar());
-						_stdio(io);
 //________ flushing com buffer/not echoed if debug_________ 
-						if(io->tx->size - _buffer_count(io->tx) > sizeof(CanTxMsg)) {
+						if(com && io->tx->size - _buffer_count(io->tx) > sizeof(CanTxMsg)) {
 CanTxMsg			txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};		
 							txm.StdId=idCOM2CAN;
 							txm.DLC=_buffer_pull(com->tx,txm.Data,sizeof(txm.Data));
 							if(txm.DLC)
 								Send(&txm);
 						}
-					}
 //______________________________________________________________________________________					
 					if(_buffer_count(io->rx) && _buffer_pull(io->rx,&rxm,sizeof(CanTxMsg))) {
 //
@@ -248,10 +256,13 @@ CanTxMsg			txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 //______________________________________________________________________________________
 							case idCAN2COM:
 								if(rxm.DLC) {
-									if(com == NULL)
+									if(com == NULL) {
 										com = _io_init(128,128);
+										_thread_add((void *)Console,lm,(char *)"CAN console",0);
+									}
 									_buffer_push(com->rx,rxm.Data,rxm.DLC);
 								} else {
+								_thread_remove((void *)Console,lm);
 									com=_io_close(com);
 								}
 								break;

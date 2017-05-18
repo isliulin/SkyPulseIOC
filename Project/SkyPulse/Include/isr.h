@@ -131,6 +131,8 @@ int 		update_crc(int, char *, char);
 int 		crc(int, int);
 }
 
+
+
 #ifndef	__max				
 #define __max(a,b)  (((a) > (b)) ? (a) : (b))	
 #endif

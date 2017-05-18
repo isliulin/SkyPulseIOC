@@ -9,7 +9,6 @@
 	*
 	*/
 #include "lm.h"
-
 string _LM::ErrMsg[] = {
 				"5V  supply",
 				"12V supply",
@@ -35,53 +34,40 @@ int			_LM::debug=0,
 	* @retval : None
 	*/
 /*******************************************************************************/
-//_LM::_LM() : ec20(this) {
 _LM::_LM() {
 			_thread_add((void *)Poll,this,(char *)"lm",1);
 			_thread_add((void *)Display,this,(char *)"plot",1);			
 	
 			FIL f;
 			if(f_open(&f,"0:/lm.ini",FA_READ) == FR_OK) {
-				
-// periph. settings
-//				pyro.LoadSettings((FILE *)&f);
+
 				pump.LoadSettings((FILE *)&f);
 				fan.LoadSettings((FILE *)&f);
 				spray.LoadSettings((FILE *)&f);
-//				ec20.LoadSettings((FILE *)&f);
-//				pilot.LoadSettings((FILE *)&f);
-				
+
 // add. settings parsing
 				while(!f_eof(&f))
 					Parse((FILE *)&f);
 				f_close(&f);	
-			}	else				
-				printf("\r\n setup file error...\r\n:");
+			}	
+//			else				
+//				printf("\r\n setup file error...\r\n:");
 			
 			if(f_open(&f,"0:/limits.ini",FA_READ) == FR_OK) {
 				pump.LoadLimits((FILE *)&f);
 				fan.LoadLimits((FILE *)&f);
 				f_close(&f);	
-			}	else				
-				printf("\r\n limits not active...\r\n:");
+			}	
+//			else				
+//				printf("\r\n limits not active...\r\n:");
 			
-//			if(f_open(&f,"0:/pw.ini",FA_READ) == FR_OK) {
-//				pyro.LoadFit((FILE *)&f);
-//				f_close(&f);	
-//			}	else				
-//				printf("\r\n fitting not active...\r\n:");
-
-//			printf("\r\n[F1]  - thermopile");
-//			printf("\r\n[F2]  - pilot");
 			printf("\r\n[F4]  - spray on/off");
 			printf("\r\n[F5]  - pump");
 			printf("\r\n[F6]  - fan");
 			printf("\r\n[F7]  - spray");
-//			printf("\r\n[F8]  - EC20 console");
 			printf("\r\n[F11] - save settings");	
 			printf("\r\n[F12] - exit app.    ");	
-			printf("\r\n");	
-//			printf("\r\nCtrlE - EC20 console ");	
+			printf("\r\n");		
 			printf("\r\nCtrlY - reset");	
 			printf("\r\n:");	
 
@@ -116,6 +102,8 @@ _LM::~_LM() {
 			_thread_remove((void *)Poll,this);
 			_thread_remove((void *)Print,this);
 			_thread_remove((void *)Display,this);
+			_thread_remove((void *)can.Console,this);
+			_thread_remove((void *)ws.proc_WS2812,this);
 }
 /*******************************************************************************
 * Function Name	:
@@ -267,7 +255,7 @@ void	_LM::Increment(int i, int j) {
 * Function Name	: 
 * Description		: 
 * Output				:
-* Return				: _thread_add((void *)poll_callback,this,(char *)"lm",10);
+* Return				:
 *******************************************************************************/
 int		_LM::DecodePlus(char *c) {
 			switch(*c) {
@@ -298,7 +286,7 @@ int		_LM::DecodePlus(char *c) {
 * Function Name	: 
 * Description		: 
 * Output				:
-* Return				: _thread_add((void *)poll_callback,this,(char *)"lm",10);
+* Return				:
 *******************************************************************************/
 int		_LM::DecodeMinus(char *c) {
 			switch(*c) {
@@ -329,7 +317,7 @@ int		_LM::DecodeMinus(char *c) {
 * Function Name	: 
 * Description		: 
 * Output				:
-* Return				: _thread_add((void *)poll_callback,this,(char *)"lm",10);
+* Return				:
 *******************************************************************************/
 int		_LM::DecodeWhat(char *c) {
 			switch(*c) {
@@ -384,7 +372,7 @@ int		_LM::DecodeWhat(char *c) {
 * Function Name	: 
 * Description		: 
 * Output				:
-* Return				: _thread_add((void *)poll_callback,this,(char *)"lm",10);
+* Return				:
 *******************************************************************************/
 int		_LM::DecodeEq(char *c) {
 			switch(*c) {
@@ -431,7 +419,7 @@ int		_LM::DecodeEq(char *c) {
 * Function Name	: 
 * Description		: 
 * Output				:
-* Return				: _thread_add((void *)poll_callback,this,(char *)"lm",10);
+* Return				:
 *******************************************************************************/
 int		_LM::Decode(char *c) {
 			switch(*c) {
@@ -493,7 +481,7 @@ bool	ret=Parse(fgetc(f));
 * Return				:
 *******************************************************************************/
 bool	_LM::Parse(int i) {
-			switch(VT100.Escape(i)) {
+			switch(console.Esc(i)) {
 				case EOF:
 					break;
 
@@ -519,25 +507,21 @@ bool	_LM::Parse(int i) {
 				case __F5:
 				case __f5:
 					Select(PUMP);
-					VT100.Repeat(1000);
+					console.Refresh(1000);
 					break;
 				case __F6:
 				case __f6:
 					Select(FAN);
-					VT100.Repeat(1000);
+					console.Refresh(1000);
 					break;			
 				case __F7:
 				case __f7:
 					Select(SPRAY);
-					VT100.Repeat(1000);
+					console.Refresh(1000);
 					break;
 				case __F8:
 				case __f8:
-//				{
-//					_EC20Status		m;
 					Select(EC20);
-//					m.Send(Sys2Ec);
-//				}
 					break;
 				case __F9:
 				case __f9:
@@ -550,31 +534,28 @@ bool	_LM::Parse(int i) {
 				case __f11:
 					FIL f;
 					if(f_open(&f,"0:/lm.ini",FA_WRITE | FA_OPEN_ALWAYS) == FR_OK) {
-//						pyro.SaveSettings((FILE *)&f);
 						pump.SaveSettings((FILE *)&f);
 						fan.SaveSettings((FILE *)&f);
 						spray.SaveSettings((FILE *)&f);
-//						ec20.SaveSettings((FILE *)&f);
-//						pilot.SaveSettings((FILE *)&f);
 						ws.SaveSettings((FILE *)&f);
 						f_sync(&f);
 						f_close(&f);							
 						printf("\r\n saved...\r\n:");
 					}	else				
 						printf("\r\n file error...\r\n:");
-					break;	
-
+					break;
 				case __F12:
 				case __f12:
+				{
 					printf("entering lib...\r\n>");
-					_wait(100,_thread_loop);
-					do
+					_io*	io=_stdio(NULL);
+					do {
 						_thread_loop();
-					while(ParseCom(io));
+					} while(ParseCom(io));
 					printf("...exit\r\n:");
-					break;
-//					return false;
-				
+					_stdio(io);
+				}
+				break;			
 				case __Up:
 					Increment(1, 0);
 					break;				
@@ -608,20 +589,16 @@ bool	_LM::Parse(int i) {
 					else
 						spray.vibrate=true;
 					break;
-
 				case __CtrlI:
 					_ADC::offset = _ADC::adf;
 					printf("\r\n:offset...  %3d,%3d,%3d,%3d\r\n:",pump.offset.cooler,spray.offset.bottle,spray.offset.compressor,spray.offset.air);
 					break;
-
 				case __CtrlQ:
 					pump.Test();
 					break;
-
 				case __CtrlR:
 					fan.Test();
 					break;
-				
 				case __CtrlP:
 					if(!pump.Align())
 						printf("\r\n pump processing error...\r\n:");
@@ -639,7 +616,6 @@ bool	_LM::Parse(int i) {
 							printf("\r\n file error...\r\n:");
 					}
 					break;
-					
 				case __FOOT_OFF:
 					IOC_Footsw.State=_OFF;
 					IOC_Footsw.Send();
@@ -670,15 +646,16 @@ bool	_LM::Parse(int i) {
 					if(_BIT(_LM::debug, DBG_INFO))
 						printf("\r\n:\r\n:footswitch state 4\r\n:");					
 					break;
-				case __CtrlY:
+				case __CtrlY:																	// reset call
 					NVIC_SystemReset();
-				case __CtrlZ:
+				case __CtrlZ:																	// bootloader call
 					while(1);
-
+				case __End:																		// exit call
+					return false;
 				default:
-					if(!VT100.Line(i))
+					if(console.Cmd(i) == NULL)
 						break;
-					if(int err=Decode(VT100.Line()))
+					if(int err=Decode(console.Cmd()))
 						printf(" ...wtf(%02X)\r\n:",err);
 					else
 						printf("\r\n:");
@@ -694,54 +671,21 @@ bool	_LM::Parse(int i) {
 *******************************************************************************/
 void	_LM::Display(void *v) {
 _LM 	*me = static_cast<_LM *>(v);	
-_io*	temp=_stdio(me->io);
-//			while(_buffer_count(me->pyro.buffer) >= 3*sizeof(short)) {
-//				short 	ta,tp,t;
-////______ buffer pull from ISR __________________________________________________					
-//				_buffer_pull(me->pyro.buffer,&t,sizeof(short));							
-//				_buffer_pull(me->pyro.buffer,&ta,sizeof(short));
-//				_buffer_pull(me->pyro.buffer,&tp,sizeof(short));
-////______ filter ________________________________________________________________			
-//				me->plotA=ta;
-//				me->plotB=me->pyro.addSample(ta+tp);
-////______ print at F1____________________________________________________________							
-//				if(me->pyro.Enabled && me->item == PYRO) {
-////					printf("%4d,%5d,%3.1lf,%hu,%u",ta,(int)tp+0x8000,(double)_ADC::Instance()->Th2o/100,t,me->pyro.sync);
-//					printf("%4d,%5d,%3.1lf,%hu",ta,(int)tp+0x8000,(double)_ADC::Th2o()/100,t);
-//					printf("\r\n");
-//				}
-//				
-//				if(me->pyro.Enabled && me->item == PYROnew) {
-//static int		offs=0,cnt=0,sum=0;	
-//	
-//							if(t > 10000) {
-//								t=10000;
-//								 me->pyro.sync=__time__ - 10000;
-//							}
+_io*	io=_stdio(me->io);
 
-//							if(t < 20*me->pyro.Period) {
-//								if((cnt && t <= me->pyro.Period)) {
-//									printf(":%d\r\n",sum);
-//									cnt=sum=0;
-//								} else {
-//									sum += (ta/2+tp-offs);
-//									++cnt;
-//								}
-//							} else {
-//								if(cnt) {
-//									printf(":%d\r\n",sum);
-//									cnt=sum=0;
-//								} else
-//										offs=ta/2+tp;
-//							}								
-//				}
-////______________________________________________________________________________							
-//#ifdef	USE_LCD
-//				if(me->plot.Refresh())
-//					me->lcd.Grid();				
-//#endif
-//			}
-			_stdio(temp);
+			_stdio(io);
+}
+/*******************************************************************************
+* Function Name	: 
+* Description		: 
+* Output				:
+* Return				:
+*******************************************************************************/
+void	_LM::Print(void *v) {
+_LM 	*me = static_cast<_LM *>(v);	
+_io		*io=_stdio(me->io);
+
+			_stdio(io);
 }
 /*******************************************************************************
 * Function Name : batch
@@ -753,8 +697,8 @@ _io*	temp=_stdio(me->io);
 void	_LM::CanConsole(int k, int __ctrl) {
 CanTxMsg	m={idCAN2COM,0,CAN_ID_STD,CAN_RTR_DATA,2,'v','\r',0,0,0,0,0};
 int		j;
-			printf(" Remote console open... \r\n>");
-			Select(NONE);															// Select operation mode
+			printf(" remote console open... \r\n>");
+			Select(NONE);																			// Select operation mode
 			can.Send(&m);																			// send initial string
 			do {																							// pull max. 8 characters from stdio
 				for(m.DLC=0; m.DLC<8; ++m.DLC) {
@@ -770,22 +714,7 @@ int		j;
 			m.DLC=0;																					// set empty payload
 			can.Send(&m);																			// and send
 			Select(NONE);																			// Close operation mode
-			printf(" ...Remote console closed\r\n>");
-}
-/*******************************************************************************
-* Function Name	: 
-* Description		: 
-* Output				:
-* Return				:
-*******************************************************************************/
-void	_LM::Print(void *v) {
-_LM 	*me = static_cast<_LM *>(v);	
-_io		*temp=_stdio(me->io);
-			printf("%d,%d,%d,%d\r\n",_ADC::adf.cooler,
-																_ADC::adf.bottle,
-																	_ADC::adf.compressor,
-																		_ADC::adf.air);
-			_stdio(temp);
+			printf(" ...remote console closed\r\n>");
 }
 /*******************************************************************************
 * Function Name	: 
@@ -805,13 +734,14 @@ extern "C" {
 *******************************************************************************/
 int		lm() {
 _LM 	lm;						
-			do {
+			while(1)	{
 				_thread_loop();
 _io*		io=_stdio(lm.io);
-				lm.Parse(getchar());
+				if(lm.Parse(getchar()) == false)
+					return 0;
 				_stdio(io);
-			} while(1);
-			return 0;
+			} 
+
 	}
 }
 

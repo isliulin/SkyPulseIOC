@@ -18,10 +18,10 @@ class _TERM {
 			seq=timeout=0;
 			lp=lbuf;
 		};
-		char *Line(char c);
-		char *Line(void);
-		void Repeat(int);
-		int	 Escape(int);
+		char *Cmd(char c);
+		char *Cmd(void);
+		void Refresh(int);
+		int	 Esc(int);
 };
 
 #endif

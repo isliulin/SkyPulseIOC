@@ -470,7 +470,7 @@ int		_WS2812::GetColor(int color) {
 			
 			printf("\n\rHSB:%d,%d,%d      ",w->color.h,w->color.s,w->color.v);
 			while(1) {
-				switch(key.Escape(getchar())) {
+				switch(key.Esc(getchar())) {
 					case EOF:
 						break;
 					case __Up:

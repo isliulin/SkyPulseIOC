@@ -55,7 +55,7 @@ class	_LM {
 		~_LM();
 
 		_io					*io;
-		_TERM				VT100; 
+		_TERM				console; 
 		static int	debug, error, error_mask;
 		static 			string ErrMsg[];
 		double			plotA,plotB,plotC;
