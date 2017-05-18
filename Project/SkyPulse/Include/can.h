@@ -29,8 +29,7 @@
 //
 class	_CAN {
 	private:
-		_io				*com, *oldcom;
-		_io				*io;
+		_io		*io, *com;
 	
 	public:
 #if defined (__DISCO__)

@@ -21,7 +21,7 @@ class _TERM {
 		char *Line(char c);
 		char *Line(void);
 		void Repeat(int);
-		int	 Escape(void);
+		int	 Escape(int);
 };
 
 #endif

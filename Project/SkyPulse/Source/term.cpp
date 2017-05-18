@@ -74,9 +74,7 @@ char	*_TERM::Line(char c) {
 * Output				:
 * Return				:
 *******************************************************************************/
-int		_TERM::Escape(void) {
-int		i=getchar();
-
+int		_TERM::Escape(int i) {
 			if(i==EOF) {
 				if(timeout && (__time__ > abs(timeout))) {
 					timeout=0;

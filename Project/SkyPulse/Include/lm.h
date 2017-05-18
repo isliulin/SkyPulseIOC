@@ -36,13 +36,12 @@
 
 typedef enum		{DBG_CAN_TX, DBG_CAN_RX, DBG_ERR, DBG_INFO, DBG_CAN_COM=21, DBG_EC_SIM=22, DBG_ENRG=23}	_DEBUG_;
 typedef enum		{PYRO, PYROnew, PILOT, PLOT_OFFSET, PLOT_SCALE, PUMP, FAN, SPRAY, 
-									EC20 ,EC20bias, CTRL_A, CTRL_B, CTRL_C, CTRL_D, CAN_CONSOLE, NONE} _SELECTED_;
+									EC20 ,EC20bias, CTRL_A, CTRL_B, CTRL_C, CTRL_D, NONE} _SELECTED_;
 //_____________________________________________________________________________
 class	_LM {
 
 	private:
 		_SELECTED_ 	item;
-		_TERM				VT100; 
 
 		int					Decode(char *c);
 		int					DecodePlus(char *c);
@@ -56,6 +55,7 @@ class	_LM {
 		~_LM();
 
 		_io					*io;
+		_TERM				VT100; 
 		static int	debug, error, error_mask;
 		static 			string ErrMsg[];
 		double			plotA,plotB,plotC;
@@ -80,14 +80,13 @@ class	_LM {
 		_SELECTED_	Active(void)			{	return item;	}
 		
 		void 				Refresh(void)			{	Increment(0,0);	}
-		bool				Parse(FILE *);
-		bool				Parse(void);
+		bool				Parse(FILE *),
+								Parse(int);
 		
 		bool				ErrTimeout(void)	{ return __time__ < errT; }
 		void				ErrTimeout(int t)	{ errT = __time__ + t; }
 		void				ErrParse(int);
 		
-		bool				Parse(int);
 		void				CanConsole(int, int);
 		
 		static void	Poll(void *),

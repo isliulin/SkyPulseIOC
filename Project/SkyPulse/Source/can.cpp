@@ -116,7 +116,7 @@ GPIO_InitTypeDef				GPIO_InitStructure;
 					NVIC_Init(&NVIC_InitStructure);
 					
 					CAN_ITConfig(__CAN__, CAN_IT_FMP0, ENABLE);
-					com=oldcom=NULL;
+					com=NULL;
 				}
 }
 /*******************************************************************************
@@ -208,17 +208,22 @@ CanRxMsg	buf={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 void			_CAN::Parse(void *v) {	
 _LM				*lm = (_LM *)v;
 CanRxMsg	rxm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};		
-//
+
+					if(com) {
+_io*				io=_stdio(com);
+						lm->Parse(getchar());
+						_stdio(io);
 //________ flushing com buffer/not echoed if debug_________ 
-					if(com &&  io->tx->size - _buffer_count(io->tx) > sizeof(CanTxMsg)) {
-CanTxMsg		txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};		
-						txm.StdId=idCOM2CAN;
-						txm.DLC=_buffer_pull(com->tx,txm.Data,sizeof(txm.Data));
-						if(txm.DLC)
-							Send(&txm);
+						if(io->tx->size - _buffer_count(io->tx) > sizeof(CanTxMsg)) {
+CanTxMsg			txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};		
+							txm.StdId=idCOM2CAN;
+							txm.DLC=_buffer_pull(com->tx,txm.Data,sizeof(txm.Data));
+							if(txm.DLC)
+								Send(&txm);
+						}
 					}
 //______________________________________________________________________________________					
-					if(_buffer_count(io->rx)  && _buffer_pull(io->rx,&rxm,sizeof(CanTxMsg))) {
+					if(_buffer_count(io->rx) && _buffer_pull(io->rx,&rxm,sizeof(CanTxMsg))) {
 //
 //________ debug print__________________________________________________________________
 						if(_BIT(_LM::debug, DBG_CAN_RX)) {
@@ -243,22 +248,23 @@ CanTxMsg		txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 //______________________________________________________________________________________
 							case idCAN2COM:
 								if(rxm.DLC) {
-									if(com == NULL) {
-										oldcom = lm->io;
-										lm->io = com = _io_init(128,128);
-									}
+									if(com == NULL)
+										com = _io_init(128,128);
 									_buffer_push(com->rx,rxm.Data,rxm.DLC);
 								} else {
-									lm->io = oldcom;
 									com=_io_close(com);
 								}
 								break;
 //______________________________________________________________________________________							
-							case idCOM2CAN: 
-								if(lm->Active() == CAN_CONSOLE)
+							case idCOM2CAN:
+							{
+_io*							io=_stdio(lm->io);
 									for(int i=0; i<rxm.DLC; ++i)
 										putchar(rxm.Data[i]);
-							break;//______________________________________________________________________________________					
+									_stdio(io);
+							}
+							break;
+//______________________________________________________________________________________					
 							default:
 							break;
 						}

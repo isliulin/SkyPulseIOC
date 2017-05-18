@@ -176,12 +176,10 @@ int		err  = _ADC::Status();								// collecting error data
 			err |= lm->pump.Poll();
 			err |= lm->fan.Poll();
 			err |= lm->spray.Poll();
-//			err |= lm->pyro.Error();
 			lm->ErrParse(err);										// parsing error data
+			_TIM::Instance()->Poll();
 	
 			lm->can.Parse(lm);										
-//			lm->pilot.Poll();
-			_TIM::Instance()->Poll();
 
 
 #ifdef __SIMULATION__
@@ -229,36 +227,6 @@ void	_LM::Increment(int i, int j) {
 					spray.Increment(i,j);
 					break;
 				
-				case EC20:
-//					ec20.Increment(i,j);
-					break;
-
-				case EC20bias:
-//					ec20.IncrementBias(i,j);
-					break;
-				
-				case PILOT:
-//					pilot.Increment(i,j);
-					break;
-				
-				case PYRO:
-//					if(i || j || pyro.Enabled) {
-//						pyro.Enabled=false;
-//						pyro.Increment(i,j);
-//					}	else {
-//						pyro.Enabled=true;
-//						printf("\r\n");
-//						plot.Clear();
-//						plot.Add(&plotA,0,1, LCD_COLOR_YELLOW);
-//						plot.Add(&plotB,2813,10, LCD_COLOR_CYAN);
-//						plot.Add(&plotC,0,1, LCD_COLOR_YELLOW);
-//					}
-					break;
-
-				case PYROnew:
-//					pyro.Enabled=true;
-					break;
-
 				case CTRL_A:
 					pump.offset.cooler+=10*i;
 					pump.gain.cooler+=10*j;
@@ -498,120 +466,6 @@ int		_LM::Decode(char *c) {
 				case '<':
 					can.Recv(++c);
 					break;
-				case 'e':
-//					char s[128];
-//					if(*++c) {
-//					int i=strtoul(c,&c,0);
-//					if(*c) {
-//						for(int j=0; *c++; s[j]=strtoul(c,&c,0), ++j);
-//						ee.putPage(i,s);
-//					} else
-//						printf("   %s",ee.getPage(i,s));
-//					} else
-//						printf("   %s",ee.getSerial(s));
-					break;
-				case '!': {
-//					FIL 									f;
-//					WAVE_FormatTypeDef		w;
-//					short									nbytes, sample;
-//					char									flag=0;
-//					
-//#ifdef	USE_LCD
-//int					to=0;
-////int					pref=0,
-////						peak=0;
-//#endif
-//					plot.Clear();
-//					plot.Add(&plotA,0,5, LCD_COLOR_YELLOW);
-//					plot.Add(&plotB,0,10, LCD_COLOR_CYAN);
-////				plot.Add(&plotC,0,1, LCD_COLOR_YELLOW);
-
-//					if(f_open(&f,"0:/3.wav",FA_READ) == FR_OK) {
-//						if(f_read (&f, &w, sizeof(w), (UINT *)&nbytes)==FR_OK) {
-//							while(!f_eof(&f)) {
-//								_wait(3,_thread_loop);
-//								if(!flag) {
-//									f_read (&f, &sample, sizeof(sample),(UINT *)&nbytes);
-//									plotA=sample-6767;
-//									plotB=pyro.addSample(plotA);
-
-////									if(peak==0) {															// falling..
-////										if(plotB < pref) {
-////											if(plotB < pref-50) {
-////												peak=pref;
-////												plotC=0;
-////												printf("%d,%d\r\n",to,peak);
-////											}
-////										}
-////										else
-////											pref=plotB;
-////									} else {																	// rising...
-////										if(plotB > pref) {
-////											if(plotB > pref + 50)
-////												if(peak > 5) {
-////													peak=0;
-////													plotC=50;
-////												}
-////										}
-////										else {
-////											pref=plotB;
-////										}
-////									}	
-
-//#ifdef	USE_LCD
-//									to=(f_tell(&f)-sizeof(w))*3/2;
-//									if(plot.Refresh()) {
-//char								str[16];
-//										lcd.Grid();
-//										sprintf(str,"%d",to/1000);
-//										LCD_SetFont(&Font8x12);
-//										sFONT *fnt = LCD_GetFont();
-//										LCD_SetTextColor(LCD_COLOR_GREY);
-//										LCD_DisplayStringLine(1, (uint8_t *)str);
-//									}
-//#endif
-//								}
-//								switch(VT100.Escape()) {
-//									case EOF:
-//										break;
-//									case ' ':
-//										flag ^= 1;
-//										break;
-//									case 'l':
-//										f_lseek(&f, f_tell(&f) - 320);
-//										break;
-//									case 'r':
-//										f_lseek(&f, f_tell(&f) + 320);
-//										break;
-//									case 0x1b:
-//										f_lseek (&f, f.fsize);
-//										break;
-//									case __F2:case __f2:
-//										Select(PLOT_OFFSET);
-//										break;
-//									case __F3:case __f3:
-//										Select(PLOT_SCALE);
-//										break;
-//									case __Up:
-//										Increment(1, 0);
-//										break;				
-//									case __Down:
-//										Increment(-1, 0);
-//										break;	
-//									case __Left:
-//										Increment(0, -1);
-//										break;				
-//									case __Right:
-//										Increment(0, 1);
-//										break;	
-//								}
-//							}
-//						f_close(&f);
-//						}
-//					} else
-//						printf("\r\n file not found...\r\n:");
-}
-					break;
 
 				default:
 					*c=0;
@@ -619,16 +473,6 @@ int		_LM::Decode(char *c) {
 			}
 			*c=0;
 			return PARSE_OK;
-}
-/*******************************************************************************
-* Function Name	: 
-* Description		: 
-* Output				:
-* Return				:
-*******************************************************************************/
-bool	_LM::Parse() {
-			_stdio(io);
-			return Parse(VT100.Escape());
 }
 /*******************************************************************************
 * Function Name	: 
@@ -649,7 +493,7 @@ bool	ret=Parse(fgetc(f));
 * Return				:
 *******************************************************************************/
 bool	_LM::Parse(int i) {
-			switch(i) {
+			switch(VT100.Escape(i)) {
 				case EOF:
 					break;
 
@@ -722,9 +566,12 @@ bool	_LM::Parse(int i) {
 
 				case __F12:
 				case __f12:
+					printf("entering lib...\r\n>");
+					_wait(100,_thread_loop);
 					do
 						_thread_loop();
 					while(ParseCom(io));
+					printf("...exit\r\n:");
 					break;
 //					return false;
 				
@@ -907,7 +754,7 @@ void	_LM::CanConsole(int k, int __ctrl) {
 CanTxMsg	m={idCAN2COM,0,CAN_ID_STD,CAN_RTR_DATA,2,'v','\r',0,0,0,0,0};
 int		j;
 			printf(" Remote console open... \r\n>");
-			Select(CAN_CONSOLE);															// Select operation mode
+			Select(NONE);															// Select operation mode
 			can.Send(&m);																			// send initial string
 			do {																							// pull max. 8 characters from stdio
 				for(m.DLC=0; m.DLC<8; ++m.DLC) {
@@ -959,34 +806,12 @@ extern "C" {
 int		lm() {
 _LM 	lm;						
 			do {
-				_stdio(NULL);
 				_thread_loop();
-			} while(lm.Parse()==true);
+_io*		io=_stdio(lm.io);
+				lm.Parse(getchar());
+				_stdio(io);
+			} while(1);
 			return 0;
 	}
 }
-//Q1   +f 0.00229515,0.00459030,0.00229515,1.89738149,-0.90656211
-//Q05  +f 0.00219271, 0.00438542, 0.00219271, 1.81269433, -0.82146519
-
-// band +f 0.03207092,0,-0.03207092,1.89866118,-0.93585815
-//		  +f 0.16324316,0,-0.16324316,1.64135758,-0.67351367
-
-// high +f 0.98621179,-1.9724235902,0.98621179,1.972233470,-0.97261371
-
-/*
-+f 0.15794200,0,-0.15794200,1.65422610,-0.68411599									bp, 10hz
-
-+f 0.02570835,0.05141670,0.02570835,1.35864700,-0.46148042					lp. 10hz
-+f 0.00008735,0.00017470,0.00008735,1.96261474,-0.96296415					lp 1Hz
-+f 0.00203203,0.00406407,0.00203203,1.81968752,-0.82781567					lp 5 Hz
-
-
-+f 1.0, 0.00019998012,-0.999800019877, 1.97576083265,  -0.975764811473
-+f 1.0,-1.94962512491, 0.949862985499, 1.26448606693,  -0.310384244533
-+f 68.4272224754, -112.860738664, 46.3531200753, 0.0,   0.0
-
-+f 1.0, 0.00019998013,-0.999800019866, 1.97163751419,  -0.971642174499
-+f 1.0,-1.95436818551, 0.954558994233, 1.26044681223,  -0.309037826299
-+f 132.819471678, -224.031891995, 94.1796821905, 0.0,   0.0
-*/
 

@@ -237,7 +237,7 @@ void			PrintVersion(int v) {
 	
 					RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC, ENABLE);
 					CRC_ResetDR();
-					printf(" %d.%02d %s, <%08X>+",
+					printf(" %d.%02d %s, <%08X>",
 						v/100,v%100,
 						__DATE__,
 							CRC_CalcBlockCRC(__Vectors, (FATFS_ADDRESS-(int)__Vectors)/sizeof(int)));
