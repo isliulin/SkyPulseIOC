@@ -36,13 +36,14 @@ void 			_thread_init(void) {
 					Watchdog_init(__IWDGHIGH__);
 					_thread_add(Watchdog,NULL,"IWDG",0);
 
-					__com0=Initialize_USART(921600);
-					_thread_add(ParseCom,__com0,"ParseCom COM0",0);
+					__com1=Initialize_USART1(921600);
+					__com3=Initialize_USART3(115200);
+					_thread_add(ParseCom,__com1,"ParseCom COM1",0);
 
 					f_mount(&fsCpu,FSDRIVE_CPU,1);
 					f_mount(&fsUsb,FSDRIVE_USB,1);
 
-					_stdio(__com0);
+					_stdio(__com1);
 					if(RCC_GetFlagStatus(RCC_FLAG_SFTRST) == SET)
 						printf("\r ... SWR reset, %dMHz\r\n>",SystemCoreClock/1000000);
 					else if(RCC_GetFlagStatus(RCC_FLAG_IWDGRST) == SET)

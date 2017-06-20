@@ -88,6 +88,7 @@ class	_LM {
 		void				ErrParse(int);
 		
 		void				CanConsole(int, int);
+		void				Foot2Can(void);
 		
 		static void	Poll(void *),
 								Print(void *),

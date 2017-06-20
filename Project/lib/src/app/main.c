@@ -27,7 +27,6 @@ int				main(void) {
 					while(1)
 						_thread_loop();
 }
-
 /** 
 * @}
 */

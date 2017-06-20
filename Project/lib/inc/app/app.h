@@ -179,7 +179,8 @@ void						SysTick_init(void),
 								Initialize_NVIC(void);
 int							batch(char *);
 										
-_io 						*Initialize_USART(int);
+_io 						*Initialize_USART1(int),
+								*Initialize_USART3(int);
 
 #define 	_THREAD_BUFFER_SIZE 128
 
@@ -203,7 +204,8 @@ _thread					*_thread_add(void *,void *,char *,int),
 void						_wait(int,void (*)(void));
 								
 
-extern _io			*__com0,
+extern _io			*__com1,
+								*__com3,
 								*__dbug,
 								*__can;
 								

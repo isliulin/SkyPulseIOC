@@ -2,18 +2,18 @@
 #define					GPIO_H
 #include				"stm32f2xx.h"
 
-#define	__FOOT_MASK	0xf800
+#define	__FOOT_MASK	0xe000
 
 //
 // Footswitch port pattern
 //
 
 typedef enum {					// gpioc	15 14 13 20 10
-	__FOOT_OFF	=0xf800,	//				 1  1  1  1  1
-	__FOOT_1		=0x3800,	//				 0  0  1  1  1
-	__FOOT_2		=0xb800,	//				 1  0  1  1  1
-	__FOOT_3		=0x9800,	//				 1  0  0  1  1
-	__FOOT_4		=0xd800		//				 1  1  0  1  1
+	__FOOT_OFF	=0xe000,	//				 1  1  1  x  x
+	__FOOT_1		=0x2000,	//				 0  0  1  x  x
+	__FOOT_2		=0xa000,	//				 1  0  1  x  x
+	__FOOT_3		=0x8000,	//				 1  0  0  x  x
+	__FOOT_4		=0xc000		//				 1  1  0  x  x
 } __FOOT;
 
 class	_GPIO { 

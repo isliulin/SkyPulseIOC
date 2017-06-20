@@ -1,16 +1,16 @@
-#ifndef					ISR_H
-#define					ISR_H
-#include				"stm32f2xx.h"
-#include				<stdio.h>
-#include				"ff.h"
+#ifndef		ISR_H
+#define		ISR_H
+#include	"stm32f2xx.h"
+#include	<stdio.h>
+#include	"ff.h"
 
-extern "C" {
-	
-extern					volatile int __time__;
-void						PrintVersion(int);
-void						Watchdog(void);
-void						_led(int, int),
-								_lightshow(void);
+extern		"C" {
+
+extern	volatile int __time__;
+void		PrintVersion(int);
+void		Watchdog(void);
+void		_led(int, int),
+				_lightshow(void);
 
 #define	_RED1(a)		_led(0,a)
 #define	_GREEN1(a)	_led(1,a)

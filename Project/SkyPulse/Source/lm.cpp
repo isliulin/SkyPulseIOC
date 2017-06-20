@@ -21,7 +21,7 @@ string _LM::ErrMsg[] = {
 				"fan speed out of range",
 				"emergency button pressed",
 				"handpiece ejected",
-				"EC20 not responding"
+				"illegal status request"
 };
 
 int			_LM::debug=0,
@@ -36,7 +36,6 @@ int			_LM::debug=0,
 /*******************************************************************************/
 _LM::_LM() {
 			_thread_add((void *)Poll,this,(char *)"lm",1);
-			_thread_add((void *)Display,this,(char *)"plot",1);			
 	
 			FIL f;
 			if(f_open(&f,"0:/lm.ini",FA_READ) == FR_OK) {
@@ -100,8 +99,6 @@ _LM::_LM() {
 *******************************************************************************/
 _LM::~_LM() {
 			_thread_remove((void *)Poll,this);
-			_thread_remove((void *)Print,this);
-			_thread_remove((void *)Display,this);
 			_thread_remove((void *)can.Console,this);
 			_thread_remove((void *)ws.proc_WS2812,this);
 }
@@ -114,35 +111,43 @@ _LM::~_LM() {
 void	_LM::ErrParse(int e) {
 	
 			e &= error_mask;
-			e ? _RED1(200): _GREEN1(20);
+			e ? _RED1(3000): _GREEN1(20);
 			if(e ^ _LM::error) {
-//				if(_BIT(e,pyroNoresp)) {
-//					pump.Disable();
-//					Submit("@ejected.led");
-//				} else {
-//					pump.Enable();
-//					Submit("@inserted.led");
-//					_CLEAR_BIT(_LM::error,pyroNoresp);
-//				}
+
+//		if(_BIT(e,pyroNoresp)) {
+//			pump.Disable();
+//			Submit("@ejected.led");
+//		} else {
+//			pump.Enable();
+//			Submit("@inserted.led");
+//			_CLEAR_BIT(_LM::error,pyroNoresp);
+//		}
 			}
+
 
 			e = (e ^ _LM::error) & e;									// extract the rising edge only 
 			_LM::error |= e;													// OR into LM error register
 
-			if(!ErrTimeout())	{
+			if(ErrTimeout() == 0)	{
 				if(e) {
+					Submit("@error.led");
 					ErrTimeout(5000);
 //					if(e & error_mask) {								// mask off inactive errors...
-//						Submit("@error.led");
 						_SYS_SHG_DISABLE;
-						IOC_State.Error=(_Error)_LM::error;
-						IOC_State.Send();
+//						IOC_State.Error=(_Error)_LM::error;
+//						IOC_State.Send();
 //					}
-
 				} else {
 					_SYS_SHG_ENABLE;
 					_LM::error=0;
+					IOC_State.Error=_NOERR;
 				}
+			}
+			
+			if(e) {
+				IOC_State.State = _ERROR;
+				IOC_State.Error = (_Error)_LM::error;
+				IOC_State.Send();
 			}
 
 			for(int n=0; e && _BIT(_LM::debug, DBG_ERR); e >>= 1, ++n)
@@ -167,8 +172,8 @@ int		err  = _ADC::Status();								// collecting error data
 			lm->ErrParse(err);										// parsing error data
 			_TIM::Instance()->Poll();
 	
-			lm->can.Parse(lm);										
-
+			lm->can.Parse(lm);			
+			lm->Foot2Can();
 
 #ifdef __SIMULATION__
 			lm->spray.Simulator();
@@ -177,7 +182,28 @@ int		err  = _ADC::Status();								// collecting error data
 //				me->lcd.Grid();
 #endif
 #endif			
-			_stdio(temp);
+			_stdio(temp);		
+}			
+/*******************************************************************************
+* Function Name	: 
+* Description		: 
+* Output				:	
+* Return				:
+*******************************************************************************/
+extern _io *__com3;
+
+void _LM::Foot2Can() {
+	_io *temp=_stdio(__com3);
+	CanTxMsg	tx={idFOOT2CAN,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};	
+	while(tx.DLC  < 8) {
+		int i=getchar();
+		if(i==EOF)
+			break; 
+		tx.Data[tx.DLC++] = i;
+	}
+	_stdio(temp);			
+	if(tx.DLC > 0)
+		can.Send(&tx);
 }
 /*******************************************************************************
 * Function Name	: 
@@ -259,9 +285,6 @@ void	_LM::Increment(int i, int j) {
 *******************************************************************************/
 int		_LM::DecodePlus(char *c) {
 			switch(*c) {
-				case 'P':
-					_thread_add((void *)_LM::Print,this,(char *)"lm",strtoul(++c,NULL,0));
-					break;
 				case 'D':
 					for(c=strchr(c,' '); c && *c;)
 						_SET_BIT(debug,strtoul(++c,&c,10));
@@ -269,9 +292,6 @@ int		_LM::DecodePlus(char *c) {
 				case 'E':
 					for(c=strchr(c,' '); c && *c;)
 						_SET_BIT(error_mask,strtoul(++c,&c,10));
-					break;
-				case 'f':
-//					pyro.addFilter(++c);
 					break;
 				case 'c':
 					return ws.ColorOn(strchr(c,' '));
@@ -290,9 +310,6 @@ int		_LM::DecodePlus(char *c) {
 *******************************************************************************/
 int		_LM::DecodeMinus(char *c) {
 			switch(*c) {
-				case 'P':
-					_thread_remove((void *)_LM::Print,this);
-					break;
 				case 'D':
 					for(c=strchr(c,' '); c && *c;)
 						_CLEAR_BIT(debug,strtoul(++c,&c,10));
@@ -300,9 +317,6 @@ int		_LM::DecodeMinus(char *c) {
 				case 'E':
 					for(c=strchr(c,' '); c && *c;)
 						_CLEAR_BIT(error_mask,strtoul(++c,&c,10));
-					break;
-				case 'f':
-//					pyro.initFilter();
 					break;
 				case 'c':
 					return ws.ColorOff(strchr(c,' '));
@@ -341,9 +355,6 @@ int		_LM::DecodeWhat(char *c) {
 						if(_BIT(e, 0))
 							printf("\r\nerror %03d: %s",n, ErrMsg[n].c_str());	
 						printf("\r\nerror mask=%08X\r\n:",error_mask);	
-					break;
-				case 'f':
-//					pyro.printFilter();
 					break;
 				case 'c':
 					return ws.GetColor(atoi(strchr(c,' ')));
@@ -662,30 +673,6 @@ bool	_LM::Parse(int i) {
 					break;
 			}
 			return true;
-}
-/*******************************************************************************
-* Function Name	: 
-* Description		: 
-* Output				:
-* Return				:
-*******************************************************************************/
-void	_LM::Display(void *v) {
-_LM 	*me = static_cast<_LM *>(v);	
-_io*	io=_stdio(me->io);
-
-			_stdio(io);
-}
-/*******************************************************************************
-* Function Name	: 
-* Description		: 
-* Output				:
-* Return				:
-*******************************************************************************/
-void	_LM::Print(void *v) {
-_LM 	*me = static_cast<_LM *>(v);	
-_io		*io=_stdio(me->io);
-
-			_stdio(io);
 }
 /*******************************************************************************
 * Function Name : batch

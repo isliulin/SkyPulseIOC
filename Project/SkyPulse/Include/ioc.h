@@ -17,7 +17,7 @@ typedef	enum {
 	_fanTacho					=0x0100,
 	_emgDisabled			=0x0200,
 	_pyroNoresp				=0x0400,
-	_ec20noresp				=0x0800,
+	_illstatereq			=0x0800,
 } _Error;           
                   
 typedef enum {    
@@ -26,7 +26,10 @@ typedef enum {
 	idIOC_Cmd					=0x201,
 	idIOC_Footsw			=0x241,
 	idCAN2COM					=0xB0,
-  idCOM2CAN					=0xB1
+  idCOM2CAN					=0xB1,
+	idCAN2FOOT				=0x209,
+	idFOOT2CAN				=0x249,
+  idBOOT						=0x20
 } _StdId;
 
 typedef enum {

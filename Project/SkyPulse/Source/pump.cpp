@@ -198,7 +198,7 @@ int			_fpl=fpl,
 				printf("\rpump ");
 				for(int i=_fpl; i<_fph; i+=5) {
 					fpl=fph=i;
-					_wait(1000,_thread_loop);
+					_wait(3000,_thread_loop);
 					t->Sample(i,Tau());
 					p->Sample(i,(double)adf.cooler);
 					c->Sample(i,(double)adf.Ipump);
@@ -206,7 +206,7 @@ int			_fpl=fpl,
 				}
 				for(int i=_fph; i>_fpl; i-=5) {
 					fpl=fph=i;
-					_wait(1000,_thread_loop);
+					_wait(3000,_thread_loop);
 					t->Sample(i,Tau());
 					p->Sample(i,(double)adf.cooler);
 					c->Sample(i,(double)adf.Ipump);

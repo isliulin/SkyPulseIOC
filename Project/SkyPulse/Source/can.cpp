@@ -100,6 +100,11 @@ GPIO_InitTypeDef				GPIO_InitStructure;
 					CAN_FilterInitStructure.CAN_FilterNumber=__FILT_BASE__+2;
 					CAN_FilterInit(&CAN_FilterInitStructure);
 
+					CAN_FilterInitStructure.CAN_FilterIdHigh=idBOOT<<5;
+					CAN_FilterInitStructure.CAN_FilterMaskIdHigh=0x7ff<<5;
+					CAN_FilterInitStructure.CAN_FilterNumber=__FILT_BASE__+3;
+					CAN_FilterInit(&CAN_FilterInitStructure);
+
 					NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
 					NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
 					NVIC_InitStructure.NVIC_IRQChannelSubPriority = 2;
@@ -245,8 +250,36 @@ CanTxMsg			txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 //______________________________________________________________________________________
 						switch(rxm.StdId) {
 							case idIOC_State:
-								if(rxm.DLC)
-									lm->IOC_State.State=(_State)rxm.Data[0];
+								if(rxm.DLC) {
+									switch((_State)rxm.Data[0]) {
+										case	_STANDBY:
+											lm->IOC_State.State = _STANDBY;
+											lm->IOC_State.Error = _NOERR;
+											lm->Submit("@standby.led");
+											break;
+										case	_READY:
+											if(lm->IOC_State.State == _STANDBY || lm->IOC_State.State == _ACTIVE) {
+												lm->IOC_State.State = _READY;
+												lm->Submit("@ready.led");
+											} else
+												lm->ErrParse(_illstatereq);
+											break;
+										case	_ACTIVE:
+											if(lm->IOC_State.State == _READY) {
+												lm->IOC_State.State = _ACTIVE;
+												lm->Submit("@active.led");
+											} else
+												lm->ErrParse(_illstatereq);
+											break;
+										case	_ERROR:
+											lm->IOC_State.State = _ERROR;
+											lm->Submit("@error.led");
+											break;
+										default:
+											lm->ErrParse(_illstatereq);
+											break;
+									}
+								}
 								lm->IOC_State.Send();
 								break;
 							case idIOC_Cmd:
@@ -269,11 +302,27 @@ CanTxMsg			txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 //______________________________________________________________________________________							
 							case idCOM2CAN:
 							{
-_io*							io=_stdio(lm->io);
-									for(int i=0; i<rxm.DLC; ++i)
-										putchar(rxm.Data[i]);
-									_stdio(io);
+_io*						io=_stdio(lm->io);
+								for(int i=0; i<rxm.DLC; ++i)
+									putchar(rxm.Data[i]);
+								_stdio(io);
 							}
+							break;
+//______________________________________________________________________________________							
+							case idCAN2FOOT:
+extern _io*		__com3;
+							{
+_io*						io=_stdio(__com3);
+								for(int i=0; i<rxm.DLC; ++i)
+									while(putchar(rxm.Data[i]) == EOF)
+										_wait(10,_thread_loop);
+								_stdio(io);
+							}								
+							break;
+//______________________________________________________________________________________							
+							case idBOOT:
+								if(rxm.Data[0]==0xAA)
+									while(1);
 							break;
 //______________________________________________________________________________________					
 							default:
