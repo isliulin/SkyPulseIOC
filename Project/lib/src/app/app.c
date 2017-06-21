@@ -37,7 +37,7 @@ void 			_thread_init(void) {
 					_thread_add(Watchdog,NULL,"IWDG",0);
 
 					__com1=Initialize_USART1(921600);
-					__com3=Initialize_USART3(115200);
+					__com3=Initialize_USART3(57600);
 					_thread_add(ParseCom,__com1,"ParseCom COM1",0);
 
 					f_mount(&fsCpu,FSDRIVE_CPU,1);

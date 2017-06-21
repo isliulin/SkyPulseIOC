@@ -185,9 +185,9 @@ int		err  = _ADC::Status();								// collecting error data
 			_stdio(temp);		
 }			
 /*******************************************************************************
-* Function Name	: 
-* Description		: 
-* Output				:	
+* Function Name	:
+* Description		:
+* Output				:
 * Return				:
 *******************************************************************************/
 extern _io *__com3;
