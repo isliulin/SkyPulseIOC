@@ -25,10 +25,11 @@ typedef enum {
 	idIOC_State_Ack		=0x240,
 	idIOC_Cmd					=0x201,
 	idIOC_Footsw			=0x241,
-	idCAN2COM					=0xB0,
-  idCOM2CAN					=0xB1,
-	idCAN2FOOT				=0x209,
-	idFOOT2CAN				=0x249,
+	idCAN2COM					=0x20B,
+  idCOM2CAN					=0x24B,
+	idCAN2FOOT				=0x20C,
+	idFOOT2CAN				=0x24C,
+	idENGM						=0x0C0,
   idBOOT						=0x20
 } _StdId;
 

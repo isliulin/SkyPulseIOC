@@ -112,39 +112,29 @@ void	_LM::ErrParse(int e) {
 	
 			e &= error_mask;
 			e ? _RED1(3000): _GREEN1(20);
-			if(e ^ _LM::error) {
-
-//		if(_BIT(e,pyroNoresp)) {
-//			pump.Disable();
-//			Submit("@ejected.led");
-//		} else {
-//			pump.Enable();
-//			Submit("@inserted.led");
-//			_CLEAR_BIT(_LM::error,pyroNoresp);
-//		}
-			}
-
-
 			e = (e ^ _LM::error) & e;									// extract the rising edge only 
 			_LM::error |= e;													// OR into LM error register
 
 			if(ErrTimeout() == 0)	{
 				if(e) {
-					Submit("@error.led");
-					ErrTimeout(5000);
+//					Submit("@error.led");
+//					ErrTimeout(5000);
 //					if(e & error_mask) {								// mask off inactive errors...
-						_SYS_SHG_DISABLE;
+//						_SYS_SHG_DISABLE;
 //						IOC_State.Error=(_Error)_LM::error;
 //						IOC_State.Send();
 //					}
 				} else {
-					_SYS_SHG_ENABLE;
-					_LM::error=0;
-					IOC_State.Error=_NOERR;
+//					_SYS_SHG_ENABLE;
+//					_LM::error=0;
+//					IOC_State.Error=_NOERR;
 				}
 			}
 			
 			if(e) {
+				_SYS_SHG_DISABLE;
+				if(IOC_State.State != _ERROR)
+						Submit("@error.led");
 				IOC_State.State = _ERROR;
 				IOC_State.Error = (_Error)_LM::error;
 				IOC_State.Send();

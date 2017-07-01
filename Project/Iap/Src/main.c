@@ -333,7 +333,7 @@ CanRxMsg		rx;
 							case _ID_IAP_ERASE:	
 								_Words32Received=0;
 								Watchdog();
-								if(IS_FLASH_SECTOR(*(int *)rx.Data) || *(int *)rx.Data != _BOOT_SECTOR)
+								if(IS_FLASH_SECTOR(*(int *)rx.Data) && *(int *)rx.Data != _BOOT_SECTOR)
 									ret=FlashErase(*(int *)rx.Data);
 								else
 									ret=-1;

@@ -256,11 +256,15 @@ CanTxMsg			txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 											lm->IOC_State.State = _STANDBY;
 											lm->IOC_State.Error = _NOERR;
 											lm->Submit("@standby.led");
+											_SYS_SHG_ENABLE;
+											_LM::error=0;
 											break;
 										case	_READY:
 											if(lm->IOC_State.State == _STANDBY || lm->IOC_State.State == _ACTIVE) {
 												lm->IOC_State.State = _READY;
 												lm->Submit("@ready.led");
+												_SYS_SHG_ENABLE;
+												_LM::error=0;
 											} else
 												lm->ErrParse(_illstatereq);
 											break;
@@ -268,12 +272,15 @@ CanTxMsg			txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 											if(lm->IOC_State.State == _READY) {
 												lm->IOC_State.State = _ACTIVE;
 												lm->Submit("@active.led");
+												_SYS_SHG_ENABLE;
+												_LM::error=0;
 											} else
 												lm->ErrParse(_illstatereq);
 											break;
 										case	_ERROR:
 											lm->IOC_State.State = _ERROR;
 											lm->Submit("@error.led");
+											_SYS_SHG_DISABLE;
 											break;
 										default:
 											lm->ErrParse(_illstatereq);
