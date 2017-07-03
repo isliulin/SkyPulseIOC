@@ -9,6 +9,7 @@
 	*
 	*/
 #include "lm.h"
+
 string _LM::ErrMsg[] = {
 				"5V  supply",
 				"12V supply",
@@ -74,7 +75,11 @@ _LM::_LM() {
 // not used in the application
 #ifdef	USE_LCD
 	#ifdef	__SIMULATION__
+			spray.pComp=_BAR(1.0);
+			spray.pBott=spray.pAir=spray.pAmb=_BAR(1.0);
+			spray.simrate=0;
 			plot.Clear();
+			
 			plot.Add(&spray.pComp,1.0,0.02, LCD_COLOR_YELLOW);
 			plot.Add(&spray.pBott,1.0,0.02, LCD_COLOR_CYAN);
 			plot.Add(&spray.pAir,1.0,0.002, LCD_COLOR_MAGENTA);
@@ -147,11 +152,12 @@ int		err  = _ADC::Status();								// collecting error data
 			lm->Foot2Can();
 
 #ifdef __SIMULATION__
-			lm->spray.Simulator();
+			if(lm->spray.Simulator()) {
 #ifdef USE_LCD
-//			if(!(++me->zzz % 10) && me->plot.Refresh())
-//				me->lcd.Grid();
+				if(lm->plot.Refresh())
+					lm->lcd.Grid();
 #endif
+			}
 #endif			
 			_stdio(temp);		
 }			
@@ -472,15 +478,12 @@ bool	_LM::Parse(int i) {
 
 				case __F1:
 				case __f1:
-					Select(PYRO);
 					break;
 				case __F2:
 				case __f2:
-					Select(PILOT);
 					break;
 				case __F3:
 				case __f3:
-					Select(PYROnew);
 					break;
 				case __F4:
 				case __f4:
@@ -506,11 +509,9 @@ bool	_LM::Parse(int i) {
 					break;
 				case __F8:
 				case __f8:
-					Select(EC20);
 					break;
 				case __F9:
 				case __f9:
-					Select(EC20bias);
 					break;				
 				case __F10:
 				case __f10:
@@ -705,4 +706,3 @@ _io*		io=_stdio(lm.io);
 
 	}
 }
-

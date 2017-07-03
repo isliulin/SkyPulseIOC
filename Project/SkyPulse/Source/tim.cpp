@@ -146,6 +146,25 @@ GPIO_InitTypeDef					GPIO_InitStructure;
 * Output				:
 * Return				:
 *******************************************************************************/
+int		_TIM::Pwm(int tim) {
+			switch(tim) {
+				case 0: return TIM1->CCR1;
+				case 1: return TIM1->CCR2;
+				case 2: return TIM1->CCR3;
+				case 3: return TIM1->CCR4;
+				case 4: return TIM8->CCR1;
+				case 5: return TIM8->CCR2;
+				case 6: return TIM8->CCR3;
+				case 7: return TIM8->CCR4;
+				default:return EOF;
+			}
+}
+/*******************************************************************************
+* Function Name	: 
+* Description		: 
+* Output				:
+* Return				:
+*******************************************************************************/
 int		_TIM::Pwm(int tim, int value ) {
 			switch(tim) {
 				case 0: TIM1->CCR1=value; break;
@@ -166,18 +185,11 @@ int		_TIM::Pwm(int tim, int value ) {
 * Output				:
 * Return				:
 *******************************************************************************/
-int		_TIM::Pwm(int tim) {
-			switch(tim) {
-				case 0: return TIM1->CCR1;
-				case 1: return TIM1->CCR2;
-				case 2: return TIM1->CCR3;
-				case 3: return TIM1->CCR4;
-				case 4: return TIM8->CCR1;
-				case 5: return TIM8->CCR2;
-				case 6: return TIM8->CCR3;
-				case 7: return TIM8->CCR4;
-				default:return EOF;
-			}
+int		_TIM::Pwm(int tim, int value, int i, int j ) {
+			Pwm(tim, value);
+			t1[tim]=__time__ + i;
+			t2[tim]=__time__ + j;
+			return Pwm(tim);
 }
 /*******************************************************************************
 * Function Name	: 
@@ -190,18 +202,6 @@ bool	_TIM::Busy(int tim) {
 				return true;
 			else
 				return false;
-}
-/*******************************************************************************
-* Function Name	: 
-* Description		: 
-* Output				:
-* Return				:
-*******************************************************************************/
-int		_TIM::Pwm(int tim, int value, int i, int j ) {
-			Pwm(tim, value);
-			t1[tim]=__time__ + i;
-			t2[tim]=__time__ + j;
-			return Pwm(tim);
 }
 /*******************************************************************************
 * Function Name	: 

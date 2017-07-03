@@ -24,22 +24,29 @@ class	_TIM {
 class	_VALVE {
 	private:
 		int 	n;
+		bool	inv;
 		_TIM *t;
 	public:
-		_VALVE(int k)									{	t=_TIM::Instance(); n = k;			};
+		_VALVE(int k, bool i)					{	
+																		t=_TIM::Instance(); 
+																		n = k; 
+																		inv=i;
+																	};
+		
 		void Set(int i)								{ t->Pwm(n,i);										};
 		void Set(int i, int j, int k)	{ t->Pwm(n,i,j,k);								};
-		bool isOn(void)								{ return(t->Pwm(n)>_PWM_RATE/2);	};
-		bool isOff(void)							{ return(t->Pwm(n)<_PWM_RATE/2);	};
-		void On(void)									{ Set(_PWM_RATE*9/10);						};
-		void Off(void)								{ Set(0);													};
-		void On(int i, int j)					{ Set(_PWM_RATE*9/10,i,j);				};
-		void Off(int i, int j)				{ Set(0,i,j);											};
+
+		
+		bool Opened(void)							{ if(inv) return t->Pwm(n) > _PWM_RATE/2; else return t->Pwm(n) < _PWM_RATE/2;};
+		bool Closed(void)							{ if(inv) return t->Pwm(n) < _PWM_RATE/2; else return t->Pwm(n) > _PWM_RATE/2;};
+		void Open(void)								{ inv ? Set(_PWM_RATE*9/10): Set(0);};
+		void Close(void)							{ inv ? Set(0): Set(_PWM_RATE*9/10);};
+		void Open(int i, int j)				{ inv ? Set(_PWM_RATE*9/10,i,j): Set(0,i,j);};
+		void Close(int i, int j)			{ inv ? Set(0,i,j): Set(_PWM_RATE*9/10,i,j);};
 		bool Busy(void)								{ return t->Busy(n);							};
 		
 		static short speaker[];
 };
-
 //________________________________________________________________________________________________
 class	_TIM3 {
 	private:
@@ -50,5 +57,4 @@ class	_TIM3 {
 		void	ISR(int);
 		int		Tau(void);
 };
-
 #endif
