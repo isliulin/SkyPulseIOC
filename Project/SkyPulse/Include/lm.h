@@ -27,8 +27,6 @@
 #include				"tim.h"
 #include				"dac.h"
 #include				"can.h"
-//#include				"pyro.h"
-//#include				"pilot.h"
 #include				"ws2812.h"
 #include				"ioc.h"
 
@@ -56,7 +54,7 @@ class	_LM {
 
 		_io					*io;
 		_TERM				console; 
-		static int	debug, error, error_mask;
+		static int	debug, error_mask;
 		static 			string ErrMsg[];
 		double			plotA,plotB,plotC;
 	
@@ -82,9 +80,7 @@ class	_LM {
 		void 				Refresh(void)			{	Increment(0,0);	}
 		bool				Parse(FILE *),
 								Parse(int);
-		
-		bool				ErrTimeout(void)	{ return __time__ < errT; }
-		void				ErrTimeout(int t)	{ errT = __time__ + t; }
+
 		void				ErrParse(int);
 		
 		void				CanConsole(int, int);

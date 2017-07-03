@@ -30,7 +30,7 @@ _PUMP::_PUMP() :_TIM3(0)  {
 				ftl=25;
 				fth=40;
 
-				timeout=__time__ + 3000;
+				timeout=__time__ + _PUMP_ERR_DELAY;
 
 				tacho = pressure = current = NULL;
 				offset.cooler=12500;
@@ -101,7 +101,7 @@ void		_PUMP::SaveSettings(FILE *f) {
 	*/
 void		_PUMP::Enable() {
 				if(timeout == INT_MAX)
-					timeout=__time__ +  1000;
+					timeout=__time__ +  _PUMP_ERR_DELAY;
 }
 /*******************************************************************************/
 /**
@@ -152,6 +152,9 @@ void		_PUMP::SaveLimits(FILE *f) {
 int			_PUMP::Increment(int a, int b)	{
 				idx= __min(__max(idx+b,0),4);
 	
+				if(a)
+					timeout=__time__ + _PUMP_ERR_DELAY;
+
 				switch(idx) {
 					case 1:
 						fpl= __min(__max(fpl+a,5),fph);

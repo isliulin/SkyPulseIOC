@@ -28,7 +28,7 @@ _FAN::_FAN() :_TIM3(1) {
 				ftl=25;
 				fth=40;
 				tacho = NULL;
-				timeout=__time__ + 3000;
+				timeout=__time__ + _FAN_ERR_DELAY;
 				idx=0;
 }
 /*******************************************************************************
@@ -113,6 +113,9 @@ void		_FAN::SaveLimits(FILE *f) {
 /*******************************************************************************/
 int			_FAN::Increment(int a, int b) {
 				idx= __min(__max(idx+b,0),4);
+
+				if(a)
+					timeout=__time__ + _FAN_ERR_DELAY;
 
 				switch(idx) {
 					case 1:

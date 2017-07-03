@@ -90,6 +90,7 @@ _ADC::_ADC() {
 				ADC_InitStructure.ADC_DataAlign = ADC_DataAlign_Left;
 				ADC_InitStructure.ADC_NbrOfConversion = sizeof(_ADMA)/sizeof(short);
 				ADC_Init(ADC1, &ADC_InitStructure);
+
 /* ADC1 regular channel12 configuration *************************************/
 				ADC_RegularChannelConfig(ADC1, ADC_Channel_1,  1, ADC_SampleTime_112Cycles);
 				ADC_RegularChannelConfig(ADC1, ADC_Channel_2,  2, ADC_SampleTime_112Cycles);
@@ -140,17 +141,20 @@ int			e=_NOERR;
 				adf.air					+= (buffer.air				- adf.air)/16;
 				adf.Ipump				+= (buffer.Ipump			- adf.Ipump)/16;
 
-				if(abs(adf.V5  - _V5to16X)	> _V5to16X/10)
-					e |= _V5;
-				if(abs(adf.V12 - _V12to16X) > _V12to16X/5)
-					e |= _V12;
-				if(abs(adf.V24 - _V24to16X) > _V24to16X/10)
-					e |= _V24;
-
-				if(Th2o() > 50*100)
-					e |= _sysOverheat;
 				if(_EMG_DISABLED && _SYS_SHG_ENABLED)
 					e |= _emgDisabled;
+				
+				if(__time__ > _ADC_ERR_DELAY) {
+					if(abs(adf.V5  - _V5to16X)	> _V5to16X/10)
+						e |= _V5;
+					if(abs(adf.V12 - _V12to16X) > _V12to16X/5)
+						e |= _V12;
+					if(abs(adf.V24 - _V24to16X) > _V24to16X/10)
+						e |= _V24;
+					if(Th2o() > 50*100)
+						e |= _sysOverheat;
+				}
+				
 				return e;
 }
 /**

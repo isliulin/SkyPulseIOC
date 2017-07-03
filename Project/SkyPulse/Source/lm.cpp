@@ -25,7 +25,6 @@ string _LM::ErrMsg[] = {
 };
 
 int			_LM::debug=0,
-				_LM::error=0,
 				_LM::error_mask=EOF;
 /*******************************************************************************/
 /**
@@ -87,7 +86,6 @@ _LM::_LM() {
 	#endif
 #endif
       io=_stdio(NULL);
-			ErrTimeout(3000);
 			Select(NONE);
 			Submit("@onoff.led");
 }
@@ -112,32 +110,15 @@ void	_LM::ErrParse(int e) {
 	
 			e &= error_mask;
 			e ? _RED1(3000): _GREEN1(20);
-			e = (e ^ _LM::error) & e;									// extract the rising edge only 
-			_LM::error |= e;													// OR into LM error register
+			e = (e ^ IOC_State.Error) & e;
+			IOC_State.Error = (_Error)(IOC_State.Error | e);
 
-			if(ErrTimeout() == 0)	{
-				if(e) {
-//					Submit("@error.led");
-//					ErrTimeout(5000);
-//					if(e & error_mask) {								// mask off inactive errors...
-//						_SYS_SHG_DISABLE;
-//						IOC_State.Error=(_Error)_LM::error;
-//						IOC_State.Send();
-//					}
-				} else {
-//					_SYS_SHG_ENABLE;
-//					_LM::error=0;
-//					IOC_State.Error=_NOERR;
-				}
-			}
-			
 			if(e) {
 				_SYS_SHG_DISABLE;
-				if(IOC_State.State != _ERROR)
-						Submit("@error.led");
 				IOC_State.State = _ERROR;
-				IOC_State.Error = (_Error)_LM::error;
 				IOC_State.Send();
+				if(IOC_State.State != _ERROR)
+					Submit("@error.led");
 			}
 
 			for(int n=0; e && _BIT(_LM::debug, DBG_ERR); e >>= 1, ++n)
@@ -216,14 +197,10 @@ void	_LM::Select(_SELECTED_ i) {
 void	_LM::Increment(int i, int j) {
 			switch(item) {
 				case PUMP:
-					if(i)
-						ErrTimeout(1000);
 					pump.Increment(i,j);
 					break;
 				
 				case FAN:
-					if(i)
-						ErrTimeout(1000);
 					fan.Increment(i,j);
 					break;
 				
@@ -275,10 +252,12 @@ void	_LM::Increment(int i, int j) {
 *******************************************************************************/
 int		_LM::DecodePlus(char *c) {
 			switch(*c) {
+				case 'd':
 				case 'D':
 					for(c=strchr(c,' '); c && *c;)
 						_SET_BIT(debug,strtoul(++c,&c,10));
 					break;
+				case 'e':
 				case 'E':
 					for(c=strchr(c,' '); c && *c;)
 						_SET_BIT(error_mask,strtoul(++c,&c,10));
@@ -300,10 +279,12 @@ int		_LM::DecodePlus(char *c) {
 *******************************************************************************/
 int		_LM::DecodeMinus(char *c) {
 			switch(*c) {
+				case 'd':
 				case 'D':
 					for(c=strchr(c,' '); c && *c;)
 						_CLEAR_BIT(debug,strtoul(++c,&c,10));
 					break;
+				case 'e':
 				case 'E':
 					for(c=strchr(c,' '); c && *c;)
 						_CLEAR_BIT(error_mask,strtoul(++c,&c,10));
@@ -337,11 +318,13 @@ int		_LM::DecodeWhat(char *c) {
 				case 'B':
 					printf(",%02X",*(unsigned char *)strtoul(++c,&c,16));
 					break;
+				case 'd':
 				case 'D':
 					printf(" %0*X ",2*sizeof(debug)/sizeof(char),debug);
 					break;
+				case 'e':
 				case 'E':
-					for(int n=0,e=error; e; e >>= 1, ++n)
+					for(int n=0,e=IOC_State.Error; e; e >>= 1, ++n)
 						if(_BIT(e, 0))
 							printf("\r\nerror %03d: %s",n, ErrMsg[n].c_str());	
 						printf("\r\nerror mask=%08X\r\n:",error_mask);	
@@ -404,6 +387,7 @@ int		_LM::DecodeEq(char *c) {
 				case 'k':
 					break;
 
+				case 'e':
 				case 'E':
 					while(*c)
 						ErrParse(1 << strtoul(++c,&c,10));

@@ -4,6 +4,10 @@
 #include						<string.h>
 #include						"can.h"
 
+#define	_ADC_ERR_DELAY	200
+#define _PUMP_ERR_DELAY	3000
+#define _FAN_ERR_DELAY	5000
+
 typedef	enum {
 	_NOERR						=0,
 	_V5								=0x0001,

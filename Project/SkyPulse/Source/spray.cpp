@@ -88,10 +88,7 @@ int		e=_NOERR;
 					}
 					
 					Air_ref			= offset.air + AirLevel*gain.air/10;																				// AirLevel od 0-10
-					Bottle_ref	= offset.bottle + AirLevel*gain.bottle*(100+4*WaterLevel)/100/10;						// WaterLevel od 0,10
-
-					Bottle_ref	= offset.bottle + AirLevel*gain.bottle/10 + 4*WaterLevel/100/10;
-					
+					Bottle_ref	= offset.bottle + AirLevel*gain.bottle*(100+4*WaterLevel)/100/10;		
 
 					if(!BottleIn->Busy() && !BottleOut->Busy()) {
 						if(accin) {

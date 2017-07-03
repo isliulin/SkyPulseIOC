@@ -11,7 +11,7 @@
 class	_PUMP:public _ADC,_DAC,_TIM3 {
 	private:
 
-int		idx,led,timeoutt;
+int		idx,led,timeout;
 int		fpl,fph,ftl,fth;
 _FIT	*tacho,*pressure,*current;
 	
