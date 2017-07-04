@@ -1,7 +1,5 @@
 #ifndef			TIM_H
 #define			TIM_H
-
-#include		"stm32f2xx.h"
 #include		<stdio.h>
 #define			_PWM_RATE			2000
 #define			_PWon					_PWM_RATE*9/10	

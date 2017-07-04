@@ -49,7 +49,7 @@
  #include "stm3210c_eval_spi_sd.h"
 #else
 //~~~ #error "Missing define: Evaluation board (ie. USE_STM322xG_EVAL)"
-#include "stm32f2xx.h"
+#include "stm32f4xx.h"
 #endif
 
 /** @addtogroup USB_OTG_DRIVER

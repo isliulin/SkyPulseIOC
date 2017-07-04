@@ -1,6 +1,5 @@
 #ifndef					LCD_H
 #define					LCD_H
-#include				"stm32f2xx.h"
 #include				"stdio.h"
 #include				"stdlib.h"
 #include				"stmpe811qtr.h"

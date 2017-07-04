@@ -48,15 +48,10 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#ifdef STM32F4XX
 	#include "stm32f4xx.h"
 	#include "stm32f4xx_rcc.h"
-#else
-	 #include "stm32f2xx.h"
-	 #include "stm32f2xx_rcc.h"
 	
    #define ETH_MACMIIAR_CR_Div102  ((uint32_t)0x00000010)  /* HCLK:150-168 MHz; MDC clock= HCLK/102 */  
-#endif
 
 /* Exported types ------------------------------------------------------------*/
 /* Exported constants --------------------------------------------------------*/

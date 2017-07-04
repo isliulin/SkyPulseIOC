@@ -11,7 +11,6 @@
 	* @brief	lightmaster application class
 	*
 	*/
-#include				"stm32f2xx.h"
 #include				<stdio.h>
 #include				<stdlib.h>
 #include				<ctype.h>

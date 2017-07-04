@@ -10,6 +10,7 @@
 /** @addtogroup
 * @{
 */
+#include	"stm32f4xx.h"
 #include	"dac.h"
 #include	"math.h"
 _DAC *_DAC::instance=NULL;

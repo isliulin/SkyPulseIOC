@@ -1,6 +1,5 @@
 #ifndef					DAC_H
 #define					DAC_H
-#include				"stm32f2xx.h"
 #include				"stdio.h"
 
 class	_DAC {

@@ -1,6 +1,5 @@
 #ifndef					TERM_H
 #define					TERM_H
-#include				"stm32f2xx.h"
 #include				"gpio.h"
 /*******************************************************************************
 * Function Name	: 

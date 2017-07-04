@@ -1,6 +1,5 @@
 #ifndef				CAN_H
 #define				CAN_H
-#include			"stm32f2xx.h"
 #include			<stdio.h>
 #include			"isr.h"
 //______________________________________________________________________________________		

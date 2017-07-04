@@ -1,6 +1,5 @@
 #ifndef			FAN_H
 #define			FAN_H
-#include		"stm32f2xx.h"
 #include		"stdio.h"
 #include		"adc.h"
 #include		"dac.h"

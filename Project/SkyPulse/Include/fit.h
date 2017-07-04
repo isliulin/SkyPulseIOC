@@ -1,6 +1,5 @@
 #ifndef					FIT_H
 #define					FIT_H
-#include				"stm32f2xx.h"
 
 enum _fittype		{FIT_POW, FIT_TRIG, FIT_EXP, FIT_NEXP};
 

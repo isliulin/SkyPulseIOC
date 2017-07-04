@@ -48,11 +48,7 @@
 #endif
 
 /* Includes ------------------------------------------------------------------*/
-#ifdef STM32F4XX
 	#include "stm32f4xx.h"
-#else
-	 #include "stm32f2xx.h"
-#endif
 
 #include "stm32f4_discovery.h"
 #include "stm32f4_discovery_lcd.h"

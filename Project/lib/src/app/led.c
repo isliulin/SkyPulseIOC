@@ -14,14 +14,7 @@
 */
 
 #include		<stdlib.h>
-#if defined  (STM32F2XX)
-#include		"stm32f2xx.h"
-#
-#elif defined (STM32F10X_HD)
-#include		"stm32f10x.h"
-#elif	undefined (STM32F2XX || STM32F10X_HD)
-*** undefined target !!!!
-#endif
+#include		"stm32f4xx.h"
 
 extern void			(*_thread_loop)(void);
 #if		defined (__PFM6__)

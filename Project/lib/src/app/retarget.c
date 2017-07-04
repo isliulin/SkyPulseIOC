@@ -16,7 +16,7 @@
 #include <rt_misc.h>
 #include <stdlib.h>
 #include <string.h>
-#include "stm32f2xx.h"
+#include "stm32f4xx.h"
 #include "ff.h"
 #include "io.h"
 //_________________________________________________________________________________

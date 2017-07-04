@@ -24,20 +24,22 @@
 * Return				: None
 *******************************************************************************/
 _SPRAY::_SPRAY() {	
-					Bottle_ref=Air_ref=															_BAR(1);
-					mode.On=false;
-					AirLevel=WaterLevel=0;
-					vibrate=false;
-
-					offset.air=offset.bottle=offset.compressor=	_BAR(1);
-					gain.air=																		_BAR(2);
-					gain.bottle=																_BAR(1.3);
-					gain.compressor=														_BAR(1);	
-	
 					Water=			new _VALVE(7,true);
 					Air=				new _VALVE(6,true);
 					BottleIn=		new _VALVE(5,true);
 					BottleOut=	new _VALVE(4,false);
+	
+					offset.air=offset.bottle=offset.compressor=	_BAR(1);
+					gain.air=																		_BAR(2);
+					gain.bottle=																_BAR(1.3);
+					gain.compressor=														_BAR(1);
+	
+					Air_P=Bottle_P=0;
+					AirLevel=WaterLevel=0;
+					Bottle_ref=Air_ref=													_BAR(1);
+	
+					mode.On=false;
+					vibrate=false;
 					idx=0;
 
 					BottleIn->Close();
@@ -55,6 +57,7 @@ _SPRAY::_SPRAY() {
 
 #ifdef	USE_LCD
 			pBott=pComp=pAir=pAmb=1.0;
+			P1=4.0;P0=1.0;
 			simrate=0;
 #endif
 
@@ -165,7 +168,11 @@ void			_SPRAY::SaveSettings(FILE *f) {
 	*/
 /*******************************************************************************/
 void			_SPRAY::Increment(int a, int b) {
+#ifndef 	__SIMULATION__
 					idx= __min(__max(idx+b,0),1);
+#else
+					idx= __min(__max(idx+b,0),3);
+#endif			
 					switch(idx) {
 						case 0:
 							AirLevel 		= __min(__max(0,AirLevel+a),10);
@@ -174,13 +181,23 @@ void			_SPRAY::Increment(int a, int b) {
 							WaterLevel 	= __min(__max(0,WaterLevel+a),10);
 							break;
 						case 2:
+							P1 					= __min(__max(0.5,P1+(double)a/10.0),4.5);
 							break;
 						case 3:
+							P0 					= __min(__max(0.5,P0+(double)a/10.0),1.5);
 							break;
 					}
-					printf("\r:air/water   %3d,%3d,%4.1lf",AirLevel,WaterLevel,(double)(adf.compressor-offset.compressor)/gain.compressor);
-					for(int i=2+4*(2-idx);i--;printf("\b"));	
-					
+#ifndef 	__SIMULATION__
+					printf("\r:air/water   %3d,%3d,%3.1lf",
+						AirLevel,WaterLevel,
+							(double)(adf.compressor-offset.compressor)/gain.compressor);
+					for(int i=1+4*(2-idx);i--;printf("\b"));	
+#else
+					printf("\r:air/water   %3d,%3d,%3.1lf,%3.1lf",
+						AirLevel,WaterLevel,
+							P1,P0);
+					for(int i=1+4*(3-idx);i--;printf("\b"));	
+#endif			
 }
 /*******************************************************************************
 * Function Name	:
@@ -189,9 +206,6 @@ void			_SPRAY::Increment(int a, int b) {
 * Return				: None T1,T2.T3   A0,A1,A2
 *******************************************************************************/
 #ifdef 		__SIMULATION__
-
-double		_SPRAY::pComp,_SPRAY::pBott,_SPRAY::pAir,_SPRAY::pAmb;
-
 bool			_SPRAY::Simulator(void) {
 					
 	_TIM		*tim=_TIM::Instance();
@@ -199,8 +213,6 @@ bool			_SPRAY::Simulator(void) {
 	#define Uc1 pComp
 	#define Uc2 pBott
 	#define Uc3 pAmb
-	#define V1 4.0
-	#define V2 1.0
 	
 	#define R1 100
 	#define R2 100
@@ -212,12 +224,12 @@ bool			_SPRAY::Simulator(void) {
 	#define C2 50e-3
 	#define dt 1e-3
 	
-	double	Iin=(V1-Uc1)/R1;
+	double	Iin=(P1-Uc1)/R1;
 	double	I12=(Uc1-Uc2)/R2;
 	double	I13=(Uc1-Uc3)/R7;
 	double	I23=(Uc2-Uc3)/R4;
-	double	I3=(Uc3-V2)/R6;
-	double	Iout=(Uc2 - V2)/100.0;
+	double	I3=(Uc3-P0)/R6;
+	double	Iout=(Uc2 - P0)/100.0;
 
 	I13 = I13*tim->Pwm(6)/_PWM_RATE;
 

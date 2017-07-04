@@ -1,7 +1,6 @@
 #ifndef					SPRAY_H
 #define					SPRAY_H
 
-#include				"stm32f2xx.h"
 #include				<stdio.h>
 #include				"isr.h"
 #include				"dac.h"
@@ -41,7 +40,7 @@ class	_SPRAY:public _ADC {
 #endif
 		_PLOT<double>  plot;	
 		bool		Simulator(void);
-		static double	pComp,pBott,pAir,pAmb;
+		double	pComp,pBott,pAir,pAmb,P1,P0;
 		int			simrate;
 #endif
 };

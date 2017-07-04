@@ -1,7 +1,5 @@
 #ifndef					WS2812_H
 #define					WS2812_H
-
-#include				"stm32f2xx.h"
 #include 				<string>
 #include				<stdlib.h>
 #include				<stdio.h>

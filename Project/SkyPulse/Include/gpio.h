@@ -1,7 +1,5 @@
 #ifndef					GPIO_H
 #define					GPIO_H
-#include				"stm32f2xx.h"
-
 #define	__FOOT_MASK	0xe000
 
 //

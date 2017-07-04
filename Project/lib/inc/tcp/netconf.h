@@ -45,7 +45,7 @@
 #ifndef __NETCONF_H
 #define __NETCONF_H
 
-#include "stm32f2xx.h"
+#include "stm32f4xx.h"
 
 #ifdef __cplusplus
  extern "C" {

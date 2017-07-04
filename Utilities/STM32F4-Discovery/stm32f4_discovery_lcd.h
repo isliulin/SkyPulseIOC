@@ -51,11 +51,8 @@
 #endif 
 
 /* Includes ------------------------------------------------------------------*/
-#ifdef STM32F4XX
-	#include "stm32f4xx.h"
-#else
-	 #include "stm32f2xx.h"
-#endif
+#include "stm32f4xx.h"
+
 #include "fonts.h"
 
 /** @addtogroup Utilities
@@ -268,7 +265,7 @@ typedef struct
   * @brief  LCD Size (Width and Height)  
   */ 
 #define LCD_PIXEL_WIDTH          320
-#define LCD_PIXEL_HEIGHT         240
+#define LCD_PIXEL_HEIGHT         252
 
 /**
   * @}

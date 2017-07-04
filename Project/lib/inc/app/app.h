@@ -1,6 +1,6 @@
 /* Includes ------------------------------------------------------------------*/
 #ifndef WIN32
-#include				"stm32f2xx.h"
+#include				"stm32f4xx.h"
 #endif
 #include				<string.h>
 #include				<stdio.h>

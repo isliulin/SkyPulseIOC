@@ -1,6 +1,5 @@
 #ifndef					PUMP_H
 #define					PUMP_H
-#include				"stm32f2xx.h"
 #include				"stdio.h"
 #include				"stdlib.h"
 #include				"adc.h"
