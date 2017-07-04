@@ -72,24 +72,6 @@ _LM::_LM() {
 
 			_12Voff_ENABLE;
 			
-// not used in the application
-#ifdef	USE_LCD
-	#ifdef	__SIMULATION__
-			spray.pComp=_BAR(1.0);
-			spray.pBott=spray.pAir=spray.pAmb=_BAR(1.0);
-			spray.simrate=0;
-			plot.Clear();
-			
-			plot.Add(&spray.pComp,1.0,0.02, LCD_COLOR_YELLOW);
-			plot.Add(&spray.pBott,1.0,0.02, LCD_COLOR_CYAN);
-			plot.Add(&spray.pAir,1.0,0.002, LCD_COLOR_MAGENTA);
-
-//		plot.Add(&_ADC::Instance()->buf.compressor,_BAR(1),_BAR(1)*0.02, LCD_COLOR_GREEN);
-//		plot.Add(&_ADC::Instance()->buf.bottle,_BAR(1),_BAR(1)*0.02, LCD_COLOR_CYAN);
-//		plot.Add(&_ADC::Instance()->buf.air,_BAR(1),_BAR(1)*0.002, LCD_COLOR_MAGENTA);
-
-	#endif
-#endif
       io=_stdio(NULL);
 			Select(NONE);
 			Submit("@onoff.led");
@@ -150,15 +132,6 @@ int		err  = _ADC::Status();								// collecting error data
 	
 			lm->can.Parse(lm);			
 			lm->Foot2Can();
-
-#ifdef __SIMULATION__
-			if(lm->spray.Simulator()) {
-#ifdef USE_LCD
-				if(lm->plot.Refresh())
-					lm->lcd.Grid();
-#endif
-			}
-#endif			
 			_stdio(temp);		
 }			
 /*******************************************************************************
@@ -236,14 +209,6 @@ void	_LM::Increment(int i, int j) {
 					spray.offset.air+=10*i;
 					spray.gain.air+=10*j;
 					printf("\r:air.......... %5d,%5d",spray.offset.air,spray.gain.air);
-					break;
-				
-				case PLOT_OFFSET:
-					plot.Offset(i,j);
-					break;
-				
-				case PLOT_SCALE:
-					plot.Scale(i,j);
 					break;
 				
 				default:

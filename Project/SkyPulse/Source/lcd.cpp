@@ -21,13 +21,11 @@
 * Return				: None
 *******************************************************************************/
 _LCD::_LCD() {
-#ifdef USE_LCD
 			STM32f4_Discovery_LCD_Init();
 			LCD_SetBackColor(LCD_COLOR_BLACK);
 			LCD_SetTextColor(LCD_COLOR_YELLOW);
 			LCD_SetFont(&Font8x12);
 			Grid();
-#endif
 }
 /*******************************************************************************
 * Function Name	:

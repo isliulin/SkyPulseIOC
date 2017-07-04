@@ -21,8 +21,6 @@
 #include				"spray.h"
 #include				"pump.h"
 #include				"fan.h"
-//#include				"ec20.h"
-//#include				"ee.h"
 #include				"adc.h"
 #include				"tim.h"
 #include				"dac.h"
@@ -33,7 +31,7 @@
 #define					SW_version	11
 
 typedef enum		{DBG_CAN_TX, DBG_CAN_RX, DBG_ERR, DBG_INFO, DBG_CAN_COM=21, DBG_EC_SIM=22, DBG_ENRG=23}	_DEBUG_;
-typedef enum		{PUMP, FAN, SPRAY, PLOT_OFFSET, PLOT_SCALE, CTRL_A, CTRL_B, CTRL_C, CTRL_D, NONE} _SELECTED_;
+typedef enum		{PUMP, FAN, SPRAY, CTRL_A, CTRL_B, CTRL_C, CTRL_D, NONE} _SELECTED_;
 //_____________________________________________________________________________
 class	_LM {
 
@@ -57,7 +55,6 @@ class	_LM {
 		static 			string ErrMsg[];
 		double			plotA,plotB,plotC;
 	
-		_PLOT<double> plot;	
 		_SPRAY			spray;
 		_CAN				can;
 		_PUMP				pump;
@@ -67,10 +64,6 @@ class	_LM {
 		_IOC_Footsw	IOC_Footsw;
 		_IOC_Spray	IOC_Spray;
 	
-#ifdef	USE_LCD
-		_LCD				lcd;
-#endif
-
 		void 				Increment(int, int);
 		void 				Select(_SELECTED_);
 		void 				Submit(string);

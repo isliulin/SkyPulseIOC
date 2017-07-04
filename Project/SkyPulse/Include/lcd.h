@@ -35,14 +35,14 @@ typedef struct
 
 } WAVE_FormatTypeDef;
 
-using						namespace std;
-template				<typename Type>	
+using					namespace std;
+template			<typename Type>	
 
 class	_PLOT {
 	class _POINT {
 		public:
-			Type 		*Plot;
-			short		Colour,Offset,Scale;
+			Type 		*Plot,Offset,Scale;
+			short		Colour;
 			void Draw(int x) {
 				LCD_SetTextColor(Colour);
 				LCD_DrawCircle(x,LCD_PIXEL_HEIGHT/2+100-((*Plot-Offset)/Scale),1);
@@ -50,8 +50,7 @@ class	_PLOT {
 		};
 
 	private:
-		int x,				// current x-axis position
-				idx;			// index of plot selected
+		int x, idx;
 		vector<_POINT> points;
 	
 	public:
@@ -71,30 +70,6 @@ class	_PLOT {
 			points.push_back(p);
 		};
 		
-		void	Offset(int a, int b) {
-			idx= __min(__max(idx+b,0),points.size()-1);
-			points[idx].Offset -= a*points[idx].Scale;
-			printf("\r:plot offset ");
-			for(int i=0; i<points.size(); ++i)
-				printf("%6d", points[i].Offset);
-			
-			printf("\b");
-			for(int i=0; i<points.size()-idx-1; ++i)
-				printf("\b\b\b\b\b\b");
-			};			
-
-		void	Scale(int a, int b) {
-			idx= __min(__max(idx+b,0),points.size()-1);
-			points[idx].Scale = __max(points[idx].Scale-a,1);
-			printf("\r:plot scale ");
-			for(int i=0; i<points.size(); ++i)
-				printf("%6d", points[i].Scale);
-			
-			printf("\b");
-			for(int i=0; i<points.size()-idx-1; ++i)
-				printf("\b\b\b\b\b\b");
-			};			
-			
 		void	Clear(void) {
 			points.clear();
 		}
@@ -108,6 +83,14 @@ class	_PLOT {
 				return false;
 			else
 				return true;
+		}
+
+		void	Colour(Type *type, short colour) {
+			for(int i = 0; i != points.size(); ++i)
+				if(points[i].Plot==type) {
+					points[i].Colour=colour;
+					return;
+				}
 		}
 };
 

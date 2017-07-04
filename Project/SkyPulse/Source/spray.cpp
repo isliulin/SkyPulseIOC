@@ -44,6 +44,24 @@ _SPRAY::_SPRAY() {
 					BottleOut->Close();
 					Air->Close();
 					Water->Close();
+	
+#ifdef 		__SIMULATION__
+	
+					plot.Clear();
+					
+					plot.Add(&pComp,1.0,0.02, LCD_COLOR_YELLOW);
+					plot.Add(&pBott,1.0,0.02, LCD_COLOR_GREY);
+					plot.Add(&pAir,	1.0,0.02, LCD_COLOR_MAGENTA);
+
+#ifdef	USE_LCD
+			pBott=pComp=pAir=pAmb=1.0;
+			simrate=0;
+#endif
+
+		//		plot.Add(&_ADC::Instance()->buf.compressor,_BAR(1),_BAR(1)*0.02, LCD_COLOR_GREEN);
+		//		plot.Add(&_ADC::Instance()->buf.bottle,_BAR(1),_BAR(1)*0.02, LCD_COLOR_CYAN);
+		//		plot.Add(&_ADC::Instance()->buf.air,_BAR(1),_BAR(1)*0.002, LCD_COLOR_MAGENTA);
+#endif
 }
 /*******************************************************************************
 * Function Name :
@@ -100,6 +118,17 @@ int		e=_NOERR;
 					}
 					else
 						Air->Close();
+					
+					
+#ifdef __SIMULATION__
+			if(Simulator()) {
+#ifdef USE_LCD
+				if(plot.Refresh())
+					lcd.Grid();
+#endif
+			}
+#endif			
+					
 					return e;
 }
 /*******************************************************************************/
@@ -161,53 +190,71 @@ void			_SPRAY::Increment(int a, int b) {
 *******************************************************************************/
 #ifdef 		__SIMULATION__
 
-#define 	C_comp 		100
-#define		Rcomp			10
-	        
-#define 	C_air 		5
-#define		RairIn		100
-#define		RairOut		5
-	        
-#define 	C_bott 		1000
-#define		RbottIn		5
-#define		RbottOut	5
-
-#define		Rh2o			1000
 double		_SPRAY::pComp,_SPRAY::pBott,_SPRAY::pAir,_SPRAY::pAmb;
 
 bool			_SPRAY::Simulator(void) {
-					if(simrate && __time__ < simrate)
-						return false;
-					simrate = __time__ + 10;
 					
 	_TIM		*tim=_TIM::Instance();
-	
-	double	iAir  =(pComp-pAir)/RairIn * tim->Pwm(6)/_PWM_RATE;
-	double	oAir  =(pAir-pAmb)/RairOut;
-	double	iBott = BottleIn->Opened() 	? (pComp-pBott)/RbottIn : 0;			//vpih
-	double	oBott = BottleOut->Closed() ? (pBott-pAmb)/RbottOut : 0;			//izpuh
-	double	iComp =(4.0-pComp)/Rcomp;
-	double	oComp =iAir+iBott;
 
-					if(Water->Opened())	{
-						oBott += (pBott-pAir)/Rh2o;
-						iAir += (pBott-pAir)/Rh2o;
-					}
-					
-					pAir += (iAir-oAir)/C_air;
-					pBott += (iBott-oBott)/C_bott;
-					pComp += (iComp-oComp)/C_comp;
-					
-					buffer.compressor=pComp*_BAR(1);
-					buffer.bottle=(pBott+iBott*RbottIn*0.1)*_BAR(1);
-					buffer.air=(pAir + iAir*RairIn)*_BAR(1);
-					
-					buffer.V5		= _V5to16X;
-					buffer.V12	= _V12to16X;
-					buffer.V24	= _V24to16X;
-						
-					buffer.T2=(unsigned short)0xafff;
-					return true;
+	#define Uc1 pComp
+	#define Uc2 pBott
+	#define Uc3 pAmb
+	#define V1 4.0
+	#define V2 1.0
+	
+	#define R1 100
+	#define R2 100
+	#define R4 300
+	#define R7 300
+	#define R6 10
+	#define C1 1e-3
+	#define C3 100e-6
+	#define C2 50e-3
+	#define dt 1e-3
+	
+	double	Iin=(V1-Uc1)/R1;
+	double	I12=(Uc1-Uc2)/R2;
+	double	I13=(Uc1-Uc3)/R7;
+	double	I23=(Uc2-Uc3)/R4;
+	double	I3=(Uc3-V2)/R6;
+	double	Iout=(Uc2 - V2)/100.0;
+
+	I13 = I13*tim->Pwm(6)/_PWM_RATE;
+
+	if(BottleIn->Closed()) {
+		I12=0;
+		plot.Colour(&pBott,LCD_COLOR_GREY);
+	} else
+		plot.Colour(&pBott,LCD_COLOR_RED);
+	
+	if(BottleOut->Closed())
+		Iout=0;
+	else
+		plot.Colour(&pBott,LCD_COLOR_BLUE);
+		
+	if(Water->Closed())
+		I23=0;
+
+	Uc1+=(Iin-I12-I13)/C1*dt;
+	Uc2+=(I12-I23-Iout)/C2*dt;
+	Uc3+=(I23+I13-I3)/C3*dt;	
+	
+	pAir=pAmb + I13*R7;
+	buffer.compressor	=_BAR(pComp);
+	buffer.bottle			=_BAR(pBott);
+	buffer.air				=_BAR(pAir);
+	
+	buffer.V5		= _V5to16X;
+	buffer.V12	= _V12to16X;
+	buffer.V24	= _V24to16X;
+	
+	buffer.T2=(unsigned short)0xafff;
+	
+	if(simrate && __time__ < simrate)
+		return false;
+	
+	simrate = __time__ + 10;
+	return true;
 }
 #endif
 

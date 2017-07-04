@@ -10,7 +10,7 @@
 #include				"lcd.h"
 #include				"spray.h"
 
-#define		_BAR(a) (a*0x4000)
+#define		_BAR(a) (a*16384.0)
 extern void Simulate(void);					
 
 typedef	struct {
@@ -36,6 +36,10 @@ class	_SPRAY:public _ADC {
 		bool		vibrate;
 	
 #ifdef __SIMULATION__	
+#ifdef	USE_LCD
+		_LCD				lcd;
+#endif
+		_PLOT<double>  plot;	
 		bool		Simulator(void);
 		static double	pComp,pBott,pAir,pAmb;
 		int			simrate;
