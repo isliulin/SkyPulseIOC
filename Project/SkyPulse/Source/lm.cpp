@@ -49,17 +49,13 @@ _LM::_LM() {
 					Parse((FILE *)&f);
 				f_close(&f);	
 			}	
-//			else				
-//				printf("\r\n setup file error...\r\n:");
-			
+
 			if(f_open(&f,"0:/limits.ini",FA_READ) == FR_OK) {
 				pump.LoadLimits((FILE *)&f);
 				fan.LoadLimits((FILE *)&f);
 				f_close(&f);	
 			}	
-//			else				
-//				printf("\r\n limits not active...\r\n:");
-			
+
 			printf("\r\n[F4]  - spray on/off");
 			printf("\r\n[F5]  - pump");
 			printf("\r\n[F6]  - fan");
@@ -235,6 +231,19 @@ int		_LM::DecodePlus(char *c) {
 					break;
 				case 'c':
 					return ws.ColorOn(strchr(c,' '));
+				case 's':
+				case 'S':
+				case __CtrlS:
+					ADC_DeInit();
+#ifdef USE_LCD
+					spray.plot.Clear();
+					spray.plot.Add(&_ADC::buffer.compressor,_BAR(1.0),_BAR(0.02), LCD_COLOR_YELLOW);
+					spray.plot.Add(&_ADC::buffer.bottle,_BAR(1.0),_BAR(0.02), LCD_COLOR_GREY);
+					spray.plot.Add(&_ADC::buffer.air,_BAR(1.0),_BAR(0.02), LCD_COLOR_MAGENTA);
+					spray.lcd=new _LCD;
+#endif
+					spray.mode.Simulator=true;
+					break;
 				default:
 					*c=0;
 					return PARSE_SYNTAX;
@@ -262,6 +271,16 @@ int		_LM::DecodeMinus(char *c) {
 					break;
 				case 'c':
 					return ws.ColorOff(strchr(c,' '));
+				case 's':
+				case 'S':
+				case __CtrlS:
+					new _ADC;
+					spray.mode.Simulator=false;
+					if(spray.lcd) {
+						LCD_Clear(LCD_COLOR_BLACK);
+						spray.lcd=NULL;
+					}
+					break;
 				default:
 					*c=0;
 					return PARSE_SYNTAX;
@@ -357,7 +376,7 @@ int		_LM::DecodeEq(char *c) {
 
 				case 'k':
 					break;
-
+				
 				case 'e':
 				case 'E':
 					while(*c)
@@ -531,14 +550,17 @@ bool	_LM::Parse(int i) {
 				case __CtrlD:
 					Select(CTRL_D);
 					break;
+				case __CtrlT:
+					tetris_run(12,18);
+					break;
 				case __CtrlE: 
 					CanConsole(idCAN2COM,__CtrlE);
 					break;	
 				case __CtrlV:
-					if(spray.vibrate)
-						spray.vibrate=false;
+					if(spray.mode.Vibrate)
+						spray.mode.Vibrate=false;
 					else
-						spray.vibrate=true;
+						spray.mode.Vibrate=true;
 					break;
 				case __CtrlI:
 					_ADC::offset = _ADC::adf;
@@ -568,32 +590,32 @@ bool	_LM::Parse(int i) {
 					}
 					break;
 				case __FOOT_OFF:
-					IOC_Footsw.State=_OFF;
-					IOC_Footsw.Send();
+					IOC_FootAck.State=_OFF;
+					IOC_FootAck.Send();
 					if(_BIT(_LM::debug, DBG_INFO))
 						printf("\r\n:\r\n:footswitch disconnected \r\n:");					
 					break;
 				case __FOOT_1:
-					IOC_Footsw.State=_1;
-					IOC_Footsw.Send();
+					IOC_FootAck.State=_1;
+					IOC_FootAck.Send();
 					if(_BIT(_LM::debug, DBG_INFO))
 						printf("\r\n:\r\n:footswitch state 1\r\n:");					
 					break;
 				case __FOOT_2:
-					IOC_Footsw.State=_2;
-					IOC_Footsw.Send();
+					IOC_FootAck.State=_2;
+					IOC_FootAck.Send();
 					if(_BIT(_LM::debug, DBG_INFO))
 						printf("\r\n:\r\n:footswitch state 2\r\n:");					
 					break;
 				case __FOOT_3:
-					IOC_Footsw.State=_3;
-					IOC_Footsw.Send();
+					IOC_FootAck.State=_3;
+					IOC_FootAck.Send();
 					if(_BIT(_LM::debug, DBG_INFO))
 						printf("\r\n:\r\n:footswitch state 3\r\n:");					
 					break;
 				case __FOOT_4:
-					IOC_Footsw.State=_4;
-					IOC_Footsw.Send();
+					IOC_FootAck.State=_4;
+					IOC_FootAck.Send();
 					if(_BIT(_LM::debug, DBG_INFO))
 						printf("\r\n:\r\n:footswitch state 4\r\n:");					
 					break;

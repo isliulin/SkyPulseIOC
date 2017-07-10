@@ -112,3 +112,14 @@ f error.led
 15.5.2017
 
 - remove ee,ec20,pyro.....
+
+
+
+
+
+
+7.7..2017
+- preklop na STM32f4
+- nove kode za can
+- simulator mode
+

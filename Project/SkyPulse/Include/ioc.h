@@ -26,9 +26,11 @@ typedef	enum {
                   
 typedef enum {    
 	idIOC_State				=0x200,
+	idIOC_SprayParm		=0x201,
+	idIOC_SprayCmd		=0x202,
 	idIOC_State_Ack		=0x240,
-	idIOC_Cmd					=0x201,
-	idIOC_Footsw			=0x241,
+	idIOC_FootAck			=0x241,
+	idIOC_SprayAck		=0x242,
 	idCAN2COM					=0x20B,
   idCOM2CAN					=0x24B,
 	idCAN2FOOT				=0x20C,
@@ -54,8 +56,10 @@ typedef enum {
 
 typedef enum {
 	_SPRAY_NOT_READY,
-	_SPRAY_READY
+	_SPRAY_READY,
+	_VIBRATE
 } _Spray;
+
 //_____________________________________________________________________
 /*
 IOC status report, send on:
@@ -74,20 +78,25 @@ typedef __packed struct _IOC_State {
 	}
 } _IOCstatus;
 //_____________________________________________________________________
-typedef __packed struct _IOC_Footsw {
+typedef __packed struct _IOC_FootAck {
 	_Footsw State;
-	_IOC_Footsw() : State(_OFF)	{}	
+	_IOC_FootAck() : State(_OFF)	{}	
 	void	Send() {
-		CanTxMsg	m={idIOC_Footsw,0,CAN_ID_STD,CAN_RTR_DATA,sizeof(_IOC_Footsw),0,0,0,0,0,0,0,0};
-		memcpy(m.Data,(const void *)&State,sizeof(_IOC_Footsw));
+		CanTxMsg	m={idIOC_FootAck,0,CAN_ID_STD,CAN_RTR_DATA,sizeof(_IOC_FootAck),0,0,0,0,0,0,0,0};
+		memcpy(m.Data,(const void *)&State,sizeof(_IOC_FootAck));
 		_CAN::Instance()->Send(&m);
 	}
-} _IOC_Footsw;
+} IOC_FootAck;
 //_____________________________________________________________________
-typedef __packed struct _IOC_Cmd {
-	_Spray	Spray;
-	_IOC_Cmd() : Spray(_SPRAY_NOT_READY)	{}	
-} _IOC_Spray;
+typedef __packed struct _IOC_SprayAck {
+	_Spray	Status;
+	_IOC_SprayAck() : Status(_SPRAY_NOT_READY)	{}	
+	void	Send() {
+		CanTxMsg	m={idIOC_SprayAck,0,CAN_ID_STD,CAN_RTR_DATA,sizeof(_IOC_SprayAck),0,0,0,0,0,0,0,0};
+		memcpy(m.Data,(const void *)&Status,sizeof(_IOC_SprayAck));
+		_CAN::Instance()->Send(&m);
+	}
+} IOC_SprayAck;
 //_____________________________________________________________________
 
 

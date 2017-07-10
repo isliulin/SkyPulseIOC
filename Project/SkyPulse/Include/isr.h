@@ -11,6 +11,7 @@ void		PrintVersion(int);
 void		Watchdog(void);
 void		_led(int, int),
 				_lightshow(void);
+void 		tetris_run(int , int );
 
 #define	_RED1(a)		_led(0,a)
 #define	_GREEN1(a)	_led(1,a)
@@ -38,6 +39,8 @@ void		_led(int, int),
 #define	__CtrlP			0x10
 #define	__CtrlQ			0x11
 #define	__CtrlR			0x12
+#define	__CtrlS			0x13
+#define	__CtrlT			0x14
 #define	__CtrlV			0x16
 #define	__CtrlZ			0x1a
 #define	__CtrlY			0x19
@@ -130,8 +133,6 @@ void 		gen_crc_table(void);
 int 		update_crc(int, char *, char);
 int 		crc(int, int);
 }
-
-
 
 #ifndef	__max				
 #define __max(a,b)  (((a) > (b)) ? (a) : (b))	

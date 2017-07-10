@@ -58,15 +58,10 @@ char	*p;
 				case _CtrlZ:
 					while(1);
 				case '1':
-#ifdef	__PVC__
-					for(j=0; j<32; ++j) {
-#endif
-#ifdef	STM32F2XX
 					for(j=0; j<5; ++j) {
-#endif
-						CanHexMessage(_ID_IAP_ERASE,_SIGN_PAGE+j*_PAGE_SIZE);
-						for(i=0;i<1000;++i)	
-							App_Loop();
+					CanHexMessage(_ID_IAP_ERASE,_SIGN_PAGE+j*_PAGE_SIZE);
+					for(i=0;i<1000;++i)	
+						App_Loop();
 					}
 					break;
 				case '2':

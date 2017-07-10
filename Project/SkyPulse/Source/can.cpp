@@ -35,7 +35,7 @@ CAN_InitTypeDef					CAN_InitStructure;
 CAN_FilterInitTypeDef		CAN_FilterInitStructure;
 NVIC_InitTypeDef 				NVIC_InitStructure;
 				if(me==NULL) {
-#ifndef __SIMULATION__					
+				
 GPIO_InitTypeDef				GPIO_InitStructure;
 					GPIO_StructInit(&GPIO_InitStructure);
 					GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
@@ -49,7 +49,7 @@ GPIO_InitTypeDef				GPIO_InitStructure;
 
 					GPIO_PinAFConfig(CAN_GPIO, CAN_RXPIN, GPIO_AF_CAN);
 					GPIO_PinAFConfig(CAN_GPIO, CAN_TXPIN, GPIO_AF_CAN);
-#endif
+
 					RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN1, ENABLE);							// glej opis driverja, šmafu, treba inicializirat komplet :(
 					RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN2, ENABLE);
 					CAN_StructInit(&CAN_InitStructure);
@@ -284,9 +284,23 @@ CanTxMsg			txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 								}
 								lm->IOC_State.Send();
 								break;
-							case idIOC_Cmd:
+							case idIOC_SprayParm:
 								lm->spray.AirLevel 		= __min(rxm.Data[0],10);
 								lm->spray.WaterLevel 	= __min(rxm.Data[1],10);
+							break;
+							case idIOC_SprayCmd:
+								lm->spray.mode.On=false;
+								lm->spray.mode.Vibrate=false;
+								switch(rxm.Data[0]) {
+									case _SPRAY_NOT_READY:
+									break;
+									case _SPRAY_READY:
+										lm->spray.mode.On=true;
+									break;
+									case _VIBRATE:
+										lm->spray.mode.Vibrate=true;
+									break;
+									}
 							break;
 //______________________________________________________________________________________
 							case idCAN2COM:

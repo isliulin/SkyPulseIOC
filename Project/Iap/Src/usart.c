@@ -9,33 +9,6 @@
 
 _io*				__this_io;
 
-#if  defined (__PVC__)
-//______________________________________________________________________________________
-int					__get (_buffer *p) {
-int					i=0;
-						if(_buffer_pull(p,&i,1))
-							return i;
-						else
-							return EOF;
-}
-//______________________________________________________________________________________
-int					__put (_buffer *p, int c) {
-int					i=0;
-						USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
-						if(USART_GetFlagStatus(USART1, USART_FLAG_TXE) != RESET) {
-							if(_buffer_pull(__this_io->tx,&i,1))
-								USART_SendData(USART1, i);
-							else {
-								USART_SendData(USART1, c);
-								return(c);
-							}
-						}
-						i=_buffer_push(p,&c,1);
-						USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
-						return(i);
-}
-#endif
-
 #if  defined (__PFM6__) ||  defined (__DISCO__)
 //______________________________________________________________________________________
 #ifdef __DISCO__
@@ -175,30 +148,6 @@ _io*	 			Initialize_USART(void) {
 						GPIO_PinAFConfig(GPIOB, GPIO_PinSource7, GPIO_AF_USART1);	
 						DMA_Configuration(__this_io);
 						
-#elif  defined (__PVC__)
-{
-						NVIC_InitTypeDef 				NVIC_InitStructure;					
-						NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);  
-						NVIC_InitStructure.NVIC_IRQChannelSubPriority = 3;
-						NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
-						NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-						NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
-						NVIC_Init(&NVIC_InitStructure);
-
-						RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1 | RCC_APB2Periph_GPIOA, ENABLE);
-						GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-
-						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9;
-						GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_PP;
-						GPIO_Init(GPIOA, &GPIO_InitStructure);
-	 
-						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
-						GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-						GPIO_Init(GPIOA, &GPIO_InitStructure);
-	
-						USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);		
-}
-
 #else
 #### error, no HW defined
 #endif				 

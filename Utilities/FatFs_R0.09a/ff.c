@@ -3819,7 +3819,6 @@ FRESULT f_mkfs (
 extern 
 void	(*App_Loop)(void);
 void	Wait(int,void (*)(void));
-
 			Wait(5,App_Loop);
 }
 #endif

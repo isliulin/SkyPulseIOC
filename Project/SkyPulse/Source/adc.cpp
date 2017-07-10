@@ -26,7 +26,7 @@ _ADMA		 _ADC::buffer,_ADC::adf,_ADC::offset,_ADC::gain;
 _ADC::_ADC() {
 			if(instance==NULL) {
 				instance=this;
-#ifndef __SIMULATION__
+
 				ADC_InitTypeDef       ADC_InitStructure;
 				DMA_InitTypeDef       DMA_InitStructure;
 				GPIO_InitTypeDef      GPIO_InitStructure;
@@ -108,7 +108,6 @@ _ADC::_ADC() {
 				ADC_Cmd(ADC1, ENABLE);
 				ADC_DMACmd(ADC1, ENABLE);
 				ADC_SoftwareStartConv(ADC1);
-#endif
 				n=timeout=0;
 			}
 }

@@ -54,14 +54,13 @@ class	_LM {
 		static 			string ErrMsg[];
 		double			plotA,plotB,plotC;
 	
-		_SPRAY			spray;
-		_CAN				can;
-		_PUMP				pump;
-		_FAN				fan;
-		_WS2812			ws;
-		_IOC_State	IOC_State;
-		_IOC_Footsw	IOC_Footsw;
-		_IOC_Spray	IOC_Spray;
+	_SPRAY				spray;
+	_CAN					can;
+	_PUMP					pump;
+	_FAN					fan;
+	_WS2812				ws;
+	_IOC_State		IOC_State;
+	_IOC_FootAck	IOC_FootAck;
 	
 		void 				Increment(int, int);
 		void 				Select(_SELECTED_);

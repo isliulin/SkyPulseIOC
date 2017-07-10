@@ -35,7 +35,7 @@ CanTxMsg		tx={_ID_IAP_ACK,0,CAN_ID_STD,CAN_RTR_DATA,1,0,0,0,0,0,0,0,0};
 /******************************************************************************/
 int					main(void) {
 int					*p=(int *)*_FW_START;
-	
+
 						Watchdog_init(4000);
 						if(RCC_GetFlagStatus(RCC_FLAG_SFTRST) == SET && !crcError()) {
 							NVIC_SetVectorTable(NVIC_VectTab_FLASH,(uint32_t)p-_BOOT_TOP);				
@@ -43,16 +43,15 @@ int					*p=(int *)*_FW_START;
 							((void (*)(void))*p)();
 						}
 						App_Init();
-	
-#if	defined (__PFM6__) || defined(__DISCO__)
+
 						if(RCC_GetFlagStatus(RCC_FLAG_WWDGRST) != RESET) {
-							RCC_ClearFlag();	
+							RCC_ClearFlag();
 							FileHexProg();
 						}
-#endif
-						RCC_ClearFlag();	
+
+						RCC_ClearFlag();
 						while(1)
-							App_Loop();							
+							App_Loop();
 }
 /******************************************************************************/
 void				Watchdog_init(int t) {
@@ -85,24 +84,16 @@ void 				SysTick_init(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-//char 				*leds[]={"d0","d1","d2","d3","","d4","d5","d6","d7"};
-
 void 				App_Init(void) {
-
-#if defined (__PVC__)
-						RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA|RCC_APB2Periph_GPIOB|RCC_APB2Periph_GPIOC|RCC_APB2Periph_GPIOD|RCC_APB2Periph_GPIOE|RCC_APB2Periph_GPIOF|RCC_APB2Periph_GPIOG,ENABLE);				
-#elif defined  (STM32F2XX)
 						RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOB|RCC_AHB1Periph_GPIOC|RCC_AHB1Periph_GPIOD|RCC_AHB1Periph_GPIOE|RCC_AHB1Periph_GPIOF|RCC_AHB1Periph_GPIOG,ENABLE);	
-#endif
-
-						Initialize_CAN(0);							// 0=normal, 1=loopback(testiranje)
+						Initialize_CAN(0);	// 0=normal, 1=loopback(testiranje)
 						SysTick_init();
 						
 #ifdef WITH_COM_PORT
 						__stdin.handle.io=__stdout.handle.io=Initialize_USART();
 						printf(IAP_MSG);
-//						Initialize_LED(leds,9);
 #endif
+	
 #if		defined (__PFM6__)
 {
 // pfm ventilatorji off		
@@ -127,7 +118,6 @@ void 				App_Init(void) {
 }
 /*******************************************************************************/
 void				__App_Loop(void)  {
-
 #ifdef WITH_COM_PORT
 static int	t=0;
 						if(t != __time__) {
@@ -150,22 +140,17 @@ void				(*App_Loop)(void)= __App_Loop;
 /*******************************************************************************
 * Function Name  : FlashErase
 * Description    : Brisanje flash bloka
-* Input          :
+* Input          : flash setor no., blokada neveljavnik in boot
 * Output         :
 * Return         :
 *******************************************************************************/
 int					FlashErase(int n) {
 int					i;
-						if(n == _BOOT_SECTOR) 
+						if(!IS_FLASH_SECTOR(n) || n == _BOOT_SECTOR)
 							return(-1);
 						FLASH_Unlock();
-#if defined (__PVC__)
-						FLASH_ClearFlag(FLASH_FLAG_BSY | FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPRTERR);						
-						do i=FLASH_ErasePage(n); while(i==FLASH_BUSY);
-#elif defined  (STM32F2XX)
 						FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR|FLASH_FLAG_PGSERR);	
-						do i=FLASH_EraseSector(n, VoltageRange_3);	while(i==FLASH_BUSY);
-#endif			
+						do i=FLASH_EraseSector(n, VoltageRange_3);	while(i==FLASH_BUSY);		
 						if(i==FLASH_COMPLETE)
 							return(0);
 						else
@@ -175,7 +160,7 @@ int					i;
 * Function Name  : FlashProgram32
 * Description    : programiranje  ali verificiranje 32 bitov, klièe  driver v knjižnici samo
 *								 : èe se vsebina razlikuje od zahtevane; specifikacije enake kot FLASH_ProgramWord 
-*								 : iz knjižnice
+*								 : iz knjižnice. Blokada adres, nižjih od adrese signature
 * Input          :
 * Output         :
 * Return         :
@@ -188,13 +173,8 @@ int					i;
 							return(-1);
 						else {
 							FLASH_Unlock();
-#if defined (__PVC__)
-							FLASH_ClearFlag(FLASH_FLAG_BSY | FLASH_FLAG_EOP | FLASH_FLAG_PGERR | FLASH_FLAG_WRPRTERR);						
-							do i=FLASH_ProgramWord(Address,Data); while(i==FLASH_BUSY);
-#elif defined  (STM32F2XX)
 							FLASH_ClearFlag(FLASH_FLAG_EOP | FLASH_FLAG_OPERR | FLASH_FLAG_WRPERR | FLASH_FLAG_PGAERR | FLASH_FLAG_PGPERR|FLASH_FLAG_PGSERR);	
-							do i=FLASH_ProgramWord(Address,Data); while(i==FLASH_BUSY);
-#endif				
+							do i=FLASH_ProgramWord(Address,Data); while(i==FLASH_BUSY);	
 						}
 						if(i==FLASH_COMPLETE)
 							return(0);
@@ -212,11 +192,7 @@ int					i;
 int					crcError(void) {
 int 				i;
 
-#if defined (__PVC__)
-						RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
-#elif defined  (STM32F2XX)
 						RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC, ENABLE);
-#endif
 						CRC_ResetDR();
 						if(CRC_CalcBlockCRC((uint32_t *)_FW_SIZE,3)==*_SIGN_CRC) {
 							CRC_ResetDR();
@@ -230,17 +206,12 @@ int 				i;
 int					crcSIGN(void) {
 int 				i=-1,crc;
 
-#if defined (__PVC__)
-						RCC_AHBPeriphClockCmd(RCC_AHBPeriph_CRC, ENABLE);
-#elif defined  (STM32F2XX)
-						RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC, ENABLE);
-#endif				
+						RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC, ENABLE);	
 #ifdef	__DISCO__	
-						_Words32Received=0;
-						_minAddress=0x08008000;
-						
-						if(_Words32Received)
+						_Words32Received=(STORAGE_TOP-_FLASH_TOP)/sizeof(uint32_t);
+						_minAddress=_FLASH_TOP;				
 #endif						
+						if(_Words32Received)
 						{
 							i=FlashErase(_SIGN_PAGE);
 							CRC_ResetDR();
@@ -333,10 +304,7 @@ CanRxMsg		rx;
 							case _ID_IAP_ERASE:	
 								_Words32Received=0;
 								Watchdog();
-								if(IS_FLASH_SECTOR(*(int *)rx.Data) && *(int *)rx.Data != _BOOT_SECTOR)
-									ret=FlashErase(*(int *)rx.Data);
-								else
-									ret=-1;
+								ret=FlashErase(*(int *)rx.Data);
 								if(!p)
 									SendAck(ret);
 								break;	
@@ -530,92 +498,7 @@ char				q[16];
 * Return         : 
 *******************************************************************************/
 void 				Initialize_CAN(int loop) {
-#if defined (__PVC__)
-GPIO_InitTypeDef			GPIO_InitStructure;
-CAN_InitTypeDef				CAN_InitStructure;
-CAN_FilterInitTypeDef	CAN_FilterInitStructure;
 
-						CAN_StructInit(&CAN_InitStructure);
-						RCC_APB2PeriphClockCmd(RCC_APB2Periph_AFIO |RCC_APB2Periph_GPIOA, ENABLE);  //pppp dodal
-
-						RCC_APB1PeriphClockCmd(RCC_APB1Periph_CAN1, ENABLE);
-						CAN_DeInit(__CAN__); 
-						CAN_InitStructure.CAN_TTCM=DISABLE;
-						CAN_InitStructure.CAN_ABOM=ENABLE;
-						CAN_InitStructure.CAN_AWUM=DISABLE;
-						CAN_InitStructure.CAN_NART=ENABLE;
-						CAN_InitStructure.CAN_RFLM=DISABLE;
-						CAN_InitStructure.CAN_TXFP=DISABLE;
-						if(loop)
-							CAN_InitStructure.CAN_Mode=CAN_Mode_LoopBack;
-						else
-							CAN_InitStructure.CAN_Mode=CAN_Mode_Normal;
-// ... pomembn.. da ne zamesa mailboxov in jih oddaja po vrstnem redu vpisovanja... ni default !!!
-						CAN_InitStructure.CAN_TXFP=ENABLE;	
-						CAN_InitStructure.CAN_SJW=CAN_SJW_4tq;
-						CAN_InitStructure.CAN_BS1=CAN_BS1_12tq;
-						CAN_InitStructure.CAN_BS2=CAN_BS2_5tq;
-						CAN_InitStructure.CAN_Prescaler=4;
-						CAN_Init(__CAN__,&CAN_InitStructure);
-						
-						CAN_FilterInitStructure.CAN_FilterMode=CAN_FilterMode_IdList;
-						CAN_FilterInitStructure.CAN_FilterScale=CAN_FilterScale_32bit;
-						CAN_FilterInitStructure.CAN_FilterMaskIdLow=0;
-						CAN_FilterInitStructure.CAN_FilterIdLow=0;
-						CAN_FilterInitStructure.CAN_FilterActivation=ENABLE;
-						
-						GPIO_StructInit(&GPIO_InitStructure);
-						
-// // ... RX pin
-// 						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8;	//GPIO_Pin_11;
-// 						GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-// 						GPIO_Init(GPIOB, &GPIO_InitStructure);
-// // ... TX pin					
-// 						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_9; //GPIO_Pin_12;
-// 						GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD;
-// 						GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-// 						GPIO_Init(GPIOB, &GPIO_InitStructure);
-
-// ... RX pin
-						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_11;
-						GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;
-						GPIO_Init(GPIOA, &GPIO_InitStructure);
-// ... TX pin
-						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12;
-						GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF_OD;
-						GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-						GPIO_Init(GPIOA, &GPIO_InitStructure); 
-
-// filtri
-						CAN_FilterInitStructure.CAN_FilterMode=CAN_FilterMode_IdList;
-						CAN_FilterInitStructure.CAN_FilterScale=CAN_FilterScale_32bit;
-						
-						CAN_FilterInitStructure.CAN_FilterMaskIdLow=0;
-						CAN_FilterInitStructure.CAN_FilterIdLow=0;
-						CAN_FilterInitStructure.CAN_FilterFIFOAssignment=CAN_FIFO0;
-						CAN_FilterInitStructure.CAN_FilterActivation=ENABLE;
-// nastavitev adrese & brisanje
-						CAN_FilterInitStructure.CAN_FilterIdHigh=_ID_IAP_ADDRESS<<5;
-						CAN_FilterInitStructure.CAN_FilterMaskIdHigh=_ID_IAP_ERASE<<5;
-						CAN_FilterInitStructure.CAN_FilterNumber=0;
-						CAN_FilterInit(&CAN_FilterInitStructure);
-// programiranje 32 bit, acknowledge
-						CAN_FilterInitStructure.CAN_FilterIdHigh=_ID_IAP_DWORD<<5;
-						CAN_FilterInitStructure.CAN_FilterMaskIdHigh=_ID_IAP_ACK<<5;
-						CAN_FilterInitStructure.CAN_FilterNumber=1;
-						CAN_FilterInit(&CAN_FilterInitStructure);
-// 	run
-						CAN_FilterInitStructure.CAN_FilterIdHigh=_ID_IAP_GO<<5;
-						CAN_FilterInitStructure.CAN_FilterMaskIdHigh=_ID_IAP_SIGN<<5;
-						CAN_FilterInitStructure.CAN_FilterNumber=2;
-						CAN_FilterInit(&CAN_FilterInitStructure);
-						
-						CAN_FilterInitStructure.CAN_FilterIdHigh=_ID_IAP_STRING<<5;
-						CAN_FilterInitStructure.CAN_FilterMaskIdHigh=_ID_IAP_PING<<5;
-						CAN_FilterInitStructure.CAN_FilterNumber=3;
-						CAN_FilterInit(&CAN_FilterInitStructure);
-						
-#elif defined  (STM32F2XX)
 CAN_InitTypeDef					CAN_InitStructure;
 CAN_FilterInitTypeDef		CAN_FilterInitStructure;
 GPIO_InitTypeDef				GPIO_InitStructure;
@@ -692,7 +575,6 @@ GPIO_InitTypeDef				GPIO_InitStructure;
 						CAN_FilterInitStructure.CAN_FilterMaskIdHigh=_ID_IAP_PING<<5;
 						CAN_FilterInitStructure.CAN_FilterNumber=__FILTER_BASE__+3;
 						CAN_FilterInit(&CAN_FilterInitStructure);
-#endif
 }
 /**
   * @brief  This function handles SysTick Handler.
@@ -704,7 +586,6 @@ int 				__time__;
 void 				SysTick_Handler(void) {
 						++__time__;
 }
-#if	defined (__PFM6__) || defined(__DISCO__)
 /******************************************************************************/
 void				FileHexProg(void) {
 FATFS	fs;
@@ -728,7 +609,6 @@ char	s[128];
 						f_close(&f);
 						f_mount(0,NULL);
 }
-#endif
 /**
 * @}
 */ 

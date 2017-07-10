@@ -1,7 +1,12 @@
 /* Includes ------------------------------------------------------------------*/
+
+#ifndef _APP_H
+#define	_APP_H
+
 #ifndef WIN32
 #include				"stm32f4xx.h"
 #endif
+
 #include				<string.h>
 #include				<stdio.h>
 #include				<ctype.h>
@@ -218,28 +223,10 @@ int							DecodeCom(char *),
 
 _io 						*ParseCom(_io *);
 
-void						USBHost(void);
+void						USBHost(void),
+								USBH_PowerOn(void),
+								USBH_PowerOff(void);
 
-__inline void		USBH_PowerOff(void) {
-	#ifdef		__DISCO__
-GPIO_InitTypeDef GPIO_InitStructure; 
-								GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-								GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-								GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
-								GPIO_Init(GPIOC, &GPIO_InitStructure);
-								GPIO_SetBits(GPIOC,GPIO_Pin_0);
-	#endif
-}
-__inline void		USBH_PowerOn(void) {
-	#ifdef		__DISCO__
-GPIO_InitTypeDef GPIO_InitStructure; 
-								GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-								GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-								GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
-								GPIO_Init(GPIOC, &GPIO_InitStructure);
-								GPIO_ResetBits(GPIOC,GPIO_Pin_0);
-	#endif
-}
 int							getHEX(char *, int);
 void						putHEX(unsigned int,int);
 int							hex2asc(int);
@@ -318,11 +305,11 @@ __inline void dbg3(char *s, int arg1, int arg2) {
 				_stdio(io);
 			}
 }
-void			Pyro_Pile_Init(void),
-					Pile_Proc(char *);
-
 
 #define	GET_MACRO(_1,_2,_3,NAME,...) NAME
 #define	_DEBUG_MSG(...) GET_MACRO(__VA_ARGS__, dbg3, dbg2, dbg1)(__VA_ARGS__)
 
 #define ALL_GPIO	(RCC_AHB1Periph_GPIOA |RCC_AHB1Periph_GPIOB |RCC_AHB1Periph_GPIOC | RCC_AHB1Periph_GPIOD | RCC_AHB1Periph_GPIOE |RCC_AHB1Periph_GPIOF |RCC_AHB1Periph_GPIOG)
+
+#endif	//_APP_H
+

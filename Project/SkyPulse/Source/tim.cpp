@@ -40,7 +40,6 @@ _TIM::_TIM() {
 TIM_TimeBaseInitTypeDef		TIM_TimeBaseStructure;
 TIM_OCInitTypeDef					TIM_OCInitStructure;
 
-#ifndef __SIMULATION__
 GPIO_InitTypeDef					GPIO_InitStructure;
 // ________________________________________________________________________________
 // TIM1-TIM8, IGBT pwm outputs
@@ -76,7 +75,6 @@ GPIO_InitTypeDef					GPIO_InitStructure;
 			GPIO_Init(GPIOD, &GPIO_InitStructure);
 // ________________________________________________________________________________
 // TIMebase setup
-#endif
 			TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
 			TIM_OCStructInit(&TIM_OCInitStructure);
 

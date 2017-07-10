@@ -14,15 +14,8 @@
 */
 
 #include		<stdlib.h>
-#if defined  (STM32F2XX)
 #include		"stm32f2xx.h"
 #
-#elif defined (__PVC__)
-#include		"stm32f10x.h"
-#elif	undefined (STM32F2XX || __PVC__)
-*** undefined target !!!!
-#endif
-
 extern void			(*App_Loop)(void);
 #if		defined (__PFM6__)
 	#define	__LED_ON(a,b)			GPIO_ResetBits(a,b);
@@ -30,9 +23,6 @@ extern void			(*App_Loop)(void);
 #elif  defined (__DISCO__)
 	#define	__LED_OFF(a,b)		GPIO_ResetBits(a,b);
 	#define	__LED_ON(a,b)			GPIO_SetBits(a,b);
-#elif  defined (__PVC__)
-	#define	__LED_OFF(a,b)
-	#define	__LED_ON(a,b)
 #else
 	#### error, no HW defined
 #endif
@@ -108,7 +98,6 @@ static	int
 // leds GPIO setup ______________________________________________________________
 //
 void	Initialize_LED(char *p[], int n) {
-#if		defined (__PFM6__) || defined(__DISCO__)
 GPIO_InitTypeDef	GPIO_InitStructure;
 int		i;
 			GPIO_StructInit(&GPIO_InitStructure);
@@ -140,5 +129,4 @@ int		i;
 					GPIO_Init(gpio[i], &GPIO_InitStructure);		
 					__LED_OFF(gpio[i],pin[i]);
 				}
-#endif
 }

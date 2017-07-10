@@ -76,6 +76,27 @@ void	Initialize_host_msc(void) {
 * @}
 */ 
 
+void		USBH_PowerOn(void) {
+	#ifdef		__DISCO__
+GPIO_InitTypeDef GPIO_InitStructure; 
+								GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+								GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+								GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+								GPIO_Init(GPIOC, &GPIO_InitStructure);
+								GPIO_ResetBits(GPIOC,GPIO_Pin_0);
+	#endif
+}
+
+void		USBH_PowerOff(void) {
+	#ifdef		__DISCO__
+GPIO_InitTypeDef GPIO_InitStructure; 
+								GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+								GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+								GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;
+								GPIO_Init(GPIOC, &GPIO_InitStructure);
+								GPIO_SetBits(GPIOC,GPIO_Pin_0);
+	#endif
+}
 
 /** @defgroup USBH_USR_Private_Macros
 * @{
@@ -169,7 +190,7 @@ const uint8_t MSG_MSC_UNREC_ERROR[] = "> UNRECOVERED ERROR STATE\n";
 */
 void USBH_USR_Init(void)
 {
-	_DEBUG_MSG("... initialized");
+	// _DEBUG_MSG("... initialized");
 }
 
 /**
@@ -180,7 +201,7 @@ void USBH_USR_Init(void)
 */
 void USBH_USR_DeviceAttached(void)
 {
-	_DEBUG_MSG("... attached");
+	// _DEBUG_MSG("... attached");
 }
 
 
@@ -191,7 +212,7 @@ void USBH_USR_DeviceAttached(void)
 */
 void USBH_USR_UnrecoveredError (void)
 { 
-	_DEBUG_MSG("... error");
+	// _DEBUG_MSG("... error");
 }
 
 
@@ -205,7 +226,7 @@ void USBH_USR_DeviceDisconnected (void)
 { 
 	if(USBH_App)
 		USBH_App(EOF);
-	_DEBUG_MSG("... disconnected");
+	// _DEBUG_MSG("... disconnected");
 }
 /**
 * @brief  USBH_USR_ResetUSBDevice 
@@ -214,7 +235,7 @@ void USBH_USR_DeviceDisconnected (void)
 */
 void USBH_USR_ResetDevice(void)
 { 
-	_DEBUG_MSG("... reset");
+	// _DEBUG_MSG("... reset");
 }
 
 
@@ -226,7 +247,7 @@ void USBH_USR_ResetDevice(void)
 */
 void USBH_USR_DeviceSpeedDetected(uint8_t DeviceSpeed)
 { 
-	_DEBUG_MSG("... speed detected");
+	// _DEBUG_MSG("... speed detected");
 }
 
 /**
@@ -237,7 +258,7 @@ void USBH_USR_DeviceSpeedDetected(uint8_t DeviceSpeed)
 */
 void USBH_USR_Device_DescAvailable(void *DeviceDesc)
 {
-	_DEBUG_MSG("... description available");
+	// _DEBUG_MSG("... description available");
 }
 
 /**
@@ -248,7 +269,7 @@ void USBH_USR_Device_DescAvailable(void *DeviceDesc)
 */
 void USBH_USR_DeviceAddressAssigned(void)
 { 
-	_DEBUG_MSG("... address assigned");
+	// _DEBUG_MSG("... address assigned");
 }
 
 
@@ -262,7 +283,7 @@ void USBH_USR_Configuration_DescAvailable(USBH_CfgDesc_TypeDef * cfgDesc,
                                           USBH_InterfaceDesc_TypeDef *itfDesc,
                                           USBH_EpDesc_TypeDef *epDesc)
 {
-	_DEBUG_MSG("... configuration available");
+	// _DEBUG_MSG("... configuration available");
 }
 
 /**
@@ -273,7 +294,7 @@ void USBH_USR_Configuration_DescAvailable(USBH_CfgDesc_TypeDef * cfgDesc,
 */
 void USBH_USR_Manufacturer_String(void *ManufacturerString)
 {
-	_DEBUG_MSG("... %s",(int)ManufacturerString);
+	// _DEBUG_MSG("... %s",(int)ManufacturerString);
 }
 
 /**
@@ -284,7 +305,7 @@ void USBH_USR_Manufacturer_String(void *ManufacturerString)
 */
 void USBH_USR_Product_String(void *ProductString)
 {
-	_DEBUG_MSG("... %s",(int)ProductString);
+	// _DEBUG_MSG("... %s",(int)ProductString);
 }
 
 /**
@@ -295,7 +316,7 @@ void USBH_USR_Product_String(void *ProductString)
 */
 void USBH_USR_SerialNum_String(void *SerialNumString)
 {
-	_DEBUG_MSG("... %s",(int)SerialNumString);
+	// _DEBUG_MSG("... %s",(int)SerialNumString);
 }
 /**
 * @brief  EnumerationDone 
@@ -305,7 +326,7 @@ void USBH_USR_SerialNum_String(void *SerialNumString)
 */
 void USBH_USR_EnumerationDone(void)
 {
-	_DEBUG_MSG("... enumeration done");	
+	// _DEBUG_MSG("... enumeration done");	
 }
 
 
@@ -317,7 +338,7 @@ void USBH_USR_EnumerationDone(void)
 */
 void USBH_USR_DeviceNotSupported(void)
 { 
-	_DEBUG_MSG("... device not supported");
+	// _DEBUG_MSG("... device not supported");
 }
 
 

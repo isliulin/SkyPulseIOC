@@ -25,7 +25,6 @@ _DAC *_DAC::instance=NULL;
 _DAC::_DAC() {
 	if(instance == NULL) {
 		instance=this;
-#ifndef __SIMULATION__
 		DAC_InitTypeDef		DAC_InitStructure;
 		GPIO_InitTypeDef	GPIO_InitStructure;
 
@@ -57,7 +56,6 @@ _DAC::_DAC() {
 		DAC_Ch2_Config();
 #else
 		***error: HW platform not defined
-#endif
 #endif
 	}
 }
