@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <tetris.h>
 #include <signal.h>
 #include <time.h>
 #include	"app.h"
+#include "tetris.h"
 
 struct tetris_level {
     int score;
@@ -123,8 +123,7 @@ tetris_clean(struct tetris *t) {
 void
 tetris_print(struct tetris *t) {
     int x,y;
-    for (x=0; x<30; x++)
-        printf("\r\n");
+    printf("%c[H",__Esc);
     printf("[LEVEL: %d | SCORE: %d]\r\n", t->level, t->score);
     for (x=0; x<2*t->w+2; x++)
         printf("~");

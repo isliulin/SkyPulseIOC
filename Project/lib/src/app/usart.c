@@ -296,10 +296,10 @@ _buffer		*p=io->cmdline;
 							fputc('\b',&__stdout);
 					}
 					if(mode) {
-						if(isprint(c))
-							fputc(c,&__stdout);
-						else
+						if(c < 0x20 || c > 0x7f)
 							printf("%c%02X%c",'<',c,'>');
+						else
+							fputc(c,&__stdout);
 					}
 					break;
 			}
