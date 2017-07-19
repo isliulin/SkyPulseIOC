@@ -28,6 +28,31 @@ struct tetris {
 
 struct tetris_block blocks[] =
 {
+    {{"\xdf\xdf", 
+      "\xdf\xdf"},
+    2, 2
+    },
+    {{" \xdf ",
+      "\xdf\xdf\xdf"},
+    3, 2
+    },
+    {{"\xdf\xdf\xdf\xdf"},
+        4, 1},
+    {{"\xdf\xdf",
+         "\xdf ",
+         "\xdf "},
+    2, 3},
+    {{"\xdf\xdf",
+         " \xdf",
+         " \xdf"},
+    2, 3},
+    {{"\xdf\xdf ",
+         " \xdf\xdf"},
+    3, 2}
+};
+
+struct tetris_block blockss[] =
+{
     {{"##", 
          "##"},
     2, 2
@@ -275,9 +300,9 @@ tetris_run(int w, int h) {
     while (!t.gameover) {
 				_wait(10,_thread_loop);
         if (count%100 == 0) {
-            tetris_gravity(&t);
-            tetris_check_lines(&t);
-						tetris_print(&t);
+					tetris_gravity(&t);
+          tetris_check_lines(&t);
+					tetris_print(&t);
         }
         count++;
         while ((cmd=getchar())>0) {
@@ -295,6 +320,13 @@ tetris_run(int w, int h) {
                         t.x--;
                     break;
                 case ' ':
+										do
+											t.y++;
+										while(tetris_hittest(&t)==0);
+										t.y--;
+										tetris_print_block(&t);
+										count=0;
+										break;
                 case 'B':
 										count=0;
                     tetris_gravity(&t);
@@ -303,6 +335,7 @@ tetris_run(int w, int h) {
 										count=0;
                     tetris_rotate(&t);
                     break;
+				
             }
         }
     }
