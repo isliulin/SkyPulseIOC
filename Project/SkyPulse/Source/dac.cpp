@@ -21,7 +21,6 @@ _DAC *_DAC::instance=NULL;
 	* @retval : None
 	*/
 /*******************************************************************************/
-
 _DAC::_DAC() {
 	if(instance == NULL) {
 		instance=this;
@@ -49,7 +48,7 @@ _DAC::_DAC() {
 		DAC_Cmd(DAC_Channel_2, ENABLE);
 #elif defined (__IOC_V2__)
 		DAC_SetChannel1Data(DAC_Align_12b_R,0);	
-		DAC_SetChannel2Data(DAC_Align_12b_R,0x7ff);	
+		DAC_SetChannel2Data(DAC_Align_12b_R,0);	
 		for(int i=0; i<sizeof(DacBuff)/sizeof(short); ++i)
 			DacBuff[i]=0x7ff;	
 		TIM6_Config();

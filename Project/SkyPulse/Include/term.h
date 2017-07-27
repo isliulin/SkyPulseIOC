@@ -17,7 +17,7 @@ class _TERM {
 			seq=timeout=0;
 			lp=lbuf;
 		};
-		char *Cmd(char c);
+		char *Cmd(int c);
 		char *Cmd(void);
 		void Refresh(int);
 		int	 Esc(int);

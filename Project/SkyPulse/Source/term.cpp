@@ -39,7 +39,7 @@ char	*_TERM::Cmd(void) {
 * Output				:
 * Return				:
 *******************************************************************************/
-char	*_TERM::Cmd(char c) {
+char	*_TERM::Cmd(int c) {
 			switch(c) {
 				case 0x08:
 				case 0x7f:
@@ -59,7 +59,7 @@ char	*_TERM::Cmd(char c) {
 					break;
 
 				default:
-					if(c > 127)
+					if(c < ' ' || c > 127)
 						printf("<%X>",c);
 					else {
 						printf("%c",c);
