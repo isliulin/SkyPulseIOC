@@ -9,7 +9,7 @@
 
 _io*				__this_io;
 
-#if  defined (__PFM6__) ||  defined (__DISCO__)
+#if  defined (__PFM6__) ||  defined (__PFM8__) ||  defined (__DISCO__)
 //______________________________________________________________________________________
 #ifdef __DISCO__
 volatile int32_t 
@@ -112,7 +112,7 @@ _io*	 			Initialize_USART(void) {
 						__this_io->get= __get;	
 
 
-#if  defined (__PFM6__)
+#if  defined (__PFM6__) || defined (__PFM8__)
 						RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1,ENABLE);
 						RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA,ENABLE);
 						

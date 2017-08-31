@@ -184,10 +184,11 @@ GPIO_InitTypeDef				GPIO_InitStructure;
 }
 //______________________________________________________________________________________
 int	putCOM3(_buffer *p, int	c) {
-int i;
-	i=_buffer_push(__com3->tx,&c,1);	
-	USART_ITConfig(USART3, USART_IT_TXE, ENABLE);
-	return(i);
+	if(_buffer_push(__com3->tx,&c,1)==1)
+		USART_ITConfig(USART3, USART_IT_TXE, ENABLE);
+	else
+		c=EOF;
+	return(c);
 }
 //______________________________________________________________________________________
 _io *Initialize_USART3(int speed) {

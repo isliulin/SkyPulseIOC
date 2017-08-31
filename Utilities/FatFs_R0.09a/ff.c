@@ -3814,7 +3814,7 @@ FRESULT f_mkfs (
 				__print(" error!");
 				return FR_DISK_ERR;
 			}
-#if defined(__PFM6__) || defined (__DISCO__) 
+#if defined(__PFM6__) || defined(__PFM8__) || defined (__DISCO__) 
 {
 extern 
 void	(*App_Loop)(void);

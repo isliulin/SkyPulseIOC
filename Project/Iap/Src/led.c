@@ -17,7 +17,7 @@
 #include		"stm32f2xx.h"
 #
 extern void			(*App_Loop)(void);
-#if		defined (__PFM6__)
+#if  defined (__PFM6__) || defined (__PFM8__)
 	#define	__LED_ON(a,b)			GPIO_ResetBits(a,b);
 	#define	__LED_OFF(a,b)		GPIO_SetBits(a,b);
 #elif  defined (__DISCO__)
@@ -81,7 +81,8 @@ static	int
 				if(__time__ < 10000) {
 					if(!(++t1 % NN)) {
 						_led(t3,0);
-						t2=++t2 % Nk;
+						++t2;
+						t2 %= Nk;
 						if(t2==t3)
 								_led((t3+1)%Nk,20);
 					}
@@ -102,7 +103,7 @@ GPIO_InitTypeDef	GPIO_InitStructure;
 int		i;
 			GPIO_StructInit(&GPIO_InitStructure);
 			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-#if		defined (__PFM6__)
+#if  defined (__PFM6__) || defined (__PFM8__)
 			GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
 #elif  defined (__DISCO__)
 			GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;

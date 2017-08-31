@@ -56,17 +56,8 @@ _LM::_LM() {
 				f_close(&f);	
 			}	
 
-			printf("\r\n[F4]  - spray on/off");
-			printf("\r\n[F5]  - pump");
-			printf("\r\n[F6]  - fan");
-			printf("\r\n[F7]  - spray");
-			printf("\r\n[F11] - save settings");	
-			printf("\r\n[F12] - exit app.    ");	
-			printf("\r\n");		
-			printf("\r\nCtrlY - reset");	
-			printf("\r\n:");	
-
 			_12Voff_ENABLE;
+			Parse(__F1);
 			
       io=_stdio(NULL);
 			Select(NONE);
@@ -459,9 +450,18 @@ bool	_LM::Parse(int i) {
 			switch(console.Esc(i)) {
 				case EOF:
 					break;
-
 				case __F1:
 				case __f1:
+					printf("\r\n[F4]  - spray on/off");
+					printf("\r\n[F5]  - pump");
+					printf("\r\n[F6]  - fan");
+					printf("\r\n[F7]  - spray");
+					printf("\r\n[F11] - save settings");	
+					printf("\r\n[F12] - exit app.    ");	
+					printf("\r\n");		
+					printf("\r\nCtrlY - reset");	
+					printf("\r\nCtrlZ - boot");	
+					printf("\r\n:");	
 					break;
 				case __F2:
 				case __f2:

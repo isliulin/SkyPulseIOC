@@ -36,14 +36,61 @@ CanTxMsg		tx={_ID_IAP_ACK,0,CAN_ID_STD,CAN_RTR_DATA,1,0,0,0,0,0,0,0,0};
 int					main(void) {
 int					*p=(int *)*_FW_START;
 
+// pfm fan & trigger off
+#if		defined (__PFM6__)
+{
+						GPIO_InitTypeDef GPIO_InitStructure;   
 						Watchdog_init(4000);
-						if(RCC_GetFlagStatus(RCC_FLAG_SFTRST) == SET && !crcError()) {
+						RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOB|RCC_AHB1Periph_GPIOC|RCC_AHB1Periph_GPIOD|RCC_AHB1Periph_GPIOE|RCC_AHB1Periph_GPIOF|RCC_AHB1Periph_GPIOG,ENABLE);	
+						GPIO_StructInit(&GPIO_InitStructure);
+						GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+						GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
+						GPIO_Init(GPIOA, &GPIO_InitStructure);
+						GPIO_ResetBits(GPIOA,GPIO_Pin_6);
+
+						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13;
+						GPIO_Init(GPIOD, &GPIO_InitStructure);
+						GPIO_SetBits(GPIOD,GPIO_Pin_12 | GPIO_Pin_13);
+
+// red, yellow, blue		
+						GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_2 | GPIO_Pin_3;
+						GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+						GPIO_SetBits(GPIOD,GPIO_Pin_0 | GPIO_Pin_2 | GPIO_Pin_3);
+}			
+#elif	defined (__PFM8__)
+{
+						GPIO_InitTypeDef GPIO_InitStructure;   
+						Watchdog_init(4000);
+						RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOB|RCC_AHB1Periph_GPIOC|RCC_AHB1Periph_GPIOD|RCC_AHB1Periph_GPIOE|RCC_AHB1Periph_GPIOF|RCC_AHB1Periph_GPIOG,ENABLE);	
+						GPIO_StructInit(&GPIO_InitStructure);
+						GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
+						GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
+						GPIO_Init(GPIOA, &GPIO_InitStructure);
+						GPIO_ResetBits(GPIOA,GPIO_Pin_6);
+
+						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6;
+						GPIO_Init(GPIOE, &GPIO_InitStructure);
+						GPIO_SetBits(GPIOE,GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6);
+
+// red, yellow, blue		
+						GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_2 | GPIO_Pin_3;
+						GPIO_Init(GPIOD, &GPIO_InitStructure);
+
+						GPIO_SetBits(GPIOD,GPIO_Pin_0 | GPIO_Pin_2 | GPIO_Pin_3);
+}			
+#endif
+						if(RCC_GetFlagStatus(RCC_FLAG_IWDGRST) == RESET && RCC_GetFlagStatus(RCC_FLAG_WWDGRST) == RESET && !crcError()) {
 							NVIC_SetVectorTable(NVIC_VectTab_FLASH,(uint32_t)p-_BOOT_TOP);				
 							__set_MSP(*p++);
 							((void (*)(void))*p)();
 						}
-						App_Init();
 
+						App_Init();
 						if(RCC_GetFlagStatus(RCC_FLAG_WWDGRST) != RESET) {
 							RCC_ClearFlag();
 							FileHexProg();
@@ -85,34 +132,13 @@ void 				SysTick_init(void)
 * Return         : None
 *******************************************************************************/
 void 				App_Init(void) {
-						RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOB|RCC_AHB1Periph_GPIOC|RCC_AHB1Periph_GPIOD|RCC_AHB1Periph_GPIOE|RCC_AHB1Periph_GPIOF|RCC_AHB1Periph_GPIOG,ENABLE);	
 						Initialize_CAN(0);	// 0=normal, 1=loopback(testiranje)
 						SysTick_init();
 						
 #ifdef WITH_COM_PORT
 						__stdin.handle.io=__stdout.handle.io=Initialize_USART();
 						printf(IAP_MSG);
-#endif
-	
-#if		defined (__PFM6__)
-{
-// pfm ventilatorji off		
-						GPIO_InitTypeDef GPIO_InitStructure;   
-						GPIO_StructInit(&GPIO_InitStructure);
-						GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-						GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
-						GPIO_Init(GPIOA, &GPIO_InitStructure);
-						GPIO_ResetBits(GPIOA,GPIO_Pin_6);
-
-// red, yellow, blue		
-						GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_2 | GPIO_Pin_3;
-						GPIO_Init(GPIOD, &GPIO_InitStructure);
-
-						GPIO_SetBits(GPIOD,GPIO_Pin_0 | GPIO_Pin_2 | GPIO_Pin_3);
-}			
-#endif
+#endif	
 						_Words32Received=0;
 						CAN_Transmit(__CAN__,&tx);
 }
@@ -507,7 +533,7 @@ GPIO_InitTypeDef				GPIO_InitStructure;
 						GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
 						GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 
-#ifdef			__PFM6__
+#if  defined (__PFM6__) || defined (__PFM8__)
 						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
 						GPIO_Init(GPIOB, &GPIO_InitStructure);
 						GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
@@ -535,7 +561,9 @@ GPIO_InitTypeDef				GPIO_InitStructure;
 						CAN_InitStructure.CAN_AWUM=DISABLE;
 						CAN_InitStructure.CAN_NART=ENABLE;
 						CAN_InitStructure.CAN_RFLM=DISABLE;
+						
 //... pomembn.. da ne zamesa mailboxov in jih oddaja po vrstnem redu vpisovanja... ni default !!!
+
 						CAN_InitStructure.CAN_TXFP=ENABLE;	
 						if(loop)
 							CAN_InitStructure.CAN_Mode=CAN_Mode_LoopBack;

@@ -3,7 +3,7 @@
 
 #define 		SW_version					110		
 
-#if defined	(__PFM6__)
+#if  defined (__PFM6__) || defined (__PFM8__)
 	#define			__CAN__						CAN2
 	#define			__FILTER_BASE__		14
 #elif defined	(__DISCO__)
