@@ -240,6 +240,8 @@ int							sDump(char *,int);
 int							hex2asc(int);
 int							asc2hex(int);
 int 						wcard(char *, char *);
+void						print_date_time(uint32_t d,uint32_t t);
+void						PrintRtc(void);
 void						PrintVersion(int);
 int							putLCD(_buffer *, int);
 

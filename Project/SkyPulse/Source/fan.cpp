@@ -10,7 +10,6 @@
 /** @addtogroup
 * @{
 */
-
 #include	"fan.h"
 #include	"limits.h"
 #include	"math.h"
@@ -22,7 +21,7 @@
 	* @retval : None
 	*/
 /*******************************************************************************/
-_FAN::_FAN() :_TIM3(1) {
+_FAN::_FAN() :_TIM9(0) {
 				fpl=20;
 				fph=95;
 				ftl=25;
@@ -40,9 +39,9 @@ _FAN::_FAN() :_TIM3(1) {
 int			_FAN::Poll() {
 int			e=_NOERR;
 				if(timeout==INT_MAX)
-					TIM4->CCR1=TIM4->ARR;
+					_fTIM->CCR1=_fTIM->ARR;
 				else {
-					TIM4->CCR1=(int)((TIM4->ARR*__ramp(Th2o(),ftl*100,fth*100,fpl,fph))/100);
+					_fTIM->CCR1=(int)((_fTIM->ARR*__ramp(Th2o(),ftl*100,fth*100,fpl,fph))/100);
 					if(tacho && __time__ > timeout) {
 						if(abs(tacho->Eval(Rpm()) - Tau()) > Tau()/10)
 							e |= _fanTacho;
@@ -131,10 +130,10 @@ int			_FAN::Increment(int a, int b) {
 						fth= __min(__max(fth+a,ftl),50);
 						break;
 					}
-				
+
 				printf("\r:fan       %5d%c,%4.1lf'C",Rpm(),'%',(double)Th2o()/100);
 				if(idx>0)
-					printf("        %2d%c-%2d%c,%2d'C-%2d'C",fpl,'%',fph,'%',ftl,fth);		
+					printf("        %2d%c-%2d%c,%2d'C-%2d'C",fpl,'%',fph,'%',ftl,fth);
 				for(int i=4*(5-idx);idx && i--;printf("\b"));
 				return Rpm();
 }

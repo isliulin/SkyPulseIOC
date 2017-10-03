@@ -52,6 +52,86 @@ TIM_TimeBaseInitTypeDef		TIM_TimeBaseStructure;
 TIM_OCInitTypeDef					TIM_OCInitStructure;
 DMA_InitTypeDef						DMA_InitStructure;
 GPIO_InitTypeDef					GPIO_InitStructure;
+	
+#ifdef __IOC_V2__		
+//
+// ________________________________________________________________________________
+			ws2812 *w=ws;
+			int i=0;
+			while(w->size)																		// count number of leds
+				i+=w++->size;
+			dma_buffer=new dma[i+1];													// allocate dma buffer
+			dma_size=i*sizeof(dma)/sizeof(short)+1;
+			
+			w=ws;
+			i=0;
+			while(w->size) {
+				w->cbuf=new HSV_set[w->size];										// alloc color buffer
+				w->lbuf=&dma_buffer[i];													// pointer to dma tab
+				i+=w++->size;
+			}
+			_thread_add((void *)proc_WS2812,this,(char *)"WS2812",10);
+//
+// ________________________________________________________________________________
+// TIM4
+			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
+			GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
+			GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
+			
+			GPIO_PinAFConfig(GPIOD, GPIO_PinSource12, GPIO_AF_TIM4);
+			GPIO_PinAFConfig(GPIOD, GPIO_PinSource13, GPIO_AF_TIM4);
+			GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13;
+			GPIO_Init(GPIOD, &GPIO_InitStructure);
+// DMA setup _____________________________________________________________________
+			DMA_StructInit(&DMA_InitStructure);
+			RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1, ENABLE);
+			DMA_DeInit(DMA1_Stream6);
+			DMA_InitStructure.DMA_Memory0BaseAddr = (uint32_t)dma_buffer;
+			DMA_InitStructure.DMA_DIR = DMA_DIR_MemoryToPeripheral;
+			DMA_InitStructure.DMA_BufferSize = dma_size;
+			DMA_InitStructure.DMA_Mode = DMA_Mode_Normal;
+			DMA_InitStructure.DMA_Priority = DMA_Priority_High;
+			DMA_InitStructure.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
+			DMA_InitStructure.DMA_MemoryInc = DMA_MemoryInc_Enable;
+			DMA_InitStructure.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
+			DMA_InitStructure.DMA_MemoryDataSize = DMA_PeripheralDataSize_HalfWord;
+			DMA_InitStructure.DMA_FIFOMode = DMA_FIFOMode_Enable;
+			DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
+			DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;
+			DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
+
+			DMA_InitStructure.DMA_Channel = DMA_Channel_2;
+			DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)TIM4_BASE + 0x4C;	//~~~
+			DMA_Init(DMA1_Stream6, &DMA_InitStructure);	
+// ________________________________________________________________________________
+// TIMebase setup
+			TIM_DeInit(TIM4);
+			RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM4, ENABLE);
+			
+			TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
+			TIM_TimeBaseStructure.TIM_Prescaler = 0;
+			TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
+			TIM_TimeBaseStructure.TIM_Period = 74;
+
+			TIM_TimeBaseInit(TIM4,&TIM_TimeBaseStructure);
+// ________________________________________________________________________________
+// Output Compare
+			TIM_OCInitStructure.TIM_OutputState = TIM_OutputState_Enable;
+			TIM_OCInitStructure.TIM_OCMode = TIM_OCMode_PWM1;
+			TIM_OCInitStructure.TIM_Pulse=0;
+			TIM_OCInitStructure.TIM_OCPolarity = TIM_OCPolarity_High;
+			TIM_OC1Init(TIM4, &TIM_OCInitStructure);
+			TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);
+			TIM_OC2Init(TIM4, &TIM_OCInitStructure);
+			TIM_OC2PreloadConfig(TIM4, TIM_OCPreload_Enable);
+// ________________________________________________________________________________
+// Startup
+			TIM_CtrlPWMOutputs(TIM4, ENABLE);
+			TIM_Cmd(TIM4,ENABLE);
+
+			TIM_DMAConfig(TIM4, TIM_DMABase_CCR1, TIM_DMABurstLength_1Transfer);
+			TIM_DMACmd(TIM4, TIM_DMA_Update, ENABLE);		
+#else
 //
 // ________________________________________________________________________________
 			ws2812 *w=ws;
@@ -72,8 +152,6 @@ GPIO_InitTypeDef					GPIO_InitStructure;
 //
 // ________________________________________________________________________________
 // TIM2
-
-			GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
 			GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 			GPIO_InitStructure.GPIO_Speed = GPIO_Speed_100MHz;
@@ -81,7 +159,7 @@ GPIO_InitTypeDef					GPIO_InitStructure;
 			GPIO_PinAFConfig(GPIOA, GPIO_PinSource2, GPIO_AF_TIM2);
 			GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
 			GPIO_Init(GPIOA, &GPIO_InitStructure);
-	
+			
 // DMA setup _____________________________________________________________________
 			DMA_StructInit(&DMA_InitStructure);
 			RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA1, ENABLE);
@@ -103,6 +181,7 @@ GPIO_InitTypeDef					GPIO_InitStructure;
 			DMA_InitStructure.DMA_Channel = DMA_Channel_3;
 			DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)TIM2_BASE + 0x4C;	//~~~
 			DMA_Init(DMA1_Stream1, &DMA_InitStructure);
+			
 // ________________________________________________________________________________
 // TIMebase setup
 			TIM_DeInit(TIM2);
@@ -129,6 +208,7 @@ GPIO_InitTypeDef					GPIO_InitStructure;
 
 			TIM_DMAConfig(TIM2, TIM_DMABase_CCR3, TIM_DMABurstLength_1Transfer);
 			TIM_DMACmd(TIM2, TIM_DMA_Update, ENABLE);
+#endif
 		}
 /*******************************************************************************/
 /**
@@ -141,21 +221,49 @@ void		_WS2812::trigger() {
 int			i,j,k;
 dma			*p;
 RGB_set	q;
+int			imax=sizeof(ws)/sizeof(ws2812);
 	
-				for(i=0; ws[i].size; ++i)
+				for(i=0; i<imax/2; ++i)
 					for(j=0; j<ws[i].size; ++j)
 						if(ws[i].cbuf) {
 							HSV2RGB(ws[i].cbuf[j], &q);
 							for(k=0,p=ws[i].lbuf; k<8; ++k) {
-								(q.b & (0x80>>k)) ? (p[j].b[k]=53)	: (p[j].b[k]=20);
-								(q.g & (0x80>>k)) ? (p[j].g[k]=53)	: (p[j].g[k]=20);
-								(q.r & (0x80>>k)) ? (p[j].r[k]=53)	: (p[j].r[k]=20);
+								(q.b & (0x80>>k)) ? (p[j].b[k][0]=53)	: (p[j].b[k][0]=20);
+								(q.g & (0x80>>k)) ? (p[j].g[k][0]=53)	: (p[j].g[k][0]=20);
+								(q.r & (0x80>>k)) ? (p[j].r[k][0]=53)	: (p[j].r[k][0]=20);
 							}
 						}
 						else
 							for(k=0,p=ws[i].lbuf; k<24; ++k)
-									p[j].g[k]=20;
-				
+									p[j].g[k][0]=20;
+
+				for(i=imax/2; i<imax; ++i)
+					for(j=0; j<ws[i].size; ++j)
+						if(ws[i].cbuf) {
+							HSV2RGB(ws[i].cbuf[j], &q);
+							for(k=0,p=ws[i].lbuf; k<8; ++k) {
+								(q.b & (0x80>>k)) ? (p[j].b[k][1]=53)	: (p[j].b[k][1]=20);
+								(q.g & (0x80>>k)) ? (p[j].g[k][1]=53)	: (p[j].g[k][1]=20);
+								(q.r & (0x80>>k)) ? (p[j].r[k][1]=53)	: (p[j].r[k][1]=20);
+							}
+						}
+						else
+							for(k=0,p=ws[i].lbuf; k<24; ++k)
+									p[j].g[k][1]=20;
+						
+						
+						
+						
+#ifdef __IOC_V2__		
+				DMA_Cmd(DMA1_Stream6, DISABLE);
+				TIM_Cmd(TIM4,DISABLE);
+				TIM_SetCounter(TIM4,0);
+				while(DMA_GetCmdStatus(DMA1_Stream6) != DISABLE);
+				DMA_SetCurrDataCounter(DMA1_Stream6,dma_size);
+				DMA_ClearFlag(DMA1_Stream6, DMA_FLAG_HTIF6 | DMA_FLAG_TEIF6 | DMA_FLAG_DMEIF6	| DMA_FLAG_FEIF6 | DMA_FLAG_TCIF6);
+				DMA_Cmd(DMA1_Stream6, ENABLE);
+				TIM_Cmd(TIM4,ENABLE);
+#else						
 				DMA_Cmd(DMA1_Stream1, DISABLE);
 				TIM_Cmd(TIM2,DISABLE);
 				TIM_SetCounter(TIM2,0);
@@ -164,6 +272,7 @@ RGB_set	q;
 				DMA_ClearFlag(DMA1_Stream1, DMA_FLAG_HTIF1 | DMA_FLAG_TEIF1 | DMA_FLAG_DMEIF1	| DMA_FLAG_FEIF1 | DMA_FLAG_TCIF1);
 				DMA_Cmd(DMA1_Stream1, ENABLE);
 				TIM_Cmd(TIM2,ENABLE);
+#endif
 }
 /*******************************************************************************/
 /**
@@ -172,7 +281,7 @@ RGB_set	q;
 	* @retval : None
 	*/
 /*******************************************************************************/
-void	 *_WS2812::proc_WS2812(_WS2812 *me) {
+void		*_WS2812::proc_WS2812(_WS2812 *me) {
 int			j,k,trg=0;
 ws2812	*w=ws;
 //------------------------------------------------------------------------------
@@ -309,31 +418,31 @@ ws2812	*w=ws;
 				return NULL;
 }
 //______________________________________________________________________________________
-int				strscan(char *s,char *ss[],int c) {
-					int		i=0;
-					while(1)
-					{
-						while(*s==' ') ++s;
-						if(!*s)
-							return(i);
+int			strscan(char *s,char *ss[],int c) {
+				int		i=0;
+				while(1)
+				{
+					while(*s==' ') ++s;
+					if(!*s)
+						return(i);
 
-						ss[i++]=s;
-						while(*s && *s!=c)
-						{
-							if(*s==' ')
-								*s='\0';
-							s++;
-						}
-						if(!*s)
-							return(i);
-						*s++=0;
+					ss[i++]=s;
+					while(*s && *s!=c)
+					{
+						if(*s==' ')
+							*s='\0';
+						s++;
 					}
+					if(!*s)
+						return(i);
+					*s++=0;
+				}
 }
 //______________________________________________________________________________________
-int				numscan(char *s,char *ss[],int c) {
-					while(*s && !isdigit(*s)) 
-						++s;
-					return(strscan(s,ss,c));
+int			numscan(char *s,char *ss[],int c) {
+				while(*s && !isdigit(*s)) 
+					++s;
+				return(strscan(s,ss,c));
 }
 /*******************************************************************************/
 /**
@@ -342,43 +451,43 @@ int				numscan(char *s,char *ss[],int c) {
 	* @retval : None
 	*/
 /*******************************************************************************/
-int				_WS2812::ColorOn(char *c) {
-char			*p=strtok(c," ,");
-					switch(*p) {
-//__________________________________________________
-						case '0':
-						case '1':
-						case '2':
-						case '3':
-						case '4':
-						case '5':
-							do {
-								ws[atoi(p)].mode=SWITCH_ON;
-								p=strtok(NULL," ,");
-								} while(p);
-							break;
-//__________________________________________________
-						case 'f':
-							for(p=strtok(NULL," ,"); p; p=strtok(NULL,","))
-								ws[atoi(p)].mode=FILL_ON;
-							break;
-//__________________________________________________
-						case 'l':
-							for(p=strtok(NULL," ,"); p; p=strtok(NULL,","))
-								ws[atoi(p)].mode=RUN_LEFT_ON;
-							break;
-//__________________________________________________
-						case 'r':
-							for(p=strtok(NULL," ,"); p; p=strtok(NULL,","))
-								ws[atoi(p)].mode=RUN_RIGHT_ON;
-							break;
-//__________________________________________________
+int			_WS2812::ColorOn(char *c) {
+char		*p=strtok(c," ,");
+				switch(*p) {
+//________________________________________________
+					case '0':
+					case '1':
+					case '2':
+					case '3':
+					case '4':
+					case '5':
+						do {
+							ws[atoi(p)].mode=SWITCH_ON;
+							p=strtok(NULL," ,");
+							} while(p);
+						break;
+//________________________________________________
+					case 'f':
+						for(p=strtok(NULL," ,"); p; p=strtok(NULL,","))
+							ws[atoi(p)].mode=FILL_ON;
+						break;
+//________________________________________________
+					case 'l':
+						for(p=strtok(NULL," ,"); p; p=strtok(NULL,","))
+							ws[atoi(p)].mode=RUN_LEFT_ON;
+						break;
+//________________________________________________
+					case 'r':
+						for(p=strtok(NULL," ,"); p; p=strtok(NULL,","))
+							ws[atoi(p)].mode=RUN_RIGHT_ON;
+						break;
+//________________________________________________
 
-						default:
-							return PARSE_MISSING;
-					}
-				return PARSE_OK;
-				}	
+					default:
+						return PARSE_MISSING;
+				}
+			return PARSE_OK;
+			}	
 /*******************************************************************************/
 /**
 	* @brief	_WS2812 parser, initial '.' character
@@ -386,42 +495,42 @@ char			*p=strtok(c," ,");
 	* @retval : None
 	*/
 /*******************************************************************************/
-int				_WS2812::ColorOff(char *c) {
-char			*p=strtok(c," ,");
-					switch(*p) {
-//__________________________________________________
-						case '0':
-						case '1':
-						case '2':
-						case '3':
-						case '4':
-						case '5':
-						do {
-								ws[atoi(p)].mode=SWITCH_OFF;
-								p=strtok(NULL," ,");
-								} while(p);
-							break;
-//__________________________________________________
-						case 'f':
-							for(p=strtok(NULL," ,"); p; p=strtok(NULL,","))
-								ws[atoi(p)].mode=FILL_OFF;
-							break;
-//__________________________________________________
-						case 'l':
-							for(p=strtok(NULL," ,"); p; p=strtok(NULL,","))
-								ws[atoi(p)].mode=RUN_LEFT_OFF;
-							break;
-//__________________________________________________
-						case 'r':
-							for(p=strtok(NULL," ,"); p; p=strtok(NULL,","))
-								ws[atoi(p)].mode=RUN_RIGHT_OFF;
-							break;
-//__________________________________________________
-						default:
-							return PARSE_MISSING;
-					}
-				return PARSE_OK;
-				}	
+int		_WS2812::ColorOff(char *c) {
+char	*p=strtok(c," ,");
+			switch(*p) {
+//______________________________________________
+				case '0':
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+				do {
+						ws[atoi(p)].mode=SWITCH_OFF;
+						p=strtok(NULL," ,");
+						} while(p);
+					break;
+//______________________________________________
+				case 'f':
+					for(p=strtok(NULL," ,"); p; p=strtok(NULL,","))
+						ws[atoi(p)].mode=FILL_OFF;
+					break;
+//______________________________________________
+				case 'l':
+					for(p=strtok(NULL," ,"); p; p=strtok(NULL,","))
+						ws[atoi(p)].mode=RUN_LEFT_OFF;
+					break;
+//______________________________________________
+				case 'r':
+					for(p=strtok(NULL," ,"); p; p=strtok(NULL,","))
+						ws[atoi(p)].mode=RUN_RIGHT_OFF;
+					break;
+//______________________________________________
+				default:
+					return PARSE_MISSING;
+				}
+			return PARSE_OK;
+}	
 /*******************************************************************************/
 /**
 	* @brief	_WS2812 class load/save settings method
@@ -429,31 +538,31 @@ char			*p=strtok(c," ,");
 	* @retval : None
 	*/
 /*******************************************************************************/
-int			_WS2812::SetColor(char *c) {
-int			i;
-				c=strtok(c,", ");
-				switch(*c) {
-					case '0':
-					case '1':
-					case '2':
-					case '3':
-					case '4':
-					case '5':
-						i=atoi(c);
-						ws[i].color.h =atoi(strtok(NULL,", "));
-						ws[i].color.s =atoi(strtok(NULL,", "));
-						ws[i].color.v =atoi(strtok(NULL,", "));
-						break;						
-					case 't':
-						i=atoi(strtok(NULL,", "));
-						if(i<5 || i>1000)
-							return PARSE_ILLEGAL;
-						_thread_find((void *)proc_WS2812,this)->dt=i;	
-						break;
-					default:
+int		_WS2812::SetColor(char *c) {
+int		i;
+			c=strtok(c,", ");
+			switch(*c) {
+				case '0':
+				case '1':
+				case '2':
+				case '3':
+				case '4':
+				case '5':
+					i=atoi(c);
+					ws[i].color.h =atoi(strtok(NULL,", "));
+					ws[i].color.s =atoi(strtok(NULL,", "));
+					ws[i].color.v =atoi(strtok(NULL,", "));
+					break;						
+				case 't':
+					i=atoi(strtok(NULL,", "));
+					if(i<5 || i>1000)
 						return PARSE_ILLEGAL;
-					}
-				return PARSE_OK;
+					_thread_find((void *)proc_WS2812,this)->dt=i;	
+					break;
+				default:
+					return PARSE_ILLEGAL;
+				}
+			return PARSE_OK;
 }
 /*******************************************************************************/
 /**

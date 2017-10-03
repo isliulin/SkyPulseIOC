@@ -373,9 +373,10 @@ static 		DIR		dir;
 									if(wcard(sc[1],p)) {
 										printf("\r\n%-16s",p);
 										if (fno.fattrib & AM_DIR)
-											printf("/");
+											printf("%-8s","/");
 										else
-											printf("%d",(int)fno.fsize);								
+											printf("%-8d",(int)fno.fsize);		
+										print_date_time(fno.fdate,fno.ftime);										
 									}
 								}
 							} while(dir.sect);

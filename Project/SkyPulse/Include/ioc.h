@@ -7,6 +7,7 @@
 #define	_ADC_ERR_DELAY	200
 #define _PUMP_ERR_DELAY	3000
 #define _FAN_ERR_DELAY	5000
+#define _EC20_EM_DELAY	5
 
 typedef	enum {
 	_NOERR						=0,
@@ -22,6 +23,7 @@ typedef	enum {
 	_emgDisabled			=0x0200,
 	_pyroNoresp				=0x0400,
 	_illstatereq			=0x0800,
+	_energy_missing		=0x1000,
 } _Error;           
                   
 typedef enum {    
@@ -35,7 +37,8 @@ typedef enum {
   idCOM2CAN					=0x24B,
 	idCAN2FOOT				=0x20C,
 	idFOOT2CAN				=0x24C,
-	idENGM						=0x0C0,
+	idEC20_req				=0x280,
+	idEM_ack					=0x0C0,
   idBOOT						=0x20
 } _StdId;
 

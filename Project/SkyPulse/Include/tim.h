@@ -10,7 +10,6 @@ class	_TIM {
 		int t1[8],t2[8];
 		_TIM();
 	public:
-		static	short speaker[];
 		static	_TIM *Instance(void);
 		void		Poll(void);
 		bool		Busy(int);
@@ -42,8 +41,6 @@ class	_VALVE {
 		void Open(int i, int j)				{ inv ? Set(_PWM_RATE*9/10,i,j): Set(0,i,j);};
 		void Close(int i, int j)			{ inv ? Set(0,i,j): Set(_PWM_RATE*9/10,i,j);};
 		bool Busy(void)								{ return t->Busy(n);							};
-		
-		static short speaker[];
 };
 //________________________________________________________________________________________________
 class	_TIM3 {
@@ -52,6 +49,18 @@ class	_TIM3 {
 	public:
 		_TIM3(int);
 		~_TIM3();
+		static _TIM3 *Instance[];
+		void	ISR(int);
+		int		Tau(void);
+};
+//________________________________________________________________________________________________
+class	_TIM9 {
+	private:
+		int to,timeout,tau[32],tauN;
+	public:
+		_TIM9(int);
+		~_TIM9();
+		static _TIM9 *Instance[];
 		void	ISR(int);
 		int		Tau(void);
 };

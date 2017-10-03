@@ -42,7 +42,6 @@ class	_LM {
 		int					DecodeMinus(char *c);
 		int					DecodeWhat(char *c);
 		int					DecodeEq(char *c);
-		int					errT;
 	
 	public:
 		_LM();
@@ -54,14 +53,14 @@ class	_LM {
 		static 			string ErrMsg[];
 		double			plotA,plotB,plotC;
 	
-	_SPRAY				spray;
-	_CAN					can;
-	_PUMP					pump;
-	_FAN					fan;
-	_WS2812				ws;
-	_IOC_State		IOC_State;
-	_IOC_FootAck	IOC_FootAck;
-	
+		_SPRAY				spray;
+		_CAN					can;
+		_PUMP					pump;
+		_FAN					fan;
+		_WS2812				ws;
+		_IOC_State		IOC_State;
+		_IOC_FootAck	IOC_FootAck;
+		
 		void 				Increment(int, int);
 		void 				Select(_SELECTED_);
 		void 				Submit(string);

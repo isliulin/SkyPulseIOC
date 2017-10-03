@@ -29,15 +29,20 @@ typedef enum		{ noCOMM,
 								}	wsCmd;
 
 typedef struct	{
+#ifdef __IOC_V2__		
+									short g[8][2];
+									short r[8][2];
+									short b[8][2];
+#else
 									int g[8];
 									int r[8];
 									int b[8];
-								} dma;
+#endif
+} dma;
 
 typedef	struct	{
 									int				size;
-									HSV_set		color, 
-														*cbuf;
+									HSV_set		color, *cbuf;
 									wsCmd			mode;
 									dma 			*lbuf;
 								} ws2812;

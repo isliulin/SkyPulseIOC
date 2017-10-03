@@ -15,13 +15,13 @@ int			f1=(ft[1]*(t[0]-to)-ft[0]*(t[1]-to)) / (t[0]-t[1]);
 				return(f3*(t[2]-to)-f2*(t[3]-to)) / (t[2]-t[3]);
 }
 
-#define	_12Voff_ENABLE		GPIO_ResetBits(GPIOB,GPIO_Pin_3)
-#define	_12Voff_DISABLE		GPIO_SetBits(GPIOB,GPIO_Pin_3)
-#define	_SYS_SHG_ENABLE		GPIO_SetBits(GPIOB,GPIO_Pin_4)
-#define	_SYS_SHG_ENABLED	GPIO_ReadInputDataBit(GPIOB,GPIO_Pin_4)
-#define	_SYS_SHG_DISABLE	GPIO_ResetBits(GPIOB,GPIO_Pin_4)
+#define	_12Voff_ENABLE		GPIO_ResetBits(_12Voff_PORT,_12Voff_PIN)
+#define	_12Voff_DISABLE		GPIO_SetBits(_12Voff_PORT,_12Voff_PIN)
+#define	_SYS_SHG_ENABLE		GPIO_SetBits(GPIOB,_SYS_SHG_PIN)
+#define	_SYS_SHG_ENABLED	GPIO_ReadInputDataBit(_SYS_SHG_PORT,_SYS_SHG_PIN)
+#define	_SYS_SHG_DISABLE	GPIO_ResetBits(_SYS_SHG_PORT,_SYS_SHG_PIN)
 
-#define	_EMG_DISABLED			GPIO_ReadInputDataBit(GPIOA,GPIO_Pin_8)
+#define	_EMG_DISABLED			GPIO_ReadInputDataBit(_SYS_SHG_sense_PORT,_SYS_SHG_sense_PIN)
 
 #define	_UREF							3.3
 #define	_Rdiv(a,b)				((a)/(a+b))

@@ -2,7 +2,6 @@
 #define				CAN_H
 #include			<stdio.h>
 #include			"isr.h"
-//______________________________________________________________________________________		
 //
 //
 //
@@ -14,7 +13,7 @@
 #define				CAN_TXPIN					1
 #define 			GPIO_AF_CAN 			GPIO_AF_CAN1	
 #endif
-#if defined   (__IOC_V1__) || defined  (__IOC_V2__)
+#if defined   (__IOC_V0__) || defined  (__IOC_V1__) || defined  (__IOC_V2__)
 #define				__CAN__						CAN2
 #define				__FILT_BASE__			14
 #define				CAN_GPIO					GPIOB
@@ -29,6 +28,7 @@
 class	_CAN {
 	private:
 		_io		*io, *com;
+		int timeout;
 	
 	public:
 #if defined (__DISCO__)

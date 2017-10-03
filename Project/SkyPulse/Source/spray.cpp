@@ -13,7 +13,6 @@
 */
 #include	<stdio.h>
 #include	<stdlib.h>
-#include	<algorithm>
 #include	"spray.h"
 #include	"lcd.h"
 #include	"ioc.h"

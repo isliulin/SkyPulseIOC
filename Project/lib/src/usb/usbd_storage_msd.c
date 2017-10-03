@@ -344,7 +344,11 @@ int		c0=0,c1=0;
 }
 /*-----------------------------------------------------------------------*/
 DWORD get_fattime (void) {
-			return __time__;
+RTC_TimeTypeDef t;
+RTC_DateTypeDef d;
+	RTC_GetTime(RTC_Format_BIN,&t);
+	RTC_GetDate(RTC_Format_BIN,&d);
+	return (d.RTC_Year << 25) | (d.RTC_Month << 21) | (d.RTC_Date << 16) | (t.RTC_Seconds + t.RTC_Minutes*60 + t.RTC_Hours*3600);
 }
 /**
   * @}

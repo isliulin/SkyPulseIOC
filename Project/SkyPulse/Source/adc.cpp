@@ -1,4 +1,5 @@
 #include	"adc.h"
+#include	"gpio.h"
 #include	"ioc.h"
 #include	<stdlib.h>
 /**
@@ -77,8 +78,16 @@ _ADC::_ADC() {
 				GPIO_Init(GPIOA, &GPIO_InitStructure);
 				GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1;	 																				// V12,V24;
 				GPIO_Init(GPIOB, &GPIO_InitStructure);
+
+#if defined(__IOC_V2__)
+				GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0;																												// pump current sense;
+				GPIO_Init(GPIOA, &GPIO_InitStructure);
+				GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3;								// P0,P1,P2,P3;
+				GPIO_Init(GPIOC, &GPIO_InitStructure);
+#else
 				GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3 | GPIO_Pin_4;		// P0,P1,P2,P3, pump current sense;
 				GPIO_Init(GPIOC, &GPIO_InitStructure);
+#endif
 
 /* ADC1 Init ****************************************************************/
 				ADC_StructInit(&ADC_InitStructure);
@@ -101,8 +110,11 @@ _ADC::_ADC() {
 				ADC_RegularChannelConfig(ADC1, ADC_Channel_11, 7, ADC_SampleTime_112Cycles);
 				ADC_RegularChannelConfig(ADC1, ADC_Channel_12, 8, ADC_SampleTime_112Cycles);
 				ADC_RegularChannelConfig(ADC1, ADC_Channel_13, 9, ADC_SampleTime_112Cycles);
+#if defined(__IOC_V2__)
+				ADC_RegularChannelConfig(ADC1, ADC_Channel_0,10, 	ADC_SampleTime_112Cycles);
+#else
 				ADC_RegularChannelConfig(ADC1, ADC_Channel_14,10, ADC_SampleTime_112Cycles);
-
+#endif
 /* Enable DMA request after last transfer (Single-ADC mode) */
 				ADC_DMARequestAfterLastTransferCmd(ADC1, ENABLE);
 				ADC_Cmd(ADC1, ENABLE);

@@ -8,8 +8,8 @@
 	* @brief	lightmaster application class
 	*
 	*/
-#include "lm.h"
 
+#include "lm.h"
 string _LM::ErrMsg[] = {
 				"5V  supply",
 				"12V supply",
@@ -22,11 +22,13 @@ string _LM::ErrMsg[] = {
 				"fan speed out of range",
 				"emergency button pressed",
 				"handpiece ejected",
-				"illegal status request"
+				"illegal status request",
+				"energy report timeout"
 };
 
 int			_LM::debug=0,
 				_LM::error_mask=EOF;
+
 /*******************************************************************************/
 /**
 	* @brief	TIM3 IC2 ISR
@@ -44,7 +46,6 @@ _LM::_LM() {
 				fan.LoadSettings((FILE *)&f);
 				spray.LoadSettings((FILE *)&f);
 
-// add. settings parsing
 				while(!f_eof(&f))
 					Parse((FILE *)&f);
 				f_close(&f);	
@@ -117,10 +118,10 @@ int		err  = _ADC::Status();								// collecting error data
 			lm->ErrParse(err);										// parsing error data
 			_TIM::Instance()->Poll();
 	
-			lm->can.Parse(lm);			
+			lm->can.Parse(lm);
 			lm->Foot2Can();
-			_stdio(temp);		
-}			
+			_stdio(temp);
+}
 /*******************************************************************************
 * Function Name	:
 * Description		:
@@ -130,17 +131,18 @@ int		err  = _ADC::Status();								// collecting error data
 extern _io *__com3;
 
 void _LM::Foot2Can() {
-	_io *temp=_stdio(__com3);
-	CanTxMsg	tx={idFOOT2CAN,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};	
-	while(tx.DLC  < 8) {
-		int i=getchar();
-		if(i==EOF)
-			break; 
-		tx.Data[tx.DLC++] = i;
-	}
-	_stdio(temp);			
-	if(tx.DLC > 0)
-		can.Send(&tx);
+			_io *temp=_stdio(__com3);
+			CanTxMsg	tx={idFOOT2CAN,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};	
+			while(tx.DLC  < 8) {
+				int i=getchar();
+				if(i==EOF)
+					break; 
+				else
+				tx.Data[tx.DLC++] = i;
+			}
+			_stdio(temp);			
+			if(tx.DLC > 0)
+				can.Send(&tx);
 }
 /*******************************************************************************
 * Function Name	: 
@@ -257,8 +259,10 @@ int		_LM::DecodeMinus(char *c) {
 					break;
 				case 'e':
 				case 'E':
-					for(c=strchr(c,' '); c && *c;)
+					for(c=strchr(c,' '); c && *c;) {
 						_CLEAR_BIT(error_mask,strtoul(++c,&c,10));
+						_CLEAR_BIT(IOC_State.Error,strtoul(c,&c,10));
+					}
 					break;
 				case 'c':
 					return ws.ColorOff(strchr(c,' '));
@@ -402,6 +406,21 @@ int		_LM::Decode(char *c) {
 					return DecodeMinus(++c);
 				case 'v':
 					PrintVersion(SW_version);
+					break;
+				case 't':
+{
+					int h, m, k=sscanf(++c,"%d:%d",&h,&m);
+					if(k==2) {
+RTC_TimeTypeDef t;
+						t.RTC_H12=0;
+						t.RTC_Hours=h;
+						t.RTC_Minutes=m;
+						PWR_BackupAccessCmd(ENABLE);
+						RTC_SetTime(RTC_Format_BIN,&t);
+					} else
+						PrintRtc();
+}
+					break;
 				case 'w':
 					for(c=strchr(c,' '); c && *c;)
 						_wait(strtoul(++c,NULL,0),_thread_loop);

@@ -227,6 +227,33 @@ int wcard(char *t, char *s)
 		!*t : 
 			wcard(t+1,s) || (*s && wcard(t,s+1));
 }
+/*******************************************************************************
+* Function Name	: 
+* Description		: 
+* Output				:
+* Return				:
+*******************************************************************************/
+void	print_date_time(uint32_t d,uint32_t t) {
+	int day=d % 32;
+	int month=(d>>5) % 16;
+	int year=(d>>9) + 2000;
+	printf("%4d-%d-%d%5d:%02d",day,month,year,t/3600,(t/60)%60);
+}
+/*******************************************************************************
+* Function Name	: 
+* Description		: 
+* Output				:
+* Return				:
+*******************************************************************************/
+struct {char *day[7];} days={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
+struct {char *month[12];} months={"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+void	PrintRtc() {
+RTC_TimeTypeDef t;
+RTC_DateTypeDef d;
+	RTC_GetTime(RTC_Format_BIN,&t);
+	RTC_GetDate(RTC_Format_BIN,&d);
+	printf("%4s,%3d-%3s-%d,%3d:%02d:%02d",days.day[d.RTC_WeekDay],d.RTC_Date,months.month[d.RTC_Month],d.RTC_Year,t.RTC_Hours,t.RTC_Minutes,t.RTC_Seconds);
+}
 //___________________________________________________________________________
 void			PrintVersion(int v) {
 //	int i=-1,

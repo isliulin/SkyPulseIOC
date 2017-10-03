@@ -34,9 +34,9 @@ _CAN::_CAN(bool loopback) {
 CAN_InitTypeDef					CAN_InitStructure;
 CAN_FilterInitTypeDef		CAN_FilterInitStructure;
 NVIC_InitTypeDef 				NVIC_InitStructure;
-				if(me==NULL) {
-				
 GPIO_InitTypeDef				GPIO_InitStructure;
+	
+				if(me==NULL) {			
 					GPIO_StructInit(&GPIO_InitStructure);
 					GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
 					GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
@@ -100,9 +100,19 @@ GPIO_InitTypeDef				GPIO_InitStructure;
 					CAN_FilterInitStructure.CAN_FilterNumber=__FILT_BASE__+2;
 					CAN_FilterInit(&CAN_FilterInitStructure);
 
+					CAN_FilterInitStructure.CAN_FilterIdHigh=idEC20_req<<5;
+					CAN_FilterInitStructure.CAN_FilterMaskIdHigh=0x7f0<<5;
+					CAN_FilterInitStructure.CAN_FilterNumber=__FILT_BASE__+3;
+					CAN_FilterInit(&CAN_FilterInitStructure);
+
+					CAN_FilterInitStructure.CAN_FilterIdHigh=idEM_ack<<5;
+					CAN_FilterInitStructure.CAN_FilterMaskIdHigh=0x7f0<<5;
+					CAN_FilterInitStructure.CAN_FilterNumber=__FILT_BASE__+4;
+					CAN_FilterInit(&CAN_FilterInitStructure);
+
 					CAN_FilterInitStructure.CAN_FilterIdHigh=idBOOT<<5;
 					CAN_FilterInitStructure.CAN_FilterMaskIdHigh=0x7ff<<5;
-					CAN_FilterInitStructure.CAN_FilterNumber=__FILT_BASE__+3;
+					CAN_FilterInitStructure.CAN_FilterNumber=__FILT_BASE__+5;
 					CAN_FilterInit(&CAN_FilterInitStructure);
 
 					NVIC_PriorityGroupConfig(NVIC_PriorityGroup_1);
@@ -122,6 +132,7 @@ GPIO_InitTypeDef				GPIO_InitStructure;
 					
 					CAN_ITConfig(__CAN__, CAN_IT_FMP0, ENABLE);
 					com=NULL;
+					timeout=0;
 				}
 }
 /*******************************************************************************
@@ -336,6 +347,15 @@ _io*						io=_stdio(__com3);
 							}								
 							break;
 //______________________________________________________________________________________							
+							case idEC20_req:
+								timeout=__time__+_EC20_EM_DELAY;			
+							break;
+//______________________________________________________________________________________							
+							case idEM_ack:
+								timeout=0;
+								lm->IOC_FootAck.Send();	
+							break;
+//______________________________________________________________________________________							
 							case idBOOT:
 								if(rxm.Data[0]==0xAA)
 									while(1);
@@ -345,13 +365,18 @@ _io*						io=_stdio(__com3);
 							break;
 						}
 					}
+//______________________________________________________________________________________					
+					if(timeout && __time__ > timeout) {
+						timeout=0;
+						lm->ErrParse(_energy_missing);	
+					}
 }
-/*******************************************************************************
+/***************************************************************************************
 * Function Name	: 
 * Description		: 
 * Output				:
 * Return				:
-*******************************************************************************/
+***************************************************************************************/
 extern 		"C" {
 void 			CAN1_TX_IRQHandler() {
 					me->ISR_tx();
