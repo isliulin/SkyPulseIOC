@@ -24,6 +24,7 @@ typedef	enum {
 	_pyroNoresp				=0x0400,
 	_illstatereq			=0x0800,
 	_energy_missing		=0x1000,
+	_sprayNotReady		=0x2000
 } _Error;           
                   
 typedef enum {    
@@ -90,16 +91,6 @@ typedef __packed struct _IOC_FootAck {
 		_CAN::Instance()->Send(&m);
 	}
 } IOC_FootAck;
-//_____________________________________________________________________
-typedef __packed struct _IOC_SprayAck {
-	_Spray	Status;
-	_IOC_SprayAck() : Status(_SPRAY_NOT_READY)	{}	
-	void	Send() {
-		CanTxMsg	m={idIOC_SprayAck,0,CAN_ID_STD,CAN_RTR_DATA,sizeof(_IOC_SprayAck),0,0,0,0,0,0,0,0};
-		memcpy(m.Data,(const void *)&Status,sizeof(_IOC_SprayAck));
-		_CAN::Instance()->Send(&m);
-	}
-} IOC_SprayAck;
 //_____________________________________________________________________
 
 

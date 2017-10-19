@@ -29,7 +29,6 @@ class	_SPRAY:public _ADC {
 	public:
 		_SPRAY();
 		mode		mode;
-		_IOC_SprayAck	IOC_SprayAck;
 
 		_VALVE	*BottleIn,*BottleOut,*Air,*Water;
 		int			AirLevel, WaterLevel;

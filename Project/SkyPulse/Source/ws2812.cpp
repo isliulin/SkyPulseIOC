@@ -60,8 +60,8 @@ GPIO_InitTypeDef					GPIO_InitStructure;
 			int i=0;
 			while(w->size)																		// count number of leds
 				i+=w++->size;
-			dma_buffer=new dma[i+1];													// allocate dma buffer
-			dma_size=i*sizeof(dma)/sizeof(short)+1;
+			dma_buffer=new dma[i+2];													// allocate dma buffer
+			dma_size=i*sizeof(dma)/sizeof(short)/2;						// polovica zaradi 2xbursta
 			
 			w=ws;
 			i=0;
@@ -129,7 +129,7 @@ GPIO_InitTypeDef					GPIO_InitStructure;
 			TIM_CtrlPWMOutputs(TIM4, ENABLE);
 			TIM_Cmd(TIM4,ENABLE);
 
-			TIM_DMAConfig(TIM4, TIM_DMABase_CCR1, TIM_DMABurstLength_1Transfer);
+			TIM_DMAConfig(TIM4, TIM_DMABase_CCR1, TIM_DMABurstLength_2Transfers);
 			TIM_DMACmd(TIM4, TIM_DMA_Update, ENABLE);		
 #else
 //
@@ -221,49 +221,61 @@ void		_WS2812::trigger() {
 int			i,j,k;
 dma			*p;
 RGB_set	q;
-int			imax=sizeof(ws)/sizeof(ws2812);
-	
-				for(i=0; i<imax/2; ++i)
-					for(j=0; j<ws[i].size; ++j)
-						if(ws[i].cbuf) {
-							HSV2RGB(ws[i].cbuf[j], &q);
-							for(k=0,p=ws[i].lbuf; k<8; ++k) {
-								(q.b & (0x80>>k)) ? (p[j].b[k][0]=53)	: (p[j].b[k][0]=20);
-								(q.g & (0x80>>k)) ? (p[j].g[k][0]=53)	: (p[j].g[k][0]=20);
-								(q.r & (0x80>>k)) ? (p[j].r[k][0]=53)	: (p[j].r[k][0]=20);
-							}
-						}
-						else
-							for(k=0,p=ws[i].lbuf; k<24; ++k)
-									p[j].g[k][0]=20;
-
-				for(i=imax/2; i<imax; ++i)
-					for(j=0; j<ws[i].size; ++j)
-						if(ws[i].cbuf) {
-							HSV2RGB(ws[i].cbuf[j], &q);
-							for(k=0,p=ws[i].lbuf; k<8; ++k) {
-								(q.b & (0x80>>k)) ? (p[j].b[k][1]=53)	: (p[j].b[k][1]=20);
-								(q.g & (0x80>>k)) ? (p[j].g[k][1]=53)	: (p[j].g[k][1]=20);
-								(q.r & (0x80>>k)) ? (p[j].r[k][1]=53)	: (p[j].r[k][1]=20);
-							}
-						}
-						else
-							for(k=0,p=ws[i].lbuf; k<24; ++k)
-									p[j].g[k][1]=20;
-						
-						
-						
 						
 #ifdef __IOC_V2__		
+int				imax=sizeof(ws)/sizeof(ws2812);
+					for(i=0; i<imax/2; ++i) {
+						for(j=0; j<ws[i].size; ++j) {
+							if(ws[i].cbuf) {
+								HSV2RGB(ws[i].cbuf[j], &q);
+								for(k=0,p=ws[i].lbuf; k<8; ++k) {
+									(q.b & (0x80>>k)) ? (p[j].b[k][0]=53)	: (p[j].b[k][0]=20);
+									(q.g & (0x80>>k)) ? (p[j].g[k][0]=53)	: (p[j].g[k][0]=20);
+									(q.r & (0x80>>k)) ? (p[j].r[k][0]=53)	: (p[j].r[k][0]=20);
+								}
+							}
+								else
+									for(k=0,p=ws[i].lbuf; k<24; ++k)
+										p[j].g[k][0]=20;
+
+							if(ws[i+imax/2].cbuf) {
+								HSV2RGB(ws[i+imax/2].cbuf[j], &q);
+								for(k=0,p=ws[i].lbuf; k<8; ++k) {
+									(q.b & (0x80>>k)) ? (p[j].b[k][1]=53)	: (p[j].b[k][1]=20);
+									(q.g & (0x80>>k)) ? (p[j].g[k][1]=53)	: (p[j].g[k][1]=20);
+									(q.r & (0x80>>k)) ? (p[j].r[k][1]=53)	: (p[j].r[k][1]=20);
+								}
+							}
+								else
+									for(k=0,p=ws[i].lbuf; k<24; ++k)
+										p[j].g[k][1]=20;
+					}
+				}
+
 				DMA_Cmd(DMA1_Stream6, DISABLE);
 				TIM_Cmd(TIM4,DISABLE);
 				TIM_SetCounter(TIM4,0);
 				while(DMA_GetCmdStatus(DMA1_Stream6) != DISABLE);
-				DMA_SetCurrDataCounter(DMA1_Stream6,dma_size);
+				DMA_SetCurrDataCounter(DMA1_Stream6,dma_size+2);
 				DMA_ClearFlag(DMA1_Stream6, DMA_FLAG_HTIF6 | DMA_FLAG_TEIF6 | DMA_FLAG_DMEIF6	| DMA_FLAG_FEIF6 | DMA_FLAG_TCIF6);
 				DMA_Cmd(DMA1_Stream6, ENABLE);
 				TIM_Cmd(TIM4,ENABLE);
-#else						
+#else			
+				
+				for(i=0; ws[i].size; ++i)
+					for(j=0; j<ws[i].size; ++j)
+						if(ws[i].cbuf) {
+							HSV2RGB(ws[i].cbuf[j], &q);
+							for(k=0,p=ws[i].lbuf; k<8; ++k) {
+								(q.b & (0x80>>k)) ? (p[j].b[k]=53)	: (p[j].b[k]=20);
+								(q.g & (0x80>>k)) ? (p[j].g[k]=53)	: (p[j].g[k]=20);
+								(q.r & (0x80>>k)) ? (p[j].r[k]=53)	: (p[j].r[k]=20);
+							}
+						}
+						else
+							for(k=0,p=ws[i].lbuf; k<24; ++k)
+									p[j].g[k]=20;
+
 				DMA_Cmd(DMA1_Stream1, DISABLE);
 				TIM_Cmd(TIM2,DISABLE);
 				TIM_SetCounter(TIM2,0);
@@ -551,7 +563,7 @@ int		i;
 					i=atoi(c);
 					ws[i].color.h =atoi(strtok(NULL,", "));
 					ws[i].color.s =atoi(strtok(NULL,", "));
-					ws[i].color.v =atoi(strtok(NULL,", "));
+					ws[i].color.v =2*atoi(strtok(NULL,", "));
 					break;						
 				case 't':
 					i=atoi(strtok(NULL,", "));

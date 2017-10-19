@@ -104,6 +104,7 @@ int		e=_NOERR;
 					}						
 
 					if(WaterLevel && mode.On)
+//					if(mode.On)
 						Water->Open();
 					else
 						Water->Close();	

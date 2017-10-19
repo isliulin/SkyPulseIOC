@@ -24,6 +24,7 @@ string _LM::ErrMsg[] = {
 				"handpiece ejected",
 				"illegal status request",
 				"energy report timeout"
+				"spray not ready"
 };
 
 int			_LM::debug=0,

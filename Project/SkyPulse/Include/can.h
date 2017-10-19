@@ -34,7 +34,7 @@ class	_CAN {
 #if defined (__DISCO__)
 		_CAN	(bool=true);
 #else
-		_CAN	(bool=false);
+		_CAN	(bool=true);
 #endif
 		static _CAN	*Instance(void);
 		static void	Console(void *);
