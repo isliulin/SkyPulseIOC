@@ -107,6 +107,19 @@ void	_LM::ErrParse(int e) {
 * Output				:
 * Return				:
 *******************************************************************************/
+void	_LM::WarnParse(int e) {
+			e = (IOC_State.Error & e) ^ e;
+			if(e) {
+				IOC_State.Error = (_Error)(IOC_State.Error ^ e);
+				IOC_State.Send();
+			}
+}
+/*******************************************************************************
+* Function Name	:
+* Description		:
+* Output				:
+* Return				:
+*******************************************************************************/
 void	_LM::Poll(void *v) {
 
 _LM		*lm = static_cast<_LM *>(v);
@@ -115,10 +128,12 @@ _io		*temp=_stdio(lm->io);
 int		err  = _ADC::Status();								// collecting error data
 			err |= lm->pump.Poll();
 			err |= lm->fan.Poll();
-			err |= lm->spray.Poll();
 			lm->ErrParse(err);										// parsing error data
-			_TIM::Instance()->Poll();
 	
+			err = lm->spray.Poll();
+			lm->WarnParse(err);										// parsing warning data
+	
+			_TIM::Instance()->Poll();
 			lm->can.Parse(lm);
 			lm->Foot2Can();
 			_stdio(temp);

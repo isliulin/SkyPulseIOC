@@ -71,6 +71,7 @@ class	_LM {
 								Parse(int);
 
 		void				ErrParse(int);
+		void				WarnParse(int);
 		
 		void				CanConsole(int, int);
 		void				Foot2Can(void);

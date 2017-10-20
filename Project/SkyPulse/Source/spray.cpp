@@ -84,22 +84,16 @@ int		e=_NOERR;
 							BottleIn->Close();
 							BottleOut->Open();
 					}
-					
+
 					Air_ref			= offset.air + AirLevel*gain.air/10;
 					Bottle_ref	= offset.bottle + AirLevel*gain.bottle*(100+4*WaterLevel)/100/10;		
 
-
-					if(count == 5) {
-						IOC_SprayAck.Status = _SPRAY_NOT_READY;
-						IOC_SprayAck.Send();
-						++count;
-					}
-					
+					if(abs(adf.compressor - 4*offset.compressor) > offset.compressor/2)
+						e |= _sprayInPressure;
+					if(count > 3) 
+						e |= _sprayNotReady;				
 					if(__time__ > timeout) {
-						if(count > 5) {
-							IOC_SprayAck.Status = _SPRAY_READY;
-							IOC_SprayAck.Send();
-						}
+						e &= ~_sprayNotReady;
 						count=0;
 					}						
 
@@ -115,10 +109,7 @@ int		e=_NOERR;
 						if(mode.Vibrate && __time__ % 50 < 10)
 							Air->Open();
 						else
-							Air->Set(Air_P/_A_THRESHOLD);
-						
-						if(abs(adf.compressor - 4*offset.compressor) > offset.compressor/2)
-							e |= _sprayInPressure;
+							Air->Set(Air_P/_A_THRESHOLD);						
 					}
 					else
 						Air->Close();
@@ -130,7 +121,6 @@ int		e=_NOERR;
 							lcd->Grid();
 #endif
 					}		
-
 					return e;
 }
 /*******************************************************************************/
