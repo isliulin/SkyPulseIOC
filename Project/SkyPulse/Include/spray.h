@@ -10,28 +10,28 @@
 #include				"ioc.h"
 #include				"spray.h"
 
-#define					_BAR(a) ((a)*16384.0)
+#define					_BAR(a) 				((a)*16384.0)
+#define					_SPRAY_READY_T	500
 extern void			Simulate(void);					
 
 typedef	struct {
 	bool	On:1;
 	bool	Vibrate:1;
 	bool	Simulator:1;
-	bool	Ready:1;
 }	mode;
 
 class	_SPRAY:public _ADC {
 	private:
 		int			Bottle_ref, Bottle_P;
 		int			Air_ref, Air_P;
-		int			idx,simrate,timeout,count;
+		int			idx,simrate;
 
 	public:
 		_SPRAY();
 		mode		mode;
 
 		_VALVE	*BottleIn,*BottleOut,*Air,*Water;
-		int			AirLevel, WaterLevel;
+		int			AirLevel, WaterLevel,timeout;
 		int			Poll(void);
 		void		LoadSettings(FILE *);
 		void		SaveSettings(FILE *);

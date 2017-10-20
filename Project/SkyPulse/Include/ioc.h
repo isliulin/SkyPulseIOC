@@ -30,7 +30,6 @@ typedef	enum {
 typedef enum {    
 	idIOC_State				=0x200,
 	idIOC_SprayParm		=0x201,
-	idIOC_SprayCmd		=0x202,
 	idIOC_State_Ack		=0x240,
 	idIOC_FootAck			=0x241,
 	idIOC_SprayAck		=0x242,

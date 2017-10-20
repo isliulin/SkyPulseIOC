@@ -47,7 +47,7 @@ _SPRAY::_SPRAY() {
 					Air->Close();
 					Water->Close();
 					
-					simrate=timeout=count=0;
+					simrate=timeout=0;
 					Pin=4.0;
 					pComp= pBott=pNozz=Pout=1.0;
 }
@@ -70,15 +70,15 @@ int		e=_NOERR;
 							Bottle_P=0;
 							BottleIn->Close();
 							BottleOut->Open(150,750);
-							timeout = __time__ + 500;
-							++count;
+							if(timeout)
+								timeout = __time__ + _SPRAY_READY_T;
 						}
 						if(Bottle_P > _P_THRESHOLD) {
 							Bottle_P=0;
 							BottleIn->Open(150,750);
 							BottleOut->Close();
-							timeout = __time__ + 500;
-							++count;
+							if(timeout)
+								timeout = __time__ + _SPRAY_READY_T;
 						}
 					} else {
 							BottleIn->Close();
@@ -88,17 +88,14 @@ int		e=_NOERR;
 					Air_ref			= offset.air + AirLevel*gain.air/10;
 					Bottle_ref	= offset.bottle + AirLevel*gain.bottle*(100+4*WaterLevel)/100/10;		
 
-					if(abs(adf.compressor - 4*offset.compressor) > offset.compressor/2)
-						e |= _sprayInPressure;
-					if(count > 3) 
-						e |= _sprayNotReady;				
-					if(__time__ > timeout) {
-						e &= ~_sprayNotReady;
-						count=0;
-					}						
+					if(10*(adf.compressor-offset.compressor)/gain.compressor < 25)
+						e |= _sprayInPressure;		
+					if(timeout && __time__ < timeout)
+						e |= _sprayNotReady;
+					else
+						timeout=0;
 
 					if(WaterLevel && mode.On)
-//					if(mode.On)
 						Water->Open();
 					else
 						Water->Close();	
@@ -165,9 +162,11 @@ void			_SPRAY::Increment(int a, int b) {
 					switch(idx) {
 						case 0:
 							AirLevel 		= __min(__max(0,AirLevel+a),10);
+							timeout = __time__ + _SPRAY_READY_T;
 							break;
 						case 1:
 							WaterLevel 	= __min(__max(0,WaterLevel+a),10);
+							timeout = __time__ + _SPRAY_READY_T;
 							break;
 						case 2:
 							Pin 					= __min(__max(0.5,Pin+(double)a/10.0),4.5);

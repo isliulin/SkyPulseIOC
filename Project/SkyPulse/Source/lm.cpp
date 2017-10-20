@@ -23,12 +23,13 @@ string _LM::ErrMsg[] = {
 				"emergency button pressed",
 				"handpiece ejected",
 				"illegal status request",
-				"energy report timeout"
+				"energy report timeout",
 				"spray not ready"
 };
 
 int			_LM::debug=0,
-				_LM::error_mask=EOF;
+				_LM::warn_mask=0,
+				_LM::error_mask=0;
 
 /*******************************************************************************/
 /**
@@ -82,37 +83,57 @@ _LM::~_LM() {
 * Output				:
 * Return				:
 *******************************************************************************/
-void	_LM::ErrParse(int e) {
-	
-			e &= error_mask;
-			e ? _RED1(3000): _GREEN1(20);
-			e = (e ^ IOC_State.Error) & e;
-			IOC_State.Error = (_Error)(IOC_State.Error | e);
+//void	_LM::ErrParse(int e) {
+//	
+//			e &= ~error_mask;
+//			e ? _RED1(3000): _GREEN1(20);
+//			e = (e ^ IOC_State.Error) & e;
+//			IOC_State.Error = (_Error)(IOC_State.Error | e);
 
-			if(e) {
-				_SYS_SHG_DISABLE;
-				IOC_State.State = _ERROR;
-				IOC_State.Send();
-				if(IOC_State.State != _ERROR)
-					Submit("@error.led");
-			}
+//			if(e) {
+//				_SYS_SHG_DISABLE;
+//				IOC_State.State = _ERROR;
+//				IOC_State.Send();
+//				if(IOC_State.State != _ERROR)
+//					Submit("@error.led");
+//			}
 
-			for(int n=0; e && _BIT(_LM::debug, DBG_ERR); e >>= 1, ++n)
-				if(_BIT(e, 0))
-					printf("\r\nerror %03d: %s",n, ErrMsg[n].c_str());	
-}
+//			for(int n=0; e && _BIT(_LM::debug, DBG_ERR); e >>= 1, ++n)
+//				if(_BIT(e, 0))
+//					printf("\r\nerror %03d: %s",n, ErrMsg[n].c_str());	
+//}
 /*******************************************************************************
 * Function Name	:
 * Description		:
 * Output				:
 * Return				:
 *******************************************************************************/
-void	_LM::WarnParse(int e) {
-			e = (IOC_State.Error & e) ^ e;
-			if(e) {
-				IOC_State.Error = (_Error)(IOC_State.Error ^ e);
+void	_LM::ErrParse(int e) {
+	
+int		ee = (e ^ IOC_State.Error) & e & ~error_mask;
+			if(ee) {
+				_SYS_SHG_DISABLE;
+				IOC_State.State = _ERROR;
 				IOC_State.Send();
-			}
+				if(IOC_State.State != _ERROR)
+					Submit("@error.led");
+				IOC_State.Error = (_Error)(IOC_State.Error | ee);
+			} 
+
+int		ww=(e ^ IOC_State.Error) & warn_mask;
+			if(ww) {
+				IOC_State.Error = (_Error)(IOC_State.Error ^ ww);
+				IOC_State.Send();
+			} 
+
+			if(ee && _BIT(_LM::debug, DBG_ERR)) {
+				_RED1(3000);
+				for(int n=0; n<32; ++n)
+					if(ee & (1<<n))
+						printf("\r\nerror %03d: %s",n, ErrMsg[n].c_str());	
+				} else {
+					_GREEN1(20);
+				}					
 }
 /*******************************************************************************
 * Function Name	:
@@ -128,11 +149,9 @@ _io		*temp=_stdio(lm->io);
 int		err  = _ADC::Status();								// collecting error data
 			err |= lm->pump.Poll();
 			err |= lm->fan.Poll();
+			err |= lm->spray.Poll();
 			lm->ErrParse(err);										// parsing error data
-	
-			err = lm->spray.Poll();
-			lm->WarnParse(err);										// parsing warning data
-	
+
 			_TIM::Instance()->Poll();
 			lm->can.Parse(lm);
 			lm->Foot2Can();
@@ -236,13 +255,17 @@ int		_LM::DecodePlus(char *c) {
 				case 'e':
 				case 'E':
 					for(c=strchr(c,' '); c && *c;)
-						_SET_BIT(error_mask,strtoul(++c,&c,10));
+						_CLEAR_BIT(error_mask,strtoul(++c,&c,10));
+					break;
+				case 'w':
+				case 'W':
+					for(c=strchr(c,' '); c && *c;)
+						_SET_BIT(warn_mask,strtoul(++c,&c,10));
 					break;
 				case 'c':
 					return ws.ColorOn(strchr(c,' '));
-				case 's':
-				case 'S':
-				case __CtrlS:
+				case 'l':
+				case 'L':
 					ADC_DeInit();
 #ifdef USE_LCD
 					spray.plot.Clear();
@@ -276,15 +299,20 @@ int		_LM::DecodeMinus(char *c) {
 				case 'e':
 				case 'E':
 					for(c=strchr(c,' '); c && *c;) {
-						_CLEAR_BIT(error_mask,strtoul(++c,&c,10));
+						_SET_BIT(error_mask,strtoul(++c,&c,10));
 						_CLEAR_BIT(IOC_State.Error,strtoul(c,&c,10));
+					}
+					break;
+				case 'w':
+				case 'W':
+					for(c=strchr(c,' '); c && *c;) {
+						_CLEAR_BIT(error_mask,strtoul(++c,&c,10));
 					}
 					break;
 				case 'c':
 					return ws.ColorOff(strchr(c,' '));
-				case 's':
-				case 'S':
-				case __CtrlS:
+				case 'l':
+				case 'L':
 					new _ADC;
 					spray.mode.Simulator=false;
 					if(spray.lcd) {

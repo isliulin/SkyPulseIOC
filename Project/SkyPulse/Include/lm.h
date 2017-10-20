@@ -49,7 +49,7 @@ class	_LM {
 
 		_io					*io;
 		_TERM				console; 
-		static int	debug, error_mask;
+		static int	debug, error_mask, warn_mask;
 		static 			string ErrMsg[];
 		double			plotA,plotB,plotC;
 	
@@ -71,7 +71,6 @@ class	_LM {
 								Parse(int);
 
 		void				ErrParse(int);
-		void				WarnParse(int);
 		
 		void				CanConsole(int, int);
 		void				Foot2Can(void);
