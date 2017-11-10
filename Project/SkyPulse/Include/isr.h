@@ -8,8 +8,6 @@ extern		"C" {
 
 extern	volatile int __time__;
 void		PrintVersion(int);
-void		PrintRtc(void);
-void		SetRtc(int, int);
 void		Watchdog(void);
 void		_led(int, int),
 				_lightshow(void);

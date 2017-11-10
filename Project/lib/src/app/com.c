@@ -30,6 +30,10 @@ int				DecodeMinus(char *c) {
 					case 't':
 #if	defined(__TCP__)
 					TcpServerInit();
+#else
+					PWR_BackupAccessCmd(ENABLE); 
+					SetCompileTime();
+					PWR_BackupAccessCmd(DISABLE); 
 #endif
 					break;
 //__________________________________________________usb host/file/serial_____
@@ -575,6 +579,47 @@ int				DecodeCom(char *c) {
 							sDump((char *)getHEX(cc[0],EOF),n);
 						}
 						break;
+//__________________________________________________rtc_________________________________
+					case 'd':
+					{
+						int wd, d, m, y, k=sscanf(++c,"%d,%d/%d/%d",&wd,&d,&m,&y);
+						RTC_DateTypeDef date;
+						RTC_GetDate(RTC_Format_BIN,&date);
+						if(k > 0) {
+							date.RTC_WeekDay=wd;
+							if(k > 1)
+								date.RTC_Date=d;
+							if(k > 2)
+								date.RTC_Month=m;
+							if(k > 3)
+								date.RTC_Year=y;
+							PWR_BackupAccessCmd(ENABLE); 
+							RTC_SetDate(RTC_Format_BIN,&date);
+							PWR_BackupAccessCmd(DISABLE); 
+						}
+						PrintRtc();
+					}
+					break;
+//__________________________________________________rtc_________________________________
+					case 't':
+					{
+						int h, m, s, k=sscanf(++c,"%d:%d:%d",&h,&m,&s);
+						RTC_TimeTypeDef t;
+						RTC_GetTime(RTC_Format_BIN,&t);
+						t.RTC_H12=0;
+						if(k > 0) {
+							t.RTC_Hours=h;
+							if(k > 1)
+								t.RTC_Minutes=m;
+							if(k > 2)
+								t.RTC_Seconds=s;
+							PWR_BackupAccessCmd(ENABLE); 
+							RTC_SetTime(RTC_Format_BIN,&t);
+							PWR_BackupAccessCmd(DISABLE); 
+						}
+						PrintRtc();
+					}
+					break;
 //______________________________________________________________________________________
 					case 'w':
 						_wait(strtoul(++c,NULL,0),_thread_loop);

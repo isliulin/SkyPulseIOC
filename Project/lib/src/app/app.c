@@ -28,7 +28,7 @@ int				__time__,__debug__,__mode__,__status__,__error__,__event__;
 void 			_thread_init(void) {
 	
 					RCC_AHB1PeriphClockCmd(ALL_GPIO,ENABLE);
-
+		
 					SysTick_init();
 					SystemCoreClockUpdate();
 					Initialize_NVIC();
@@ -55,6 +55,7 @@ void 			_thread_init(void) {
 					else if(RCC_GetFlagStatus(RCC_FLAG_PINRST) == SET)
 					{} else {}
 					RCC_ClearFlag();
+					Rtc_init();
 					ungets("@cfg.ini\r");
 					_stdio(NULL);
 }

@@ -18,3 +18,6 @@ ungetch, ungets
 batch, ungets na startu...
 _io_init v initVCP
 +/-L lcd output 
+
+10.11.17 v1.01
+- rtc 

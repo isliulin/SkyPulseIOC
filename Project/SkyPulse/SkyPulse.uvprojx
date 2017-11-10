@@ -48,13 +48,13 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\output\</OutputDirectory>
-          <OutputName>SkyPulse</OutputName>
+          <OutputName>SkyPulseIOC2</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
-          <ListingPath>.\list\</ListingPath>
+          <ListingPath>.\listing\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
           <CreateBatchFile>0</CreateBatchFile>
@@ -430,14 +430,14 @@
               <FilePath>.\Source\can.cpp</FilePath>
             </File>
             <File>
-              <FileName>dac.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\dac.cpp</FilePath>
-            </File>
-            <File>
               <FileName>gpio.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Source\gpio.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>dac.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\dac.cpp</FilePath>
             </File>
             <File>
               <FileName>term.cpp</FileName>
@@ -599,13 +599,13 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\output\</OutputDirectory>
-          <OutputName>SkyPulse</OutputName>
+          <OutputName>SkyPulseIOC1</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
-          <ListingPath>.\list\</ListingPath>
+          <ListingPath>.\listing\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
           <CreateBatchFile>0</CreateBatchFile>
@@ -981,14 +981,14 @@
               <FilePath>.\Source\can.cpp</FilePath>
             </File>
             <File>
-              <FileName>dac.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\dac.cpp</FilePath>
-            </File>
-            <File>
               <FileName>gpio.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Source\gpio.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>dac.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\dac.cpp</FilePath>
             </File>
             <File>
               <FileName>term.cpp</FileName>
@@ -1150,13 +1150,13 @@
             <InvalidFlash>1</InvalidFlash>
           </TargetStatus>
           <OutputDirectory>.\output\</OutputDirectory>
-          <OutputName>SkyPulse_HW1</OutputName>
+          <OutputName>SkyPulseIOC0</OutputName>
           <CreateExecutable>1</CreateExecutable>
           <CreateLib>0</CreateLib>
           <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
-          <ListingPath>.\list\</ListingPath>
+          <ListingPath>.\listing\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
           <CreateBatchFile>0</CreateBatchFile>
@@ -1532,14 +1532,14 @@
               <FilePath>.\Source\can.cpp</FilePath>
             </File>
             <File>
-              <FileName>dac.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\dac.cpp</FilePath>
-            </File>
-            <File>
               <FileName>gpio.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Source\gpio.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>dac.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\dac.cpp</FilePath>
             </File>
             <File>
               <FileName>term.cpp</FileName>
@@ -1657,7 +1657,7 @@
           <CreateHexFile>1</CreateHexFile>
           <DebugInformation>1</DebugInformation>
           <BrowseInformation>1</BrowseInformation>
-          <ListingPath>.\list\</ListingPath>
+          <ListingPath>.\listing\</ListingPath>
           <HexFormatSelection>1</HexFormatSelection>
           <Merge32K>0</Merge32K>
           <CreateBatchFile>0</CreateBatchFile>
@@ -2033,14 +2033,14 @@
               <FilePath>.\Source\can.cpp</FilePath>
             </File>
             <File>
-              <FileName>dac.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\dac.cpp</FilePath>
-            </File>
-            <File>
               <FileName>gpio.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Source\gpio.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>dac.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\dac.cpp</FilePath>
             </File>
             <File>
               <FileName>term.cpp</FileName>

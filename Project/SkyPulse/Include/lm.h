@@ -27,7 +27,7 @@
 #include				"ws2812.h"
 #include				"ioc.h"
 
-#define					SW_version	11
+#define					SW_version	12
 
 typedef enum		{DBG_CAN_TX, DBG_CAN_RX, DBG_ERR, DBG_INFO, DBG_CAN_COM=21, DBG_EC_SIM=22, DBG_ENRG=23}	_DEBUG_;
 typedef enum		{PUMP, FAN, SPRAY, CTRL_A, CTRL_B, CTRL_C, CTRL_D, NONE} _SELECTED_;

@@ -11,6 +11,7 @@
 #include				<stdio.h>
 #include				<ctype.h>
 #include				<math.h>
+#include				<time.h>
 #include				"io.h"
 #include				"ff.h"
 
@@ -26,7 +27,7 @@
 #include 				"usbh_core.h"
 #include				<stdint.h>
 
-#define 				SW_version		100  
+#define 				SW_version		101
 #define					_uS						60
 #define					_mS						(1000*_uS)
 void						_led(int, int),
@@ -176,6 +177,7 @@ int							FLASH_Erase(uint32_t);
 #define					__IWDGLOW__		4000
 #define					__IWDGHIGH__	300
 void						SysTick_init(void),
+								Rtc_init(void),
 								Watchdog_init(int),
 								WWDG_init(void),
 										
@@ -240,9 +242,10 @@ int							sDump(char *,int);
 int							hex2asc(int);
 int							asc2hex(int);
 int 						wcard(char *, char *);
-void						print_date_time(uint32_t d,uint32_t t);
-void						PrintRtc(void);
 void						PrintVersion(int);
+void						PrintRtc(void);
+void						print_date_time(uint32_t d,uint32_t t);
+void						SetCompileTime(void);
 int							putLCD(_buffer *, int);
 
 #ifndef	__max				

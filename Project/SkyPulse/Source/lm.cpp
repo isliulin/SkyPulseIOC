@@ -338,6 +338,9 @@ int		_LM::DecodeWhat(char *c) {
 				case 'v':
 					printf("\r\nV5=%4.1f,V12=%4.1f,V24=%4.1f",_16XtoV5(_ADC::adf.V5),_16XtoV12(_ADC::adf.V12),_16XtoV24(_ADC::adf.V24));			
 					break;
+				case 's':
+					printf("\r\npI=%1.3lf,pB=%1.3lf,pA=%1.3lf,pC=%1.3lf",(double)_ADC::adf.compressor/0x4000,(double)_ADC::adf.bottle/0x4000,(double)_ADC::adf.air/0x4000,(double)_ADC::adf.cooler/0x4000);			
+					break;
 				case 'L':
 					printf(",%08X",*(unsigned int *)strtoul(++c,&c,16));
 					break;
@@ -450,20 +453,6 @@ int		_LM::Decode(char *c) {
 					return DecodeMinus(++c);
 				case 'v':
 					PrintVersion(SW_version);
-					break;
-				case 't':
-{
-					int h, m, k=sscanf(++c,"%d:%d",&h,&m);
-					if(k==2) {
-RTC_TimeTypeDef t;
-						t.RTC_H12=0;
-						t.RTC_Hours=h;
-						t.RTC_Minutes=m;
-						PWR_BackupAccessCmd(ENABLE);
-						RTC_SetTime(RTC_Format_BIN,&t);
-					} else
-						PrintRtc();
-}
 					break;
 				case 'w':
 					for(c=strchr(c,' '); c && *c;)

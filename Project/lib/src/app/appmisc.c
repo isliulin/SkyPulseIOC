@@ -236,7 +236,7 @@ int wcard(char *t, char *s)
 void	print_date_time(uint32_t d,uint32_t t) {
 	int day=d % 32;
 	int month=(d>>5) % 16;
-	int year=(d>>9) + 2000;
+	int year=(d>>9) + 1900;
 	printf("%4d-%d-%d%5d:%02d",day,month,year,t/3600,(t/60)%60);
 }
 /*******************************************************************************
@@ -244,32 +244,65 @@ void	print_date_time(uint32_t d,uint32_t t) {
 * Description		: 
 * Output				:
 * Return				:
-*******************************************************************************/
-struct {char *day[7];} days={"Sun","Mon","Tue","Wed","Thu","Fri","Sat"};
-struct {char *month[12];} months={"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
-void	PrintRtc() {
+****************************f***************************************************/
+struct	{char *day[7];} days={"Mon","Tue","Wed","Thu","Fri","Sat","Sun"};
+struct	{char *month[12];} months={"Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"};
+void		PrintRtc() {
 RTC_TimeTypeDef t;
 RTC_DateTypeDef d;
-	RTC_GetTime(RTC_Format_BIN,&t);
-	RTC_GetDate(RTC_Format_BIN,&d);
-	printf("%4s,%3d-%3s-%d,%3d:%02d:%02d",days.day[d.RTC_WeekDay],d.RTC_Date,months.month[d.RTC_Month],d.RTC_Year,t.RTC_Hours,t.RTC_Minutes,t.RTC_Seconds);
+				RTC_GetTime(RTC_Format_BIN,&t);
+				RTC_GetDate(RTC_Format_BIN,&d);
+				printf("%4s,%3d/%3s/%d,%3d:%02d:%02d",days.day[d.RTC_WeekDay-1],d.RTC_Date,months.month[d.RTC_Month-1],1900+d.RTC_Year,t.RTC_Hours,t.RTC_Minutes,t.RTC_Seconds);
 }
-//___________________________________________________________________________
-void			PrintVersion(int v) {
-//	int i=-1,
-//	*p=(int *)__Vectors,
-//	n=(FATFS_ADDRESS-(int)__Vectors)/sizeof(int);
-//	while(n--)
-//	i=crc(i,*p++);
+/*******************************************************************************
+* Function Name	: 
+* Description		: 
+* Output				:
+* Return				:
+****************************f***************************************************/
+void	SetCompileTime() {
+	time_t rawtime;
+  struct	tm * timeinfo;
+  int			year ,day, hour, min, sec;
+	char		month[8];
+	int m;
+	RTC_TimeTypeDef t;
+	RTC_DateTypeDef d;
+	t.RTC_H12=0;
 	
-					RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC, ENABLE);
-					CRC_ResetDR();
-					printf(" %d.%02d %s, <%08X>",
-						v/100,v%100,
-						__DATE__,
-							CRC_CalcBlockCRC(__Vectors, (FATFS_ADDRESS-(int)__Vectors)/sizeof(int)));
+	
+  sscanf (__DATE__,"%s %d %d",month, &day, &year);
+  sscanf (__TIME__,"%d:%d:%d",&hour, &min, &sec);
+	for(m=0; m<12; ++m)
+		if(!strcmp(months.month[m], month))
+			break;
+  time( &rawtime );
+  timeinfo = localtime ( &rawtime );
+  timeinfo->tm_year = d.RTC_Year = year - 1900;
+  timeinfo->tm_mon	= d.RTC_Month = m;
+  timeinfo->tm_mday	= d.RTC_Date = day;
+  timeinfo->tm_hour	= t.RTC_Hours = hour;
+  timeinfo->tm_min	= t.RTC_Minutes = min;
+  timeinfo->tm_sec	= t.RTC_Seconds = sec;
+  mktime ( timeinfo );
+	d.RTC_WeekDay=timeinfo->tm_wday;	
+	RTC_SetTime(RTC_Format_BIN,&t);
+	RTC_SetDate(RTC_Format_BIN,&d);	
+	}
+/*******************************************************************************
+* Function Name	: 
+* Description		: 
+* Output				:
+* Return				:
+****************************f***************************************************/
+void		PrintVersion(int v) {
+				RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC, ENABLE);
+				CRC_ResetDR();
+				printf(" %d.%02d %s <%08X>",
+					v/100,v%100,
+					__DATE__,
+						CRC_CalcBlockCRC(__Vectors, (FATFS_ADDRESS-(int)__Vectors)/sizeof(int)));
 }
-
 /**
 * @}
 */

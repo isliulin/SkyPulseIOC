@@ -84,10 +84,10 @@ int		e=_NOERR;
 							BottleIn->Close();
 							BottleOut->Open();
 					}
-
+//------------------------------------------------------------------------------
 					Air_ref			= offset.air + AirLevel*gain.air/10;
 					Bottle_ref	= offset.bottle + AirLevel*gain.bottle*(100+4*WaterLevel)/100/10;		
-
+//------------------------------------------------------------------------------
 					if(10*(adf.compressor-offset.compressor)/gain.compressor < 25)
 						e |= _sprayInPressure;		
 					if(timeout && __time__ < timeout)
