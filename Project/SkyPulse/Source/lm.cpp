@@ -28,8 +28,8 @@ string _LM::ErrMsg[] = {
 };
 
 int			_LM::debug=0,
-				_LM::warn_mask=0,
-				_LM::error_mask=0;
+				_LM::warn_mask	=	_sprayInPressure	+ _sprayNotReady,
+				_LM::error_mask	=	_sprayInPressure	+ _sprayNotReady;
 
 /*******************************************************************************/
 /**
@@ -60,6 +60,7 @@ _LM::_LM() {
 			}	
 
 			_12Voff_ENABLE;
+			_SYS_SHG_ENABLE;
 			Parse(__F1);
 			
       io=_stdio(NULL);
@@ -111,29 +112,31 @@ _LM::~_LM() {
 void	_LM::ErrParse(int e) {
 	
 int		ee = (e ^ IOC_State.Error) & e & ~error_mask;
-			if(ee) {
+			if(ee && __time__ > 3000) {
 				_SYS_SHG_DISABLE;
-				IOC_State.State = _ERROR;
-				IOC_State.Send();
 				if(IOC_State.State != _ERROR)
 					Submit("@error.led");
 				IOC_State.Error = (_Error)(IOC_State.Error | ee);
-			} 
-
-int		ww=(e ^ IOC_State.Error) & warn_mask;
-			if(ww) {
-				IOC_State.Error = (_Error)(IOC_State.Error ^ ww);
+				IOC_State.State = _ERROR;
 				IOC_State.Send();
 			} 
 
+int		ww=(e ^ IOC_State.Error) & warn_mask;
+			if(ww && __time__ > 3000) {
+				IOC_State.Error = (_Error)(IOC_State.Error ^ ww);
+				IOC_State.Send();
+			} 
+			
+			if(_SYS_SHG_ENABLED)
+				_GREEN1(200);
+			else
+				_RED1(200);
+
 			if(ee && _BIT(_LM::debug, DBG_ERR)) {
-				_RED1(3000);
 				for(int n=0; n<32; ++n)
 					if(ee & (1<<n))
 						printf("\r\nerror %03d: %s",n, ErrMsg[n].c_str());	
-				} else {
-					_GREEN1(20);
-				}					
+			} 	
 }
 /*******************************************************************************
 * Function Name	:

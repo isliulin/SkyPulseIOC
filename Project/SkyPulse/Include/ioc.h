@@ -26,7 +26,7 @@ typedef	enum {
 	_energy_missing		=0x1000,
 	_sprayNotReady		=0x2000
 } _Error;           
-                  
+                 
 typedef enum {    
 	idIOC_State				=0x200,
 	idIOC_SprayParm		=0x201,

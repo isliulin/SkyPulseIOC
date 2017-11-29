@@ -34,10 +34,10 @@ _GPIO::_GPIO() {
 			GPIO_Init(_12Voff_PORT, &GPIO_InitStructure);
 			GPIO_ResetBits(_12Voff_PORT,_12Voff_PIN);
 #endif
-#if defined (SYS_SHG_PIN)
-			GPIO_InitStructure.GPIO_Pin = SYS_SHG_PIN;
-			GPIO_Init(SYS_SHG_PORT, &GPIO_InitStructure);
-			GPIO_ResetBits(SYS_SHG_PORT,SYS_SHG_PIN);
+#if defined (_SYS_SHG_PIN)
+			GPIO_InitStructure.GPIO_Pin = _SYS_SHG_PIN;
+			GPIO_Init(_SYS_SHG_PORT, &GPIO_InitStructure);
+			GPIO_ResetBits(_SYS_SHG_PORT,_SYS_SHG_PIN);
 #endif
 #if defined (_PILOT_PIN)
 			GPIO_InitStructure.GPIO_Pin = _PILOT_PIN;

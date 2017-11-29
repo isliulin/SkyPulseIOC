@@ -77,18 +77,6 @@ void 	Initialize_NVIC() {
 			NVIC_Init(&NVIC_InitStructure);
 }
 /******************************************************************************/
-void	Watchdog_init(int t) {
-#ifdef	__PFM6__
-			IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
-			IWDG_SetPrescaler(IWDG_Prescaler_32);
-			IWDG_SetReload(t);
-			while(IWDG_GetFlagStatus(IWDG_FLAG_RVU) == RESET);
-			IWDG_ReloadCounter();
-			IWDG_Enable();
-			IWDG_WriteAccessCmd(IWDG_WriteAccess_Disable);
-#endif
-}
-/******************************************************************************/
 #define LSE_STARTUP_TIMEOUT 500
 void	Rtc_init() {
 			uint32_t StartUpCounter = 0;
@@ -162,6 +150,18 @@ void	rtc_write(time_t t) {
 			RTC_SetDate(RTC_Format_BIN, &dateStruct);
 			RTC_SetTime(RTC_Format_BIN, &timeStruct);    
 			PWR_BackupAccessCmd(DISABLE);
+}
+/******************************************************************************/
+void	Watchdog_init(int t) {
+#ifdef	__PFM6__
+			IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
+			IWDG_SetPrescaler(IWDG_Prescaler_32);
+			IWDG_SetReload(t);
+			while(IWDG_GetFlagStatus(IWDG_FLAG_RVU) == RESET);
+			IWDG_ReloadCounter();
+			IWDG_Enable();
+			IWDG_WriteAccessCmd(IWDG_WriteAccess_Disable);
+#endif
 }
 /******************************************************************************/
 void	Watchdog(void) {

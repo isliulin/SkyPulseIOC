@@ -582,7 +582,9 @@ int				DecodeCom(char *c) {
 //__________________________________________________rtc_________________________________
 					case 'd':
 					{
-						int wd, d, m, y, k=sscanf(++c,"%d,%d/%d/%d",&wd,&d,&m,&y);
+						int wd, d, m, y, k;
+						c=strchr(c,' ');
+						k=sscanf(c,"%d,%d/%d/%d",&wd,&d,&m,&y);
 						RTC_DateTypeDef date;
 						RTC_GetDate(RTC_Format_BIN,&date);
 						if(k > 0) {
@@ -592,7 +594,7 @@ int				DecodeCom(char *c) {
 							if(k > 2)
 								date.RTC_Month=m;
 							if(k > 3)
-								date.RTC_Year=y;
+								date.RTC_Year=y+100;
 							PWR_BackupAccessCmd(ENABLE); 
 							RTC_SetDate(RTC_Format_BIN,&date);
 							PWR_BackupAccessCmd(DISABLE); 
@@ -603,7 +605,9 @@ int				DecodeCom(char *c) {
 //__________________________________________________rtc_________________________________
 					case 't':
 					{
-						int h, m, s, k=sscanf(++c,"%d:%d:%d",&h,&m,&s);
+						int h, m, s, k;
+						c=strchr(c,' ');
+						k=sscanf(++c,"%d:%d:%d",&h,&m,&s);
 						RTC_TimeTypeDef t;
 						RTC_GetTime(RTC_Format_BIN,&t);
 						t.RTC_H12=0;
