@@ -297,13 +297,12 @@ CanTxMsg			txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 							case idIOC_SprayParm:
 								lm->spray.AirLevel 		= __min(rxm.Data[0],10);
 								lm->spray.WaterLevel 	= __min(rxm.Data[1],10);
-								if(rxm.Data[2])
-									lm->spray.mode.On=true;
-								else {
-									if(lm->spray.mode.On==false)
+								if(rxm.Data[2]==0) {
+									if(lm->spray.mode.Air==false && lm->spray.mode.Water==false)
 										lm->spray.timeout=__time__ + _SPRAY_READY_T;
-									lm->spray.mode.On=false;
 								}
+								lm->spray.mode.Air=rxm.Data[2] & 1;
+								lm->spray.mode.Water=rxm.Data[2] & 2;
 							break;
 //______________________________________________________________________________________
 							case idCAN2COM:

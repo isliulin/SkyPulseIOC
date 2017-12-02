@@ -163,7 +163,17 @@ f error.led
 -c r,5
 
 19.10....
-CtrlB setup, offset=14000, gain = 11000
 pri majhni vodi:  manjši offset, manj vode
 pro velikem zraku in vodi 0: ne sme pihat v flašo
 
+:cooler....... 14002,13300
+:bottle....... 13536,10999
+:compressor... 14944,16384
+:air.......... 15180,32768
+:
+... za LW varianto ...
+:cooler....... 14002,13300
+:bottle....... 12536,16009
+:compressor... 14944,16384
+:air.......... 15180,47978
+:

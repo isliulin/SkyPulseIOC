@@ -523,13 +523,21 @@ bool	_LM::Parse(int i) {
 					break;
 				case __F3:
 				case __f3:
+					if(item == SPRAY) {
+						if(spray.mode.Air)
+							spray.mode.Air=false;
+						else
+							spray.mode.Air=true;
+					}
 					break;
 				case __F4:
 				case __f4:
-					if(spray.mode.On)
-						spray.mode.On=false;
-					else
-						spray.mode.On=true;
+					if(item == SPRAY) {
+						if(spray.mode.Water)
+							spray.mode.Water=false;
+						else
+							spray.mode.Water=true;
+					}
 					break;
 				case __F5:
 				case __f5:
@@ -612,10 +620,29 @@ bool	_LM::Parse(int i) {
 					CanConsole(idCAN2COM,__CtrlE);
 					break;	
 				case __CtrlV:
-					if(spray.mode.Vibrate)
-						spray.mode.Vibrate=false;
-					else
-						spray.mode.Vibrate=true;
+					if(item == SPRAY) {
+						if(spray.mode.Vibrate)
+							spray.mode.Vibrate=false;
+						else
+							spray.mode.Vibrate=true;
+				}
+					
+				case __PageUp:
+					if(item == SPRAY)
+						spray.Wgain=__min(++spray.Wgain,_BAR(0.5));
+					break;
+				case __PageDown:
+					if(item == SPRAY)
+						spray.Wgain=__max(--spray.Wgain,0);
+					break;
+					
+				case __CtrlS:
+					if(item == SPRAY) {
+						if(spray.mode.Setup)
+							spray.mode.Setup=false;
+						else
+							spray.mode.Setup=true;
+				}
 					break;
 				case __CtrlI:
 					_ADC::offset = _ADC::adf;

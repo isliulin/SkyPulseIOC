@@ -767,7 +767,7 @@
           <Type>0</Type>
           <LineNumber>496</LineNumber>
           <EnabledFlag>1</EnabledFlag>
-          <Address>134236508</Address>
+          <Address>134240952</Address>
           <ByteObject>0</ByteObject>
           <HtxType>0</HtxType>
           <ManyObjects>0</ManyObjects>
@@ -777,22 +777,6 @@
           <Filename>.\Source\tim.cpp</Filename>
           <ExecCommand></ExecCommand>
           <Expression>\\SkyPulseDiscovery\Source/tim.cpp\496</Expression>
-        </Bp>
-        <Bp>
-          <Number>1</Number>
-          <Type>0</Type>
-          <LineNumber>588</LineNumber>
-          <EnabledFlag>1</EnabledFlag>
-          <Address>0</Address>
-          <ByteObject>0</ByteObject>
-          <HtxType>0</HtxType>
-          <ManyObjects>0</ManyObjects>
-          <SizeOfObject>0</SizeOfObject>
-          <BreakByAccess>0</BreakByAccess>
-          <BreakIfRCount>0</BreakIfRCount>
-          <Filename>C:\Users\Mocnik\Documents\SkyPulseIOC\Project\lib\src\app\com.c</Filename>
-          <ExecCommand></ExecCommand>
-          <Expression></Expression>
         </Bp>
       </Breakpoint>
       <WatchWindow1>

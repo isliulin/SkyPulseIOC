@@ -36,10 +36,13 @@ _SPRAY::_SPRAY() {
 					Air_P=Bottle_P=0;
 					AirLevel=WaterLevel=0;
 					Bottle_ref=Air_ref=													_BAR(1);
+					Wgain=																			_BAR(0.3);											
 	
 					mode.Simulator=false;
 					mode.Vibrate=false;
-					mode.On=false;
+					mode.Setup=false;
+					mode.Water=false;
+					mode.Air=false;
 					idx=0;
 
 					BottleIn->Close();
@@ -61,10 +64,18 @@ _SPRAY::_SPRAY() {
 #define		_A_THRESHOLD	0x2000
 
 int				_SPRAY::Poll() {
-
-int		e=_NOERR;
-
-					if(AirLevel) {
+int				_err=_NOERR;
+	
+//------------------------------------------------------------------------------
+					Air_ref			= offset.air + AirLevel*gain.air/10;
+//					Bottle_ref	= offset.bottle + AirLevel*gain.bottle*(100+4*WaterLevel)/100/10;
+					Bottle_ref	= offset.bottle + ((Air_ref*gain.bottle)>>16) + Wgain*WaterLevel/10;
+//------------------------------------------------------------------------------
+					if(mode.Setup) {
+						BottleIn->Close();
+						BottleOut->Close();
+					}
+					else if(AirLevel || WaterLevel) {
 						Bottle_P += (Bottle_ref - (int)buffer.bottle)/16;
 						if(Bottle_P < -_P_THRESHOLD) {
 							Bottle_P=0;
@@ -84,23 +95,20 @@ int		e=_NOERR;
 							BottleIn->Close();
 							BottleOut->Open();
 					}
-//------------------------------------------------------------------------------
-					Air_ref			= offset.air + AirLevel*gain.air/10;
-					Bottle_ref	= offset.bottle + AirLevel*gain.bottle*(100+4*WaterLevel)/100/10;		
-//------------------------------------------------------------------------------
+
 					if(10*(adf.compressor-offset.compressor)/gain.compressor < 25)
-						e |= _sprayInPressure;		
+						_err |= _sprayInPressure;		
 					if(timeout && __time__ < timeout)
-						e |= _sprayNotReady;
+						_err |= _sprayNotReady;
 					else
 						timeout=0;
 
-					if(WaterLevel && mode.On)
+					if((WaterLevel && mode.Water) || mode.Setup)
 						Water->Open();
 					else
 						Water->Close();	
 
-					if(AirLevel && mode.On) {
+					if(AirLevel && mode.Air) {
 						Air_P += (Air_ref-(int)buffer.air);
 						Air_P=__max(0,__min(_A_THRESHOLD*_PWM_RATE, Air_P));
 						if(mode.Vibrate && __time__ % 50 < 10)
@@ -110,15 +118,14 @@ int		e=_NOERR;
 					}
 					else
 						Air->Close();
-					
-					
+
 					if(mode.Simulator && Simulator()) {
 #ifdef USE_LCD
 						if(lcd && plot.Refresh())
 							lcd->Grid();
 #endif
-					}		
-					return e;
+					}
+					return _err;
 }
 /*******************************************************************************/
 /**
@@ -154,6 +161,7 @@ void			_SPRAY::SaveSettings(FILE *f) {
 	*/
 /*******************************************************************************/
 void			_SPRAY::Increment(int a, int b) {
+
 					if(mode.Simulator)
 						idx= __min(__max(idx+b,0),3);
 					else
@@ -161,31 +169,32 @@ void			_SPRAY::Increment(int a, int b) {
 					
 					switch(idx) {
 						case 0:
-							AirLevel 		= __min(__max(0,AirLevel+a),10);
-							timeout = __time__ + _SPRAY_READY_T;
+							AirLevel		= __min(__max(0,AirLevel+a),10);
+							timeout			= __time__ + _SPRAY_READY_T;
 							break;
 						case 1:
-							WaterLevel 	= __min(__max(0,WaterLevel+a),10);
-							timeout = __time__ + _SPRAY_READY_T;
+							WaterLevel	= __min(__max(0,WaterLevel+a),10);
+							timeout			= __time__ + _SPRAY_READY_T;
 							break;
 						case 2:
-							Pin 					= __min(__max(0.5,Pin+(double)a/10.0),4.5);
+							Pin 				= __min(__max(0.5,Pin+(double)a/10.0),4.5);
 							break;
 						case 3:
-							Pout 					= __min(__max(0.5,Pout+(double)a/10.0),1.5);
+							Pout 				= __min(__max(0.5,Pout+(double)a/10.0),1.5);
 							break;
 					}
+					
 					if(mode.Simulator) {
 						printf("\r:air/water   %3d,%3d,%3.1lf,%3.1lf",
 							AirLevel,WaterLevel,
 								Pin,Pout);
-						for(int i=1+4*(3-idx);i--;printf("\b"));							
+						for(int i=1+4*(3-idx); i--; printf("\b"));
 					} else {
 						printf("\r:air/water   %3d,%3d,%3.1lf",
 							AirLevel,WaterLevel,
 								(double)(adf.compressor-offset.compressor)/gain.compressor);
-						for(int i=1+4*(2-idx);i--;printf("\b"));							
-					}	
+						for(int i=1+4*(2-idx);i--;printf("\b"));
+					}
 }
 /*******************************************************************************
 * Function Name	:
@@ -219,7 +228,7 @@ bool			_SPRAY::Simulator(void) {
 	#define R2 100
 	#define Rw 300
 	#define Ra 300
-	#define Rsp 10
+	#define Rsp 100
 	#define C1 1e-2
 	#define C3 100e-6
 	#define C2 50e-3

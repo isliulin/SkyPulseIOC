@@ -15,8 +15,10 @@
 extern void			Simulate(void);					
 
 typedef	struct {
-	bool	On:1;
+	bool	Air:1;
+	bool	Water:1;
 	bool	Vibrate:1;
+	bool	Setup:1;
 	bool	Simulator:1;
 }	mode;
 
@@ -29,6 +31,7 @@ class	_SPRAY:public _ADC {
 	public:
 		_SPRAY();
 		mode		mode;
+		int			Wgain;
 
 		_VALVE	*BottleIn,*BottleOut,*Air,*Water;
 		int			AirLevel, WaterLevel,timeout;
