@@ -177,3 +177,8 @@ pro velikem zraku in vodi 0: ne sme pihat v flašo
 :compressor... 14944,16384
 :air.......... 15180,47978
 :
+
+
+n	air		bott
+10	2.5		0.64
+6	2.35	0.32

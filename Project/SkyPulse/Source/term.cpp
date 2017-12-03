@@ -21,8 +21,9 @@
 * Output				:
 * Return				:
 *******************************************************************************/
-void	_TERM::Refresh(int t) {
-			timeout = -(__time__ + t);
+void	_TERM::Refresh(int t, int ch) {
+			refresh.seq = ch;
+			refresh.timeout = __time__ + t;
 }
 /*******************************************************************************
 * Function Name	: 
@@ -76,21 +77,26 @@ char	*_TERM::Cmd(int c) {
 *******************************************************************************/
 int		_TERM::Esc(int i) {
 			if(i==EOF) {
-				if(timeout && (__time__ > abs(timeout))) {
-					timeout=0;
-					return seq;
+				if(esc.timeout && (__time__ > esc.timeout)) {
+					esc.timeout=refresh.timeout=0;
+					return esc.seq;
 					}
-			} else if(timeout > 0) {
-				seq=(seq<<8) | i;
+				if(refresh.timeout && (__time__ > refresh.timeout)) {
+					refresh.timeout=0;
+					return refresh.seq;
+					}
+			} else if(esc.timeout > 0) {
+				esc.seq=(esc.seq<<8) | i;
 				if(i=='~' || i=='A' || i=='B' || i=='C' || i=='D') {
-					timeout=0;
-					return seq;
+					esc.timeout=refresh.timeout=0;
+					return esc.seq;
 				}
 			} else if(i==__Esc) {
-				timeout=__time__+5;
-				seq=i;
+				esc.timeout=__time__+5;
+				refresh.timeout=0;
+				esc.seq=i;
 			} else {
-				timeout=0;
+				esc.timeout=refresh.timeout=0;
 				return i;
 			}
 			return gp.Poll();

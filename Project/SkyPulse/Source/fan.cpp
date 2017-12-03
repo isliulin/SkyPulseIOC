@@ -135,7 +135,7 @@ int			_FAN::Increment(int a, int b) {
 						break;
 					}
 
-				printf("\r:fan       %5d%c,%4.1lf'C",Rpm(),'%',(double)Th2o()/100);
+				printf("\r:fan   %3d%c,%4.1lf'C",Rpm(),'%',(double)Th2o()/100);
 				if(idx>0)
 					printf("        %2d%c-%2d%c,%2d'C-%2d'C",fpl,'%',fph,'%',ftl,fth);
 				for(int i=4*(5-idx);idx && i--;printf("\b"));

@@ -33,8 +33,8 @@ _PUMP::_PUMP() :_TIM3(0)  {
 				timeout=__time__ + _PUMP_ERR_DELAY;
 
 				tacho = pressure = current = NULL;
-				offset.cooler=12500;
-				gain.cooler=13300;
+				offset.cooler=_BAR(1);
+				gain.cooler=_BAR(1);
 				idx=0;
 }
 /*******************************************************************************/
@@ -170,7 +170,7 @@ int			_PUMP::Increment(int a, int b)	{
 						break;
 				}
 
-				printf("\r:pump      %5d%c,%4.1lf'C,%4.1lf",Rpm(),'%',(double)Th2o()/100,(double)(adf.cooler-offset.cooler)/gain.cooler);
+				printf("\r:pump  %3d%c,%4.1lf'C,%4.1lf",Rpm(),'%',(double)Th2o()/100,(double)(adf.cooler-offset.cooler)/gain.cooler);
 				if(idx>0)
 					printf("   %2d%c-%2d%c,%2d'C-%2d'C,%4.3lf",fpl,'%',fph,'%',ftl,fth,(double)adf.Ipump/4096.0*3.3/2.1/16);		
 				for(int i=4*(5-idx)+6;idx && i--;printf("\b"));

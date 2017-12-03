@@ -188,11 +188,11 @@ void _LM::Foot2Can() {
 * Output				:	
 * Return				:
 *******************************************************************************/
-void	_LM::Select(_SELECTED_ i) {
+void	_LM::Select(_ITEM i) {
 			if(i != item)
 				printf("\r\n:");
 			item = i;
-			Refresh();
+			Increment(0,0);
 }
 /*******************************************************************************
 * Function Name	: 
@@ -204,14 +204,17 @@ void	_LM::Increment(int i, int j) {
 			switch(item) {
 				case PUMP:
 					pump.Increment(i,j);
+					console.Refresh(200,__F5);
 					break;
 				
 				case FAN:
 					fan.Increment(i,j);
+					console.Refresh(200,__F6);
 					break;
 				
 				case SPRAY:
 					spray.Increment(i,j);
+					console.Refresh(200,__F7);
 					break;
 				
 				case CTRL_A:
@@ -342,7 +345,7 @@ int		_LM::DecodeWhat(char *c) {
 					printf("\r\nV5=%4.1f,V12=%4.1f,V24=%4.1f",_16XtoV5(_ADC::adf.V5),_16XtoV12(_ADC::adf.V12),_16XtoV24(_ADC::adf.V24));			
 					break;
 				case 's':
-					printf("\r\npI=%1.3lf,pB=%1.3lf,pA=%1.3lf,pC=%1.3lf",(double)_ADC::adf.compressor/0x4000,(double)_ADC::adf.bottle/0x4000,(double)_ADC::adf.air/0x4000,(double)_ADC::adf.cooler/0x4000);			
+					printf("\r\npI=%1.3lf,pB=%1.3lf,pA=%1.3lf,pC=%1.3lf",(double)_ADC::adf.compressor/_BAR(1),(double)_ADC::adf.bottle/_BAR(1),(double)_ADC::adf.air/_BAR(1),(double)_ADC::adf.cooler/_BAR(1));			
 					break;
 				case 'L':
 					printf(",%08X",*(unsigned int *)strtoul(++c,&c,16));
@@ -507,15 +510,14 @@ bool	_LM::Parse(int i) {
 					break;
 				case __F1:
 				case __f1:
-					printf("\r\n[F4]  - spray on/off");
-					printf("\r\n[F5]  - pump");
-					printf("\r\n[F6]  - fan");
-					printf("\r\n[F7]  - spray");
-					printf("\r\n[F11] - save settings");	
-					printf("\r\n[F12] - exit app.    ");	
+					printf("\r\n[F5]   - pump");
+					printf("\r\n[F6]   - fan");
+					printf("\r\n[F6]   - spray");
+					printf("\r\n[F11]  - save settings");	
+					printf("\r\n[F12]  - exit app.    ");	
 					printf("\r\n");		
-					printf("\r\nCtrlY - reset");	
-					printf("\r\nCtrlZ - boot");	
+					printf("\r\nCtrlY  - reset");	
+					printf("\r\nCtrlZ  - boot");	
 					printf("\r\n:");	
 					break;
 				case __F2:
@@ -523,36 +525,21 @@ bool	_LM::Parse(int i) {
 					break;
 				case __F3:
 				case __f3:
-					if(item == SPRAY) {
-						if(spray.mode.Air)
-							spray.mode.Air=false;
-						else
-							spray.mode.Air=true;
-					}
 					break;
 				case __F4:
 				case __f4:
-					if(item == SPRAY) {
-						if(spray.mode.Water)
-							spray.mode.Water=false;
-						else
-							spray.mode.Water=true;
-					}
 					break;
 				case __F5:
 				case __f5:
 					Select(PUMP);
-					console.Refresh(1000);
 					break;
 				case __F6:
 				case __f6:
 					Select(FAN);
-					console.Refresh(1000);
 					break;			
 				case __F7:
 				case __f7:
 					Select(SPRAY);
-					console.Refresh(1000);
 					break;
 				case __F8:
 				case __f8:
@@ -619,6 +606,15 @@ bool	_LM::Parse(int i) {
 				case __CtrlE: 
 					CanConsole(idCAN2COM,__CtrlE);
 					break;	
+				
+				case __PageUp:
+					if(item == SPRAY)
+						spray.Wgain=__min(++spray.Wgain,_BAR(1.0));
+					break;
+				case __PageDown:
+					if(item == SPRAY)
+						spray.Wgain=__max(--spray.Wgain,0);
+					break;					
 				case __CtrlV:
 					if(item == SPRAY) {
 						if(spray.mode.Vibrate)
@@ -626,32 +622,27 @@ bool	_LM::Parse(int i) {
 						else
 							spray.mode.Vibrate=true;
 				}
-					
-				case __PageUp:
-					if(item == SPRAY)
-						spray.Wgain=__min(++spray.Wgain,_BAR(0.5));
-					break;
-				case __PageDown:
-					if(item == SPRAY)
-						spray.Wgain=__max(--spray.Wgain,0);
-					break;
-					
-				case __CtrlS:
-					if(item == SPRAY) {
-						if(spray.mode.Setup)
-							spray.mode.Setup=false;
-						else
-							spray.mode.Setup=true;
-				}
 					break;
 				case __CtrlI:
-					_ADC::offset = _ADC::adf;
-					printf("\r\n:offset...  %3d,%3d,%3d,%3d\r\n:",pump.offset.cooler,spray.offset.bottle,spray.offset.compressor,spray.offset.air);
+					if(item == SPRAY) {
+						_ADC::offset.air = _ADC::adf.air;
+						_ADC::offset.bottle = _ADC::adf.bottle;
+						printf("\r\n: air/water offset.... \r\n:");
+						Select(SPRAY);
+					}
+					break;
+				case __CtrlR:
+					if(item == SPRAY && spray.mode.Simulator) {
+//						srand(__time__);
+//						_ADC::offset.air += rand() % 1000 - 500;
+//						_ADC::offset.bottle += rand() % 1000 - 500;
+//						_ADC::offset.compressor += rand() % 1000 - 500;
+//						printf("\r\n: offset randomized.... \r\n:");
+//						Select(SPRAY);
+					}
 					break;
 				case __CtrlQ:
 					pump.Test();
-					break;
-				case __CtrlR:
 					fan.Test();
 					break;
 				case __CtrlP:

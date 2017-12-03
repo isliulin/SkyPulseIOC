@@ -29,18 +29,17 @@ _SPRAY::_SPRAY() {
 					BottleOut=	new _VALVE(4,false);
 	
 					offset.air=offset.bottle=offset.compressor=	_BAR(1);
-					gain.air=																		_BAR(2);
-					gain.bottle=																_BAR(1.3);
+					gain.air=																		_BAR(2.5);
+					gain.bottle=																_BAR(1);
 					gain.compressor=														_BAR(1);
 	
 					Air_P=Bottle_P=0;
 					AirLevel=WaterLevel=0;
 					Bottle_ref=Air_ref=													_BAR(1);
-					Wgain=																			_BAR(0.3);											
+					Wgain=																			_BAR(0.5);											
 	
 					mode.Simulator=false;
 					mode.Vibrate=false;
-					mode.Setup=false;
 					mode.Water=false;
 					mode.Air=false;
 					idx=0;
@@ -49,16 +48,18 @@ _SPRAY::_SPRAY() {
 					BottleOut->Close();
 					Air->Close();
 					Water->Close();
+					readyTimeout=0;
+					offsetTimeout=__time__ + 5000;
 					
-					simrate=timeout=0;
 					Pin=4.0;
 					pComp= pBott=pNozz=Pout=1.0;
+					simrate=0;
 }
 /*******************************************************************************
 * Function Name :
-* Description       : 
-* Output                :
-* Return                : None
+* Description		: 
+* Output				:
+* Return				: None
 *******************************************************************************/
 #define   _P_THRESHOLD  0x8000
 #define		_A_THRESHOLD	0x2000
@@ -67,29 +68,31 @@ int				_SPRAY::Poll() {
 int				_err=_NOERR;
 	
 //------------------------------------------------------------------------------
-					Air_ref			= offset.air + AirLevel*gain.air/10;
-//					Bottle_ref	= offset.bottle + AirLevel*gain.bottle*(100+4*WaterLevel)/100/10;
-					Bottle_ref	= offset.bottle + ((Air_ref*gain.bottle)>>16) + Wgain*WaterLevel/10;
-//------------------------------------------------------------------------------
-					if(mode.Setup) {
-						BottleIn->Close();
-						BottleOut->Close();
+					if(offsetTimeout && __time__ > offsetTimeout) {
+						offset.bottle += adf.air - offset.air;
+						offset.air = adf.air;
+						offsetTimeout=0;
 					}
-					else if(AirLevel || WaterLevel) {
+//------------------------------------------------------------------------------
+					Air_ref			= offset.air + AirLevel*gain.air/10;
+					Bottle_ref	= offset.bottle + (Air_ref - offset.air)*gain.bottle/0x10000 + Wgain*WaterLevel/10;
+//					Bottle_ref	= offset.bottle + AirLevel*gain.bottle*(100+4*WaterLevel)/100/10;
+//------------------------------------------------------------------------------
+					if(AirLevel || WaterLevel) {
 						Bottle_P += (Bottle_ref - (int)buffer.bottle)/16;
 						if(Bottle_P < -_P_THRESHOLD) {
 							Bottle_P=0;
 							BottleIn->Close();
 							BottleOut->Open(150,750);
-							if(timeout)
-								timeout = __time__ + _SPRAY_READY_T;
+							if(readyTimeout)
+								readyTimeout = __time__ + _SPRAY_READY_T;
 						}
 						if(Bottle_P > _P_THRESHOLD) {
 							Bottle_P=0;
 							BottleIn->Open(150,750);
 							BottleOut->Close();
-							if(timeout)
-								timeout = __time__ + _SPRAY_READY_T;
+							if(readyTimeout)
+								readyTimeout = __time__ + _SPRAY_READY_T;
 						}
 					} else {
 							BottleIn->Close();
@@ -98,12 +101,12 @@ int				_err=_NOERR;
 
 					if(10*(adf.compressor-offset.compressor)/gain.compressor < 25)
 						_err |= _sprayInPressure;		
-					if(timeout && __time__ < timeout)
+					if(readyTimeout && __time__ < readyTimeout)
 						_err |= _sprayNotReady;
 					else
-						timeout=0;
+						readyTimeout=0;
 
-					if((WaterLevel && mode.Water) || mode.Setup)
+					if(mode.Water)
 						Water->Open();
 					else
 						Water->Close();	
@@ -139,8 +142,6 @@ char			c[128];
 					sscanf(c,"%hu,%hu,%hu,%hu",&offset.cooler,&offset.bottle,&offset.compressor,&offset.air);
 					fgets(c,sizeof(c),f);
 					sscanf(c,"%hu,%hu,%hu,%hu",&gain.cooler,&gain.bottle,&gain.compressor,&gain.air);
-					fgets(c,sizeof(c),f);
-					sscanf(c,"%d,%d",&AirLevel,&WaterLevel);
 }
 /*******************************************************************************/
 /**
@@ -151,7 +152,6 @@ char			c[128];
 void			_SPRAY::SaveSettings(FILE *f) {
 					fprintf(f,"%5d,%5d,%5d,%5d                 /.. offset\r\n", offset.cooler, offset.bottle, offset.compressor, offset.air);
 					fprintf(f,"%5d,%5d,%5d,%5d                 /.. gain\r\n", gain.cooler, gain.bottle, gain.compressor, gain.air);
-					fprintf(f,"%5d,%5d                             /.. air, H2O\r\n", AirLevel, WaterLevel);
 }
 /*******************************************************************************/
 /**
@@ -162,39 +162,69 @@ void			_SPRAY::SaveSettings(FILE *f) {
 /*******************************************************************************/
 void			_SPRAY::Increment(int a, int b) {
 
-					if(mode.Simulator)
-						idx= __min(__max(idx+b,0),3);
-					else
-						idx= __min(__max(idx+b,0),1);
+					idx= __min(__max(idx+b,0),6);
 					
 					switch(idx) {
 						case 0:
 							AirLevel		= __min(__max(0,AirLevel+a),10);
-							timeout			= __time__ + _SPRAY_READY_T;
+							readyTimeout			= __time__ + _SPRAY_READY_T;
 							break;
 						case 1:
 							WaterLevel	= __min(__max(0,WaterLevel+a),10);
-							timeout			= __time__ + _SPRAY_READY_T;
+							readyTimeout			= __time__ + _SPRAY_READY_T;
 							break;
 						case 2:
-							Pin 				= __min(__max(0.5,Pin+(double)a/10.0),4.5);
 							break;
 						case 3:
-							Pout 				= __min(__max(0.5,Pout+(double)a/10.0),1.5);
+							gain.bottle	= __min(__max(_BAR(0.5),gain.bottle+100*a),_BAR(2));
+							break;
+						case 4:
+							if(mode.Simulator) {
+								Pout 				= __min(__max(0.5,Pout+(double)a/10.0),1.5);
+								if(a) {
+									AirLevel = WaterLevel;
+									mode.Air = mode.Water = false;
+									offsetTimeout = __time__ + 3000;
+								}
+							}
+							break;
+						case 5:
+							if(a < 0)
+								mode.Air=false;
+							else if(a > 0)
+								mode.Air=true;
+							break;
+						case 6:
+							if(a < 0)
+								mode.Water=false;
+							else if(a > 0)
+								mode.Water=true;
 							break;
 					}
 					
 					if(mode.Simulator) {
-						printf("\r:air/water   %3d,%3d,%3.1lf,%3.1lf",
+						printf("\r:spray %3d,%5d,%5.2lf,%5.2lf,%5.2lf",
 							AirLevel,WaterLevel,
-								Pin,Pout);
-						for(int i=1+4*(3-idx); i--; printf("\b"));
+								(double)(adf.air-offset.air)/_BAR(1),
+									(double)(adf.bottle-offset.bottle)/_BAR(1),
+										Pout-1.0);
 					} else {
-						printf("\r:air/water   %3d,%3d,%3.1lf",
+						printf("\r:spray %3d,%5d,%5.2lf,%5.2lf,%5.2lf",
 							AirLevel,WaterLevel,
-								(double)(adf.compressor-offset.compressor)/gain.compressor);
-						for(int i=1+4*(2-idx);i--;printf("\b"));
+								(double)(adf.air-offset.air)/_BAR(1),
+									(double)(adf.bottle-offset.bottle)/_BAR(1),
+										(double)(adf.compressor-offset.compressor)/_BAR(1));
 					}
+					if(mode.Air) 
+						printf("   Air"); 
+					else 
+						printf("   ---"); 
+					if(mode.Water) 
+						printf(" Water"); 
+					else 
+						printf("   ---"); 
+					
+					for(int i=1+6*(6-idx); i--; printf("\b"));
 }
 /*******************************************************************************
 * Function Name	:
@@ -218,21 +248,21 @@ bool			_SPRAY::Simulator(void) {
 					
 	_TIM		*tim=_TIM::Instance();
 
-	#define Uc1 pComp
-	#define Uc2 pBott
-	#define Uc3 pNozz
+	#define Uc1		pComp
+	#define Uc2		pBott
+	#define Uc3		pNozz
 	
 	#define Rin		10
 	#define Rout	100
 	
-	#define R2 100
-	#define Rw 300
-	#define Ra 300
-	#define Rsp 100
-	#define C1 1e-2
-	#define C3 100e-6
-	#define C2 50e-3
-	#define dt 1e-3
+	#define R2		100
+	#define Rw		300
+	#define Ra		300
+	#define Rsp		100
+	#define C1		1e-2
+	#define C3		100e-6
+	#define C2		50e-3
+	#define dt		1e-3
 	
 	double	Iin=(Pin-Uc1)/Rin;
 	double	I12=(Uc1-Uc2)/R2;
@@ -245,7 +275,11 @@ bool			_SPRAY::Simulator(void) {
 
 	if(BottleIn->Closed()) {
 		I12=0;
-		plot.Colour(&_ADC::buffer.bottle,LCD_COLOR_GREY);
+		if(I23 < 0)
+			plot.Colour(&_ADC::buffer.bottle,LCD_COLOR_GREEN);
+		else
+			plot.Colour(&_ADC::buffer.bottle,LCD_COLOR_GREY);
+			
 	} else
 		plot.Colour(&_ADC::buffer.bottle,LCD_COLOR_RED);
 
@@ -262,8 +296,8 @@ bool			_SPRAY::Simulator(void) {
 	Uc3 += (I23+I13-I3)/C3*dt;	
 
 	buffer.compressor	=_BAR(pComp);
-	buffer.bottle			=_BAR(pBott + 0.05*I12*R2);
-	buffer.air				=_BAR(pNozz + I13*Ra);
+	buffer.bottle			=_BAR(pBott + 0.05*I12*R2 + 0.03);
+	buffer.air				=_BAR(pNozz + I13*Ra - 0.01);
 
 	buffer.V5		= _V5to16X;
 	buffer.V12	= _V12to16X;

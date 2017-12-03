@@ -30,12 +30,12 @@
 #define					SW_version	12
 
 typedef enum		{DBG_CAN_TX, DBG_CAN_RX, DBG_ERR, DBG_INFO, DBG_CAN_COM=21, DBG_EC_SIM=22, DBG_ENRG=23}	_DEBUG_;
-typedef enum		{PUMP, FAN, SPRAY, CTRL_A, CTRL_B, CTRL_C, CTRL_D, NONE} _SELECTED_;
+typedef enum		{PUMP, FAN, SPRAY, CTRL_A, CTRL_B, CTRL_C, CTRL_D, NONE} _ITEM;
 //_____________________________________________________________________________
 class	_LM {
 
 	private:
-		_SELECTED_ 	item;
+		_ITEM 			item;
 
 		int					Decode(char *c);
 		int					DecodePlus(char *c);
@@ -47,11 +47,11 @@ class	_LM {
 		_LM();
 		~_LM();
 
-		_io					*io;
-		_TERM				console; 
-		static int	debug, error_mask, warn_mask;
-		static 			string ErrMsg[];
-		double			plotA,plotB,plotC;
+		_io						*io;
+		_TERM					console; 
+		static int		debug, error_mask, warn_mask;
+		static 				string ErrMsg[];
+		double				plotA,plotB,plotC;
 	
 		_SPRAY				spray;
 		_CAN					can;
@@ -61,22 +61,20 @@ class	_LM {
 		_IOC_State		IOC_State;
 		_IOC_FootAck	IOC_FootAck;
 		
-		void 				Increment(int, int);
-		void 				Select(_SELECTED_);
-		void 				Submit(string);
-		_SELECTED_	Active(void)			{	return item;	}
+		void 					Increment(int, int);
+		void 					Select(_ITEM);
+		void 					Submit(string);
 		
-		void 				Refresh(void)			{	Increment(0,0);	}
-		bool				Parse(FILE *),
-								Parse(int);
+		bool					Parse(FILE *),
+									Parse(int);
 
-		void				ErrParse(int);
+		void					ErrParse(int);
 		
-		void				CanConsole(int, int);
-		void				Foot2Can(void);
+		void					CanConsole(int, int);
+		void					Foot2Can(void);
 		
-		static void	Poll(void *),
-								Print(void *),
-								Display(void *);
+		static void		Poll(void *),
+									Print(void *),
+									Display(void *);
 };
 #endif

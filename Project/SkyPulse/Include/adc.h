@@ -24,6 +24,7 @@ int			f1=(ft[1]*(t[0]-to)-ft[0]*(t[1]-to)) / (t[0]-t[1]);
 
 #define	_EMG_DISABLED			GPIO_ReadInputDataBit(_SYS_SHG_sense_PORT,_SYS_SHG_sense_PIN)
 
+#define	_BAR(a)						((a)*16020.0)		// see MPXH6400A specs...
 #define	_UREF							3.3
 #define	_Rdiv(a,b)				((a)/(a+b))
 #define	_Rpar(a,b)				((a)*(b)/(a+b))
