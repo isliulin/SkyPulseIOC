@@ -609,11 +609,11 @@ bool	_LM::Parse(int i) {
 				
 				case __PageUp:
 					if(item == SPRAY)
-						spray.Wgain=__min(++spray.Wgain,_BAR(1.0));
+						spray.Wgain=__min(spray.Wgain+1000,_BAR(1.0));
 					break;
 				case __PageDown:
 					if(item == SPRAY)
-						spray.Wgain=__max(--spray.Wgain,0);
+						spray.Wgain=__max(spray.Wgain-1000,0);
 					break;					
 				case __CtrlV:
 					if(item == SPRAY) {

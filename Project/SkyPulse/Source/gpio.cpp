@@ -53,15 +53,14 @@ _GPIO::_GPIO() {
 #endif	
 #if defined (_FOOT_MASK)
 			GPIO_StructInit(&GPIO_InitStructure);
-			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-			GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
 			GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
 			GPIO_InitStructure.GPIO_Pin = _FOOT_MASK;
 			GPIO_Init(_FOOT_PORT, &GPIO_InitStructure);
 			GPIO_SetBits(_FOOT_PORT, _FOOT_MASK);	
 #endif
 			timeout=0;
-			key = temp = GPIO_ReadInputData(GPIOC) & _FOOT_MASK;
+			key = temp = GPIO_ReadInputData(_FOOT_PORT) & _FOOT_MASK;
 }
 /*******************************************************************************
 * Function Name	: Poll()
@@ -70,8 +69,8 @@ _GPIO::_GPIO() {
 * Return				: footswitch code, 20ms filter, on valid change
 *******************************************************************************/
 int   _GPIO::Poll(void) {
-			if(temp != (GPIO_ReadInputData(GPIOC) & _FOOT_MASK)) {
-				temp = GPIO_ReadInputData(GPIOC) & _FOOT_MASK;
+			if(temp != (GPIO_ReadInputData(_FOOT_PORT) & _FOOT_MASK)) {
+				temp = GPIO_ReadInputData(_FOOT_PORT) & _FOOT_MASK;
 				timeout = __time__ + 5;
 			} else 
 					if(timeout && __time__ > timeout) {

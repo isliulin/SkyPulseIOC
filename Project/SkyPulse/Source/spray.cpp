@@ -30,7 +30,7 @@ _SPRAY::_SPRAY() {
 	
 					offset.air=offset.bottle=offset.compressor=	_BAR(1);
 					gain.air=																		_BAR(2.5);
-					gain.bottle=																_BAR(1);
+					gain.bottle=																_BAR(1.13);
 					gain.compressor=														_BAR(1);
 	
 					Air_P=Bottle_P=0;
@@ -141,7 +141,7 @@ char			c[128];
 					fgets(c,sizeof(c),f);
 					sscanf(c,"%hu,%hu,%hu,%hu",&offset.cooler,&offset.bottle,&offset.compressor,&offset.air);
 					fgets(c,sizeof(c),f);
-					sscanf(c,"%hu,%hu,%hu,%hu",&gain.cooler,&gain.bottle,&gain.compressor,&gain.air);
+					sscanf(c,"%hu,%hu,%hu,%hu,%d",&gain.cooler,&gain.bottle,&gain.compressor,&gain.air,&Wgain);
 }
 /*******************************************************************************/
 /**
@@ -151,7 +151,7 @@ char			c[128];
 	*/
 void			_SPRAY::SaveSettings(FILE *f) {
 					fprintf(f,"%5d,%5d,%5d,%5d                 /.. offset\r\n", offset.cooler, offset.bottle, offset.compressor, offset.air);
-					fprintf(f,"%5d,%5d,%5d,%5d                 /.. gain\r\n", gain.cooler, gain.bottle, gain.compressor, gain.air);
+					fprintf(f,"%5d,%5d,%5d,%5d,%5d           /.. gain\r\n", gain.cooler, gain.bottle, gain.compressor, gain.air, Wgain);
 }
 /*******************************************************************************/
 /**

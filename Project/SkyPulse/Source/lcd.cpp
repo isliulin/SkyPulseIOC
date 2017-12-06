@@ -51,6 +51,13 @@ void	_LCD::Grid() {
 				LCD_DrawLine(0,LCD_PIXEL_HEIGHT/2+i,LCD_PIXEL_WIDTH,LCD_DIR_HORIZONTAL);
 				LCD_DrawLine(0,LCD_PIXEL_HEIGHT/2-i,LCD_PIXEL_WIDTH,LCD_DIR_HORIZONTAL);
 			}
+			
+			LCD_SetTextColor(LCD_COLOR_YELLOW);
+			LCD_DisplayStringLine(4,(uint8_t*) "- input pressure");
+			LCD_SetTextColor(LCD_COLOR_GREY);
+			LCD_DisplayStringLine(16,(uint8_t*)"- bottle        ");
+			LCD_SetTextColor(LCD_COLOR_MAGENTA);
+			LCD_DisplayStringLine(28,(uint8_t*)"- air           ");
 }
 /**
 * @}

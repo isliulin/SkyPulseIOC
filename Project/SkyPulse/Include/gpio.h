@@ -10,7 +10,7 @@
 	#define _SYS_SHG_sense_PORT GPIOA
 	#define _PILOT_PIN 	GPIO_Pin_13
 	#define _PILOT_PORT GPIOD
-	#define _FOOT_MASK 	GPIO_Pin_15 | GPIO_Pin_14 | GPIO_Pin_13
+	#define _FOOT_MASK 	(GPIO_Pin_15 | GPIO_Pin_14 | GPIO_Pin_13)
 	#define _FOOT_PORT GPIOC
 #elif defined  (__IOC_V1__) || defined(__DISCO__) 
 	#define _12Voff_PIN GPIO_Pin_3
@@ -21,7 +21,7 @@
 	#define _SYS_SHG_sense_PORT GPIOA
 	#define _PILOT_PIN 	GPIO_Pin_13
 	#define _PILOT_PORT GPIOD
-	#define _FOOT_MASK 	GPIO_Pin_15 | GPIO_Pin_14 | GPIO_Pin_13
+	#define _FOOT_MASK 	(GPIO_Pin_15 | GPIO_Pin_14 | GPIO_Pin_13)
 	#define _FOOT_PORT GPIOC
 #elif defined  (__IOC_V2__)
 	#define _12Voff_PIN GPIO_Pin_6
@@ -30,10 +30,11 @@
 	#define _SYS_SHG_PORT GPIOB
 	#define _SYS_SHG_sense_PIN 	GPIO_Pin_9
 	#define _SYS_SHG_sense_PORT GPIOD
-	#define _FOOT_MASK 	GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3
+	#define _FOOT_MASK 	(GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2 | GPIO_Pin_3)
 	#define _FOOT_PORT GPIOE
 #else
 #endif
+
 //
 // Footswitch port pattern
 //
