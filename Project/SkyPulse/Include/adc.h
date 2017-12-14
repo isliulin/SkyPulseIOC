@@ -18,12 +18,6 @@ int			f1=(ft[1]*(t[0]-to)-ft[0]*(t[1]-to)) / (t[0]-t[1]);
 #define	_12Voff_ENABLE		GPIO_ResetBits(_12Voff_PORT,_12Voff_PIN)
 #define	_12Voff_DISABLE		GPIO_SetBits(_12Voff_PORT,_12Voff_PIN)
 
-#define	_SYS_SHG_ENABLE		GPIO_SetBits(_SYS_SHG_PORT,_SYS_SHG_PIN)
-#define	_SYS_SHG_ENABLED	GPIO_ReadInputDataBit(_SYS_SHG_PORT,_SYS_SHG_PIN)
-#define	_SYS_SHG_DISABLE	GPIO_ResetBits(_SYS_SHG_PORT,_SYS_SHG_PIN)
-
-#define	_EMG_DISABLED			GPIO_ReadInputDataBit(_SYS_SHG_sense_PORT,_SYS_SHG_sense_PIN)
-
 #define	_BAR(a)						((a)*16020.0)		// see MPXH6400A specs...
 #define	_UREF							3.3
 #define	_Rdiv(a,b)				((a)/(a+b))

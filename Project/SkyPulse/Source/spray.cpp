@@ -30,13 +30,13 @@ _SPRAY::_SPRAY() {
 	
 					offset.air=offset.bottle=offset.compressor=	_BAR(1);
 					gain.air=																		_BAR(2.5);
-					gain.bottle=																_BAR(1.13);
+					gain.bottle=																_BAR(0.5);											
 					gain.compressor=														_BAR(1);
 	
 					Air_P=Bottle_P=0;
 					AirLevel=WaterLevel=0;
 					Bottle_ref=Air_ref=													_BAR(1);
-					Wgain=																			_BAR(0.5);											
+					waterGain=																	_BAR(1.2);
 	
 					mode.Simulator=false;
 					mode.Vibrate=false;
@@ -75,21 +75,21 @@ int				_err=_NOERR;
 					}
 //------------------------------------------------------------------------------
 					Air_ref			= offset.air + AirLevel*gain.air/10;
-					Bottle_ref	= offset.bottle + (Air_ref - offset.air)*gain.bottle/0x10000 + Wgain*WaterLevel/10;
-//					Bottle_ref	= offset.bottle + AirLevel*gain.bottle*(100+4*WaterLevel)/100/10;
+					Bottle_ref	= offset.bottle + (Air_ref - offset.air)*waterGain/0x10000 + gain.bottle*WaterLevel/10;
+//					Bottle_ref	= offset.bottle + AirLevel*waterGain*(100+4*WaterLevel)/100/10;
 //------------------------------------------------------------------------------
 					if(AirLevel || WaterLevel) {
 						Bottle_P += (Bottle_ref - (int)buffer.bottle)/16;
 						if(Bottle_P < -_P_THRESHOLD) {
 							Bottle_P=0;
 							BottleIn->Close();
-							BottleOut->Open(150,750);
+							BottleOut->Open(120,750);
 							if(readyTimeout)
 								readyTimeout = __time__ + _SPRAY_READY_T;
 						}
 						if(Bottle_P > _P_THRESHOLD) {
 							Bottle_P=0;
-							BottleIn->Open(150,750);
+							BottleIn->Open(120,750);
 							BottleOut->Close();
 							if(readyTimeout)
 								readyTimeout = __time__ + _SPRAY_READY_T;
@@ -141,7 +141,10 @@ char			c[128];
 					fgets(c,sizeof(c),f);
 					sscanf(c,"%hu,%hu,%hu,%hu",&offset.cooler,&offset.bottle,&offset.compressor,&offset.air);
 					fgets(c,sizeof(c),f);
-					sscanf(c,"%hu,%hu,%hu,%hu,%d",&gain.cooler,&gain.bottle,&gain.compressor,&gain.air,&Wgain);
+					sscanf(c,"%hu,%hu,%hu,%hu",&gain.cooler,&gain.bottle,&gain.compressor,&gain.air);
+					fgets(c,sizeof(c),f);
+					sscanf(c,"%d",&waterGain);
+	
 }
 /*******************************************************************************/
 /**
@@ -151,7 +154,8 @@ char			c[128];
 	*/
 void			_SPRAY::SaveSettings(FILE *f) {
 					fprintf(f,"%5d,%5d,%5d,%5d                 /.. offset\r\n", offset.cooler, offset.bottle, offset.compressor, offset.air);
-					fprintf(f,"%5d,%5d,%5d,%5d,%5d           /.. gain\r\n", gain.cooler, gain.bottle, gain.compressor, gain.air, Wgain);
+					fprintf(f,"%5d,%5d,%5d,%5d                 /.. gain\r\n", gain.cooler,gain.bottle,gain.compressor, gain.air);
+					fprintf(f,"%5d                                   /.. gain\r\n", waterGain);
 }
 /*******************************************************************************/
 /**
@@ -176,7 +180,7 @@ void			_SPRAY::Increment(int a, int b) {
 						case 2:
 							break;
 						case 3:
-							gain.bottle	= __min(__max(_BAR(0.5),gain.bottle+100*a),_BAR(2));
+							gain.bottle	= __min(__max(_BAR(0.5),gain.bottle	+100*a),_BAR(2.5));
 							break;
 						case 4:
 							if(mode.Simulator) {

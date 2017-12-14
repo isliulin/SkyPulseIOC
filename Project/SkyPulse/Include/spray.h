@@ -29,7 +29,7 @@ class	_SPRAY:public _ADC {
 	public:
 		_SPRAY();
 		mode		mode;
-		int			Wgain;
+		int			waterGain;
 
 		_VALVE	*BottleIn,*BottleOut,*Air,*Water;
 		int			AirLevel, WaterLevel, readyTimeout, offsetTimeout;

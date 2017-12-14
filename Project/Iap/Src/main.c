@@ -84,7 +84,7 @@ int					*p=(int *)*_FW_START;
 						GPIO_SetBits(GPIOD,GPIO_Pin_0 | GPIO_Pin_2 | GPIO_Pin_3);
 }			
 #endif
-						if(RCC_GetFlagStatus(RCC_FLAG_IWDGRST) == RESET && RCC_GetFlagStatus(RCC_FLAG_WWDGRST) == RESET && !crcError()) {
+						if(RCC_GetFlagStatus(RCC_FLAG_SFTRST) != RESET && !crcError()) {
 							NVIC_SetVectorTable(NVIC_VectTab_FLASH,(uint32_t)p-_BOOT_TOP);				
 							__set_MSP(*p++);
 							((void (*)(void))*p)();

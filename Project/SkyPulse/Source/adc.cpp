@@ -62,7 +62,7 @@ _ADC::_ADC() {
 				DMA_InitStructure.DMA_FIFOThreshold = DMA_FIFOThreshold_HalfFull;
 				DMA_InitStructure.DMA_MemoryBurst = DMA_MemoryBurst_Single;
 				DMA_InitStructure.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
-				
+
 				DMA_Init(DMA2_Stream4, &DMA_InitStructure);
 
 				DMA_Cmd(DMA2_Stream4, ENABLE);

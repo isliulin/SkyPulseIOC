@@ -608,13 +608,17 @@ bool	_LM::Parse(int i) {
 					break;	
 				
 				case __PageUp:
-					if(item == SPRAY)
-						spray.Wgain=__min(spray.Wgain+1000,_BAR(1.0));
+					if(item == SPRAY) {
+						spray.waterGain=__min(spray.waterGain+1000,_BAR(2.5));
+						Select(SPRAY);
+					}
 					break;
 				case __PageDown:
-					if(item == SPRAY)
-						spray.Wgain=__max(spray.Wgain-1000,0);
-					break;					
+					if(item == SPRAY) {
+						spray.waterGain=__max(spray.waterGain-1000,_BAR(0.5));
+						Select(SPRAY);
+					}
+					break;
 				case __CtrlV:
 					if(item == SPRAY) {
 						if(spray.mode.Vibrate)
@@ -623,6 +627,7 @@ bool	_LM::Parse(int i) {
 							spray.mode.Vibrate=true;
 				}
 					break;
+				case __Delete:
 				case __CtrlI:
 					if(item == SPRAY) {
 						_ADC::offset.air = _ADC::adf.air;

@@ -2,7 +2,7 @@
 #define			TIM_H
 #include		<stdio.h>
 #define			_PWM_RATE			2000
-#define			_PWon					_PWM_RATE*9/10	
+#define			_PWon					_PWM_RATE	
 #define			_PWoff				0	
 //________________________________________________________________________________________________
 class	_TIM {
@@ -36,10 +36,10 @@ class	_VALVE {
 		
 		bool Opened(void)							{ if(inv) return t->Pwm(n) > _PWM_RATE/2; else return t->Pwm(n) < _PWM_RATE/2;};
 		bool Closed(void)							{ if(inv) return t->Pwm(n) < _PWM_RATE/2; else return t->Pwm(n) > _PWM_RATE/2;};
-		void Open(void)								{ inv ? Set(_PWM_RATE*9/10): Set(0);};
-		void Close(void)							{ inv ? Set(0): Set(_PWM_RATE*9/10);};
-		void Open(int i, int j)				{ inv ? Set(_PWM_RATE*9/10,i,j): Set(0,i,j);};
-		void Close(int i, int j)			{ inv ? Set(0,i,j): Set(_PWM_RATE*9/10,i,j);};
+		void Open(void)								{ inv ? Set(_PWM_RATE): Set(0);};
+		void Close(void)							{ inv ? Set(0): Set(_PWM_RATE);};
+		void Open(int i, int j)				{ inv ? Set(_PWM_RATE,i,j): Set(0,i,j);};
+		void Close(int i, int j)			{ inv ? Set(0,i,j): Set(_PWM_RATE,i,j);};
 		bool Busy(void)								{ return t->Busy(n);							};
 };
 //________________________________________________________________________________________________

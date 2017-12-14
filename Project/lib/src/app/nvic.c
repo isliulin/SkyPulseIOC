@@ -154,21 +154,21 @@ void	rtc_write(time_t t) {
 /******************************************************************************/
 void	Watchdog_init(int t) {
 #ifdef	__PFM6__
-			IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
-			IWDG_SetPrescaler(IWDG_Prescaler_32);
-			IWDG_SetReload(t);
-			while(IWDG_GetFlagStatus(IWDG_FLAG_RVU) == RESET);
-			IWDG_ReloadCounter();
-			IWDG_Enable();
-			IWDG_WriteAccessCmd(IWDG_WriteAccess_Disable);
+//			IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
+//			IWDG_SetPrescaler(IWDG_Prescaler_32);
+//			IWDG_SetReload(t);
+//			while(IWDG_GetFlagStatus(IWDG_FLAG_RVU) == RESET);
+//			IWDG_ReloadCounter();
+//			IWDG_Enable();
+//			IWDG_WriteAccessCmd(IWDG_WriteAccess_Disable);
 #endif
 }
 /******************************************************************************/
 void	Watchdog(void) {
 #ifdef	__PFM6__
-			IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
-			IWDG_ReloadCounter();
-			IWDG_WriteAccessCmd(IWDG_WriteAccess_Disable);
+//			IWDG_WriteAccessCmd(IWDG_WriteAccess_Enable);
+//			IWDG_ReloadCounter();
+//			IWDG_WriteAccessCmd(IWDG_WriteAccess_Disable);
 #endif
 }
 /******************************************************************************/
