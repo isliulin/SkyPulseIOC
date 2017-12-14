@@ -33,11 +33,13 @@ _GPIO::_GPIO() {
 			GPIO_Init(_12Voff_PORT, &GPIO_InitStructure);
 			GPIO_ResetBits(_12Voff_PORT,_12Voff_PIN);
 #endif
+
 #if defined (_PILOT_PIN)
 			GPIO_InitStructure.GPIO_Pin = _PILOT_PIN;
 			GPIO_Init(_PILOT_PORT, &GPIO_InitStructure);
 			GPIO_SetBits(_PILOT_PORT,_PILOT_PIN);
 #endif
+	
 #if defined (_SYS_SHG_sense_PIN)
 			GPIO_StructInit(&GPIO_InitStructure);
 			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
@@ -45,23 +47,27 @@ _GPIO::_GPIO() {
 			GPIO_InitStructure.GPIO_Pin = _SYS_SHG_sense_PIN;
 			GPIO_Init(_SYS_SHG_sense_PORT, &GPIO_InitStructure);
 #endif	
-#if defined (_FOOT_MASK)
+
 			GPIO_StructInit(&GPIO_InitStructure);
 			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
 			GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-			GPIO_InitStructure.GPIO_Pin = _FOOT_MASK;
-			GPIO_Init(_FOOT_PORT, &GPIO_InitStructure);
-#endif
+			GPIO_InitStructure.GPIO_Pin = (_FSW0 | _FSW1 | _FSW2);
+			GPIO_Init(_FSW_PORT, &GPIO_InitStructure);
+
 #if defined (_SYS_SHG_PIN)
 #if defined  (__IOC_V2__)
 			GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+#else
+			GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
 #endif
+			GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
+			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
 			GPIO_InitStructure.GPIO_Pin = _SYS_SHG_PIN;
 			GPIO_Init(_SYS_SHG_PORT, &GPIO_InitStructure);
 			_SYS_SHG_DISABLE;
 #endif
 			timeout=0;
-			key = temp = GPIO_ReadInputData(_FOOT_PORT) & _FOOT_MASK;
+			key = temp = GPIO_ReadInputData(_FSW_PORT) & (_FSW0 | _FSW1 | _FSW2);
 }
 /*******************************************************************************
 * Function Name	: Poll()
@@ -70,19 +76,18 @@ _GPIO::_GPIO() {
 * Return				: footswitch code, 20ms filter, on valid change
 *******************************************************************************/
 int   _GPIO::Poll(void) {
-			if(temp != (GPIO_ReadInputData(_FOOT_PORT) & _FOOT_MASK)) {
-				temp = GPIO_ReadInputData(_FOOT_PORT) & _FOOT_MASK;
+int		i=GPIO_ReadInputDataBit(_FSW_PORT,_FSW2);
+			i=(i<<1) | GPIO_ReadInputDataBit(_FSW_PORT,_FSW1);
+			i=(i<<1) | GPIO_ReadInputDataBit(_FSW_PORT,_FSW0);
+			if(i != temp) {
+				temp = i;
 				timeout = __time__ + 5;
 			} else 
 					if(timeout && __time__ > timeout) {
 						timeout=0;
 						if(temp != key) {
 							key=temp;
-#if defined  (__IOC_V2__)
-							return key << 12;
-#else
-							return key;
-#endif
+							return key << 13;
 						}
 			}
 			return EOF;

@@ -63,6 +63,14 @@ typedef enum {
 	_VIBRATE
 } _Spray;
 
+typedef enum {					// gpioc	15 14 13 20 10
+	__FOOT_OFF	=0xe000,	//				 1  1  1  x  x
+	__FOOT_1		=0x2000,	//				 0  0  1  x  x
+	__FOOT_2		=0xa000,	//				 1  0  1  x  x
+	__FOOT_3		=0x8000,	//				 1  0  0  x  x
+	__FOOT_4		=0xc000		//				 1  1  0  x  x
+} __FOOT;
+
 //_____________________________________________________________________
 /*
 IOC status report, send on:
