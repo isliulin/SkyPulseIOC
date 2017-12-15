@@ -21,10 +21,11 @@ string _LM::ErrMsg[] = {
 				"pump current out of range",
 				"fan speed out of range",
 				"emergency button pressed",
-				"handpiece ejected",
+				"handpiece crowbar fail",
 				"illegal status request",
 				"energy report timeout",
-				"spray not ready"
+				"spray not ready",
+				"doorswitch crowbar fail"
 };
 
 int			_LM::debug=0,

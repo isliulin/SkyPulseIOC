@@ -273,14 +273,14 @@ CanTxMsg			txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 												lm->IOC_State.State = _READY;
 												lm->Submit("@ready.led");
 											} else
-												lm->ErrParse(_illstatereq);
+												lm->ErrParse(_illStateReq);
 											break;
 										case	_ACTIVE:
 											if(lm->IOC_State.State == _READY) {
 												lm->IOC_State.State = _ACTIVE;
 												lm->Submit("@active.led");
 											} else
-												lm->ErrParse(_illstatereq);
+												lm->ErrParse(_illStateReq);
 											break;
 										case	_ERROR:
 											lm->IOC_State.State = _ERROR;
@@ -288,7 +288,7 @@ CanTxMsg			txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 											_SYS_SHG_DISABLE;
 											break;
 										default:
-											lm->ErrParse(_illstatereq);
+											lm->ErrParse(_illStateReq);
 											break;
 									}
 								}
@@ -359,7 +359,7 @@ _io*						io=_stdio(__com3);
 //______________________________________________________________________________________					
 					if(timeout && __time__ > timeout) {
 						timeout=0;
-						lm->ErrParse(_energy_missing);	
+						lm->ErrParse(_energyMissing);	
 					}
 }
 /***************************************************************************************

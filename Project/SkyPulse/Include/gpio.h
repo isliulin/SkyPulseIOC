@@ -6,28 +6,26 @@
 	#define _12Voff_PORT GPIOB
 	#define _SYS_SHG_PIN 	GPIO_Pin_4
 	#define _SYS_SHG_PORT GPIOB
-	#define _SYS_SHG_sense_PIN 	GPIO_Pin_8
-	#define _SYS_SHG_sense_PORT GPIOA
+	#define _cwbButton 	GPIO_Pin_8
+	#define _cwbPort GPIOA
 	#define _PILOT_PIN 	GPIO_Pin_13
 	#define _FOOT_PORT GPIOC
 	#define	_SYS_SHG_ENABLE		GPIO_SetBits(_SYS_SHG_PORT,_SYS_SHG_PIN)
 	#define	_SYS_SHG_ENABLED	GPIO_ReadInputDataBit(_SYS_SHG_PORT,_SYS_SHG_PIN)
 	#define	_SYS_SHG_DISABLE	GPIO_ResetBits(_SYS_SHG_PORT,_SYS_SHG_PIN)
-	#define	_EMG_DISABLED			GPIO_ReadInputDataBit(_SYS_SHG_sense_PORT,_SYS_SHG_sense_PIN)
 
 #elif defined  (__IOC_V1__) || defined(__DISCO__) 
 	#define _12Voff_PIN GPIO_Pin_3
 	#define _12Voff_PORT GPIOB
 	#define _SYS_SHG_PIN GPIO_Pin_4
 	#define _SYS_SHG_PORT GPIOB
-	#define _SYS_SHG_sense_PIN 	GPIO_Pin_8
-	#define _SYS_SHG_sense_PORT GPIOA
+	#define _cwbButton 	GPIO_Pin_8
+	#define _cwbPort GPIOA
 	#define _PILOT_PIN 	GPIO_Pin_13
 	#define _PILOT_PORT GPIOD
 	#define	_SYS_SHG_ENABLE		GPIO_SetBits(_SYS_SHG_PORT,_SYS_SHG_PIN)
 	#define	_SYS_SHG_ENABLED	GPIO_ReadInputDataBit(_SYS_SHG_PORT,_SYS_SHG_PIN)
 	#define	_SYS_SHG_DISABLE	GPIO_ResetBits(_SYS_SHG_PORT,_SYS_SHG_PIN)
-	#define	_EMG_DISABLED			GPIO_ReadInputDataBit(_SYS_SHG_sense_PORT,_SYS_SHG_sense_PIN)
 
 	#define _FSW_PORT		GPIOE
 	#define _FSW0				GPIO_Pin_13
@@ -39,13 +37,14 @@
 	#define _12Voff_PORT GPIOB
 	#define _SYS_SHG_PIN 	GPIO_Pin_4
 	#define _SYS_SHG_PORT GPIOB
-	#define _SYS_SHG_sense_PIN 	GPIO_Pin_9
-	#define _SYS_SHG_sense_PORT GPIOD
+	#define _cwbButton 		GPIO_Pin_9
+	#define _cwbDoor	 		GPIO_Pin_10
+	#define _cwbHandpc	GPIO_Pin_11
+	#define _cwbPort 			GPIOD
 
 	#define	_SYS_SHG_ENABLE		GPIO_ResetBits(_SYS_SHG_PORT,_SYS_SHG_PIN)
 	#define	_SYS_SHG_ENABLED	!GPIO_ReadInputDataBit(_SYS_SHG_PORT,_SYS_SHG_PIN)
 	#define	_SYS_SHG_DISABLE	GPIO_SetBits(_SYS_SHG_PORT,_SYS_SHG_PIN)
-	#define	_EMG_DISABLED			!GPIO_ReadInputDataBit(_SYS_SHG_sense_PORT,_SYS_SHG_sense_PIN)
 
 	#define _FSW_PORT		GPIOE
 	#define _FSW0				GPIO_Pin_0

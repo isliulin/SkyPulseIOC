@@ -21,10 +21,11 @@ typedef	enum {
 	_pumpCurrent			=0x0080,
 	_fanTacho					=0x0100,
 	_emgDisabled			=0x0200,
-	_pyroNoresp				=0x0400,
-	_illstatereq			=0x0800,
-	_energy_missing		=0x1000,
-	_sprayNotReady		=0x2000
+	_handpcDisabled		=0x0400,
+	_illStateReq			=0x0800,
+	_energyMissing		=0x1000,
+	_sprayNotReady		=0x2000,
+	_doorswDisabled		=0x4000
 } _Error;           
                  
 typedef enum {    

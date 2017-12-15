@@ -162,24 +162,8 @@ f error.led
 -c l,2
 -c r,5
 
-19.10....
-pri majhni vodi:  manjši offset, manj vode
-pro velikem zraku in vodi 0: ne sme pihat v flašo
 
-:cooler....... 14002,13300
-:bottle....... 13536,10999
-:compressor... 14944,16384
-:air.......... 15180,32768
-:
-
-... za LW varianto ...
-:cooler....... 14002,13300
-:bottle....... 12536,16009
-:compressor... 14944,16384
-:air.......... 15180,47978
-:
-
-:cooler....... 16020,16020
-:bottle....... 15482,18120
-:compressor... 16020,16020
-:air.......... 15687,40050
+15.12.2017
+- handpiece crowbar, doorswitch & emergency 
+- footsw nova koda
+- nova plata 2 issue: izpustni ventil driver !!

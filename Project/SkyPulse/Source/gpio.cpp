@@ -40,12 +40,20 @@ _GPIO::_GPIO() {
 			GPIO_SetBits(_PILOT_PORT,_PILOT_PIN);
 #endif
 	
-#if defined (_SYS_SHG_sense_PIN)
+#if defined (_cwbButton)
 			GPIO_StructInit(&GPIO_InitStructure);
 			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IN;
-			GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_NOPULL;
-			GPIO_InitStructure.GPIO_Pin = _SYS_SHG_sense_PIN;
-			GPIO_Init(_SYS_SHG_sense_PORT, &GPIO_InitStructure);
+			GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_DOWN;
+			GPIO_InitStructure.GPIO_Pin = _cwbButton;
+			GPIO_Init(_cwbPort, &GPIO_InitStructure);
+#if defined (_cwbDoor)
+			GPIO_InitStructure.GPIO_Pin = _cwbDoor;
+			GPIO_Init(_cwbPort, &GPIO_InitStructure);
+#endif	
+#if defined (_cwbHandpc)
+			GPIO_InitStructure.GPIO_Pin = _cwbHandpc;
+			GPIO_Init(_cwbPort, &GPIO_InitStructure);
+#endif	
 #endif	
 
 			GPIO_StructInit(&GPIO_InitStructure);
