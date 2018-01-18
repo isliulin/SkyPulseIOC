@@ -27,7 +27,7 @@
 	#define	_SYS_SHG_ENABLED	GPIO_ReadInputDataBit(_SYS_SHG_PORT,_SYS_SHG_PIN)
 	#define	_SYS_SHG_DISABLE	GPIO_ResetBits(_SYS_SHG_PORT,_SYS_SHG_PIN)
 
-	#define _FSW_PORT		GPIOE
+	#define _FSW_PORT		GPIOC
 	#define _FSW0				GPIO_Pin_13
 	#define _FSW1				GPIO_Pin_14
 	#define _FSW2				GPIO_Pin_15
@@ -38,9 +38,9 @@
 	#define _SYS_SHG_PIN 	GPIO_Pin_4
 	#define _SYS_SHG_PORT GPIOB
 	#define _cwbButton 		GPIO_Pin_9
-	#define _cwbDoor	 		GPIO_Pin_10
-	#define _cwbHandpc	GPIO_Pin_11
 	#define _cwbPort 			GPIOD
+	#define _cwbDoor	 		GPIO_Pin_10
+	#define _cwbHandpc		GPIO_Pin_11
 
 	#define	_SYS_SHG_ENABLE		GPIO_ResetBits(_SYS_SHG_PORT,_SYS_SHG_PIN)
 	#define	_SYS_SHG_ENABLED	!GPIO_ReadInputDataBit(_SYS_SHG_PORT,_SYS_SHG_PIN)

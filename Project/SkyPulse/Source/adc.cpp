@@ -151,19 +151,22 @@ int			e=_NOERR;
 				adf.compressor	+= (buffer.compressor	- adf.compressor)/16;
 				adf.air					+= (buffer.air				- adf.air)/16;
 				adf.Ipump				+= (buffer.Ipump			- adf.Ipump)/16;
-	
-#if defined (_cwbButton)
+
+#if defined (__IOC_V2__)
 				if(_SYS_SHG_ENABLED && GPIO_ReadInputDataBit(_cwbPort,_cwbButton) == Bit_RESET) {
+#else
+				if(_SYS_SHG_ENABLED && GPIO_ReadInputDataBit(_cwbPort,_cwbButton) == Bit_SET) {
+#endif
 #if defined (_cwbHandpc) && defined (_cwbDoor)
-					if(GPIO_ReadInputDataBit(_cwbPort,_cwbHandpc) == Bit_RESET)
-						e |= _handpcDisabled;
-					else if(GPIO_ReadInputDataBit(_cwbPort,_cwbDoor) == Bit_RESET)
-						e |= _doorswDisabled;
-					else
+						if(GPIO_ReadInputDataBit(_cwbPort,_cwbHandpc) == Bit_RESET)
+							e |= _handpcDisabled;
+						else if(GPIO_ReadInputDataBit(_cwbPort,_cwbDoor) == Bit_RESET)
+							e |= _doorswDisabled;
+						else
 #endif
 						e |= _emgDisabled;
 				}
-#endif
+	
 				if(__time__ > _ADC_ERR_DELAY) {
 					if(abs(adf.V5  - _V5to16X)	> _V5to16X/10)
 						e |= _V5;

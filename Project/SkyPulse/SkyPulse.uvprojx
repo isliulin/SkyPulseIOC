@@ -449,45 +449,6 @@
               <FileType>8</FileType>
               <FilePath>.\Source\fit.cpp</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>System</GroupName>
-          <Files>
-            <File>
-              <FileName>libDiscovery.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\lib\MDK-ARM\output\libDiscovery.lib</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
-            </File>
-            <File>
-              <FileName>arm_cortexM3l_math.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\Libraries\DSP-Lib\CMSIS\Lib\ARM\arm_cortexM3l_math.lib</FilePath>
-            </File>
-            <File>
-              <FileName>libSkyPulse.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\lib\MDK-ARM\output\libSkyPulse.lib</FilePath>
-            </File>
             <File>
               <FileName>lcd.cpp</FileName>
               <FileType>8</FileType>
@@ -541,6 +502,69 @@
                     </VariousControls>
                   </Cads>
                 </FileArmAds>
+              </FileOption>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>System</GroupName>
+          <Files>
+            <File>
+              <FileName>arm_cortexM3l_math.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\Libraries\DSP-Lib\CMSIS\Lib\ARM\arm_cortexM3l_math.lib</FilePath>
+            </File>
+            <File>
+              <FileName>libSkyPulseV1.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\lib\MDK-ARM\output\libSkyPulseV1.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>libSkyPulseV2.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\lib\MDK-ARM\output\libSkyPulseV2.lib</FilePath>
+            </File>
+            <File>
+              <FileName>libDiscovery.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\lib\MDK-ARM\output\libDiscovery.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
               </FileOption>
             </File>
           </Files>
@@ -1000,45 +1024,6 @@
               <FileType>8</FileType>
               <FilePath>.\Source\fit.cpp</FilePath>
             </File>
-          </Files>
-        </Group>
-        <Group>
-          <GroupName>System</GroupName>
-          <Files>
-            <File>
-              <FileName>libDiscovery.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\lib\MDK-ARM\output\libDiscovery.lib</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
-            </File>
-            <File>
-              <FileName>arm_cortexM3l_math.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\Libraries\DSP-Lib\CMSIS\Lib\ARM\arm_cortexM3l_math.lib</FilePath>
-            </File>
-            <File>
-              <FileName>libSkyPulse.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\lib\MDK-ARM\output\libSkyPulse.lib</FilePath>
-            </File>
             <File>
               <FileName>lcd.cpp</FileName>
               <FileType>8</FileType>
@@ -1092,6 +1077,69 @@
                     </VariousControls>
                   </Cads>
                 </FileArmAds>
+              </FileOption>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>System</GroupName>
+          <Files>
+            <File>
+              <FileName>arm_cortexM3l_math.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\..\Libraries\DSP-Lib\CMSIS\Lib\ARM\arm_cortexM3l_math.lib</FilePath>
+            </File>
+            <File>
+              <FileName>libSkyPulseV1.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\lib\MDK-ARM\output\libSkyPulseV1.lib</FilePath>
+            </File>
+            <File>
+              <FileName>libSkyPulseV2.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\lib\MDK-ARM\output\libSkyPulseV2.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>libDiscovery.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\lib\MDK-ARM\output\libDiscovery.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
               </FileOption>
             </File>
           </Files>
@@ -1551,49 +1599,35 @@
               <FileType>8</FileType>
               <FilePath>.\Source\fit.cpp</FilePath>
             </File>
+            <File>
+              <FileName>lcd.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\lcd.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>System</GroupName>
           <Files>
             <File>
-              <FileName>libDiscovery.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\lib\MDK-ARM\output\libDiscovery.lib</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds/>
-              </FileOption>
-            </File>
-            <File>
               <FileName>arm_cortexM3l_math.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\Libraries\DSP-Lib\CMSIS\Lib\ARM\arm_cortexM3l_math.lib</FilePath>
             </File>
             <File>
-              <FileName>libSkyPulse.lib</FileName>
+              <FileName>libSkyPulseV1.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\lib\MDK-ARM\output\libSkyPulse.lib</FilePath>
+              <FilePath>..\lib\MDK-ARM\output\libSkyPulseV1.lib</FilePath>
             </File>
             <File>
-              <FileName>lcd.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\lcd.cpp</FilePath>
+              <FileName>libSkyPulseV2.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\lib\MDK-ARM\output\libSkyPulseV2.lib</FilePath>
+            </File>
+            <File>
+              <FileName>libDiscovery.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\lib\MDK-ARM\output\libDiscovery.lib</FilePath>
             </File>
           </Files>
         </Group>
@@ -2052,25 +2086,25 @@
               <FileType>8</FileType>
               <FilePath>.\Source\fit.cpp</FilePath>
             </File>
+            <File>
+              <FileName>lcd.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\lcd.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>System</GroupName>
           <Files>
             <File>
-              <FileName>libDiscovery.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\lib\MDK-ARM\output\libDiscovery.lib</FilePath>
-            </File>
-            <File>
               <FileName>arm_cortexM3l_math.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\..\Libraries\DSP-Lib\CMSIS\Lib\ARM\arm_cortexM3l_math.lib</FilePath>
             </File>
             <File>
-              <FileName>libSkyPulse.lib</FileName>
+              <FileName>libSkyPulseV1.lib</FileName>
               <FileType>4</FileType>
-              <FilePath>..\lib\MDK-ARM\output\libSkyPulse.lib</FilePath>
+              <FilePath>..\lib\MDK-ARM\output\libSkyPulseV1.lib</FilePath>
               <FileOption>
                 <CommonProperty>
                   <UseCPPCompiler>2</UseCPPCompiler>
@@ -2092,9 +2126,33 @@
               </FileOption>
             </File>
             <File>
-              <FileName>lcd.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\lcd.cpp</FilePath>
+              <FileName>libSkyPulseV2.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\lib\MDK-ARM\output\libSkyPulseV2.lib</FilePath>
+              <FileOption>
+                <CommonProperty>
+                  <UseCPPCompiler>2</UseCPPCompiler>
+                  <RVCTCodeConst>0</RVCTCodeConst>
+                  <RVCTZI>0</RVCTZI>
+                  <RVCTOtherData>0</RVCTOtherData>
+                  <ModuleSelection>0</ModuleSelection>
+                  <IncludeInBuild>0</IncludeInBuild>
+                  <AlwaysBuild>2</AlwaysBuild>
+                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
+                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
+                  <PublicsOnly>2</PublicsOnly>
+                  <StopOnExitCode>11</StopOnExitCode>
+                  <CustomArgument></CustomArgument>
+                  <IncludeLibraryModules></IncludeLibraryModules>
+                  <ComprImg>1</ComprImg>
+                </CommonProperty>
+                <FileArmAds/>
+              </FileOption>
+            </File>
+            <File>
+              <FileName>libDiscovery.lib</FileName>
+              <FileType>4</FileType>
+              <FilePath>..\lib\MDK-ARM\output\libDiscovery.lib</FilePath>
             </File>
           </Files>
         </Group>
