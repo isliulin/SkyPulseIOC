@@ -247,7 +247,6 @@ CanTxMsg			txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 						}
 //______________________________________________________________________________________					
 					if(_buffer_count(io->rx) && _buffer_pull(io->rx,&rxm,sizeof(CanTxMsg))) {
-//
 //________ debug print__________________________________________________________________
 						if(_BIT(_LM::debug, DBG_CAN_RX)) {
 //							_io *temp=_stdio(lm->io);
@@ -269,18 +268,12 @@ CanTxMsg			txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 											_SYS_SHG_ENABLE;
 											break;
 										case	_READY:
-											if(lm->IOC_State.State == _STANDBY || lm->IOC_State.State == _ACTIVE) {
-												lm->IOC_State.State = _READY;
-												lm->Submit("@ready.led");
-											} else
-												lm->ErrParse(_illStateReq);
+											lm->IOC_State.State = _READY;
+											lm->Submit("@ready.led");
 											break;
 										case	_ACTIVE:
-											if(lm->IOC_State.State == _READY) {
-												lm->IOC_State.State = _ACTIVE;
-												lm->Submit("@active.led");
-											} else
-												lm->ErrParse(_illStateReq);
+											lm->IOC_State.State = _ACTIVE;
+											lm->Submit("@active.led");
 											break;
 										case	_ERROR:
 											lm->IOC_State.State = _ERROR;
@@ -288,7 +281,6 @@ CanTxMsg			txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 											_SYS_SHG_DISABLE;
 											break;
 										default:
-											lm->ErrParse(_illStateReq);
 											break;
 									}
 								}
@@ -342,6 +334,7 @@ _io*						io=_stdio(__com3);
 								timeout=__time__+_EC20_EM_DELAY;			
 							break;
 //______________________________________________________________________________________							
+							case idIOC_Footreq:
 							case idEM_ack:
 								timeout=0;
 								lm->IOC_FootAck.Send();	

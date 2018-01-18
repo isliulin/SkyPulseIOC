@@ -22,7 +22,7 @@ typedef	enum {
 	_fanTacho					=0x0100,
 	_emgDisabled			=0x0200,
 	_handpcDisabled		=0x0400,
-	_illStateReq			=0x0800,
+	_dummy						=0x0800,
 	_energyMissing		=0x1000,
 	_sprayNotReady		=0x2000,
 	_doorswDisabled		=0x4000
@@ -31,6 +31,7 @@ typedef	enum {
 typedef enum {    
 	idIOC_State				=0x200,
 	idIOC_SprayParm		=0x201,
+	idIOC_Footreq			=0x202,
 	idIOC_State_Ack		=0x240,
 	idIOC_FootAck			=0x241,
 	idIOC_SprayAck		=0x242,
