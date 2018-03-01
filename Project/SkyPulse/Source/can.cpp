@@ -334,9 +334,19 @@ _io*						io=_stdio(__com3);
 								timeout=__time__+_EC20_EM_DELAY;			
 							break;
 //______________________________________________________________________________________							
-							case idIOC_Footreq:
+							case idIOC_AuxReq:
+{
+CanTxMsg			txm={idIOC_AuxAck,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
+short					*p=(short *)txm.Data;
+							*p=lm->pump.Th2o();
+							txm.DLC=sizeof(short);
+							Send(&txm);
+							break;
+}
+//______________________________________________________________________________________							
 							case idEM_ack:
 								timeout=0;
+							case idIOC_Footreq:
 								lm->IOC_FootAck.Send();	
 							break;
 //______________________________________________________________________________________							

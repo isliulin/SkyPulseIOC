@@ -1,8 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <signal.h>
-#include <time.h>
-#include	"app.h"
+//#include <time.h>
 #include "tetris.h"
 
 struct tetris_level {
@@ -148,7 +147,7 @@ tetris_clean(struct tetris *t) {
 void
 tetris_print(struct tetris *t) {
     int x,y;
-    printf("%c[H",__Esc);
+    printf("%c[H",0x1b);
     printf("[LEVEL: %d | SCORE: %d]\r\n", t->level, t->score);
     for (x=0; x<2*t->w+2; x++)
         printf("~");
@@ -286,20 +285,18 @@ tetris_level(struct tetris *t) {
     return levels[t->level-1].nsec;
 }
 
-void
-tetris_run(int w, int h) {
+void tetris_run(int w, int h) {
 
     struct tetris t;
     char cmd;
     int count=0;
     tetris_set_ioconfig();
     tetris_init(&t, w, h);
-    srand(time(NULL));
 
     tetris_new_block(&t);
     while (!t.gameover) {
 				_wait(10,_thread_loop);
-        if (count%100 == 0) {
+        if (count%50 == 0) {
 					tetris_gravity(&t);
           tetris_check_lines(&t);
 					tetris_print(&t);
@@ -346,3 +343,4 @@ tetris_run(int w, int h) {
     tetris_clean(&t);
     tetris_cleanup_io();
 }
+

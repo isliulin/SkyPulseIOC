@@ -5,6 +5,11 @@ typedef struct	{
 unsigned short	T2,T3,V5,V12,V24,cooler,bottle,compressor,air,Ipump;
 } _ADMA;
 
+typedef struct	{
+unsigned short	D1,D2;
+} _DIODE;
+
+
 __inline 
 int			__fit(int to, const int t[], const int ft[]) {
 int			f3=(ft[3]*(t[0]-to)-ft[0]*(t[3]-to)) / (t[0]-t[3]);
@@ -39,9 +44,13 @@ class	_ADC {
 		static _ADC *instance;
 	public:
 		_ADC();
-		static 	_ADMA	buffer,adf,offset,gain;
-		static	int	Status(void);
-		static	int	Th2o(void);
-};
-
+		static _ADMA	adc[],adf,offset,gain;
+		static _DIODE	diode[];
+		static void		Initialize_ADC1();
+		static void		Initialize_ADC2();
+		static int		Status(void);
+		static int		Th2o(void);
+		static void		adcFilter(void);
+		static void		diodeFilter(int );
+	};
 #endif

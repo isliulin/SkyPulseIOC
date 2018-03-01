@@ -58,6 +58,7 @@ void						_led(int, int),
 #define					__CtrlV				0x16
 #define					__CtrlZ				0x1a
 #define					__CtrlY				0x19
+#define					__CtrlT				0x14
 
 #define	 				__f1					0x001B4F50
 #define	 				__f2					0x001B4F51
@@ -247,6 +248,7 @@ void						PrintRtc(void);
 void						print_date_time(uint32_t d,uint32_t t);
 void						SetCompileTime(void);
 int							putLCD(_buffer *, int);
+void						tetris_run(int, int);
 
 #ifndef	__max				
 #define __max(a,b)  (((a) > (b)) ? (a) : (b))	

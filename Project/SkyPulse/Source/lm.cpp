@@ -16,21 +16,21 @@ string _LM::ErrMsg[] = {
 				"24V supply",
 				"spray input pressure",
 				"cooler temperature",
-				"pump speed out of range",
+				"pump rate out of range",
 				"pump pressure out of range",
 				"pump current out of range",
-				"fan speed out of range",
+				"fan rate out of range",
 				"emergency button pressed",
 				"handpiece crowbar fail",
-				"illegal status request",
+				"flow rate out of range",
 				"energy report timeout",
 				"spray not ready",
 				"doorswitch crowbar fail"
 };
 
 int			_LM::debug=0,
-				_LM::warn_mask	=	_sprayInPressure	+ _sprayNotReady,
-				_LM::error_mask	=	_sprayInPressure	+ _sprayNotReady;
+				_LM::warn_mask	=	_sprayInPressure	+ _sprayNotReady + _flowTacho,
+				_LM::error_mask	=	_sprayInPressure	+ _sprayNotReady + _flowTacho;
 
 /*******************************************************************************/
 /**
@@ -276,9 +276,9 @@ int		_LM::DecodePlus(char *c) {
 					ADC_DeInit();
 #ifdef USE_LCD
 					spray.plot.Clear();
-					spray.plot.Add(&_ADC::buffer.compressor,_BAR(1.0),_BAR(0.02), LCD_COLOR_YELLOW);
-					spray.plot.Add(&_ADC::buffer.bottle,_BAR(1.0),_BAR(0.02), LCD_COLOR_GREY);
-					spray.plot.Add(&_ADC::buffer.air,_BAR(1.0),_BAR(0.02), LCD_COLOR_MAGENTA);
+					spray.plot.Add(&_ADC::adf.compressor,_BAR(1.0),_BAR(0.02), LCD_COLOR_YELLOW);
+					spray.plot.Add(&_ADC::adf.bottle,_BAR(1.0),_BAR(0.02), LCD_COLOR_GREY);
+					spray.plot.Add(&_ADC::adf.air,_BAR(1.0),_BAR(0.02), LCD_COLOR_MAGENTA);
 					spray.lcd=new _LCD;
 #endif
 					spray.mode.Simulator=true;
@@ -342,6 +342,9 @@ int		_LM::DecodeMinus(char *c) {
 *******************************************************************************/
 int		_LM::DecodeWhat(char *c) {
 			switch(*c) {
+				case 'p':
+					_thread_list();
+					break;
 				case 'v':
 					printf("\r\nV5=%4.1f,V12=%4.1f,V24=%4.1f",_16XtoV5(_ADC::adf.V5),_16XtoV12(_ADC::adf.V12),_16XtoV24(_ADC::adf.V24));			
 					break;
@@ -600,9 +603,6 @@ bool	_LM::Parse(int i) {
 					break;
 				case __CtrlD:
 					Select(CTRL_D);
-					break;
-				case __CtrlT:
-					tetris_run(12,18);
 					break;
 				case __CtrlE: 
 					CanConsole(idCAN2COM,__CtrlE);

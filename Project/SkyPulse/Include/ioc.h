@@ -11,30 +11,32 @@
 
 typedef	enum {
 	_NOERR						=0,
-	_V5								=0x0001,
-	_V12							=0x0002,
-	_V24							=0x0004,
-	_sprayInPressure	=0x0008,
-	_sysOverheat			=0x0010,
-	_pumpTacho				=0x0020,
-	_pumpPressure			=0x0040,
-	_pumpCurrent			=0x0080,
-	_fanTacho					=0x0100,
-	_emgDisabled			=0x0200,
-	_handpcDisabled		=0x0400,
-	_dummy						=0x0800,
-	_energyMissing		=0x1000,
-	_sprayNotReady		=0x2000,
-	_doorswDisabled		=0x4000
+	_V5								=1<<0,
+	_V12							=1<<1,
+	_V24							=1<<2,
+	_sprayInPressure	=1<<3,
+	_sysOverheat			=1<<4,
+	_pumpTacho				=1<<5,
+	_pumpPressure			=1<<6,
+	_pumpCurrent			=1<<7,
+	_fanTacho					=1<<8,
+	_emgDisabled			=1<<9,
+	_handpcDisabled		=1<<10,
+	_flowTacho				=1<<11,
+	_energyMissing		=1<<12,
+	_sprayNotReady		=1<<13,
+	_doorswDisabled		=1<<14
 } _Error;           
                  
 typedef enum {    
 	idIOC_State				=0x200,
 	idIOC_SprayParm		=0x201,
 	idIOC_Footreq			=0x202,
+	idIOC_AuxReq			=0x203,
 	idIOC_State_Ack		=0x240,
 	idIOC_FootAck			=0x241,
 	idIOC_SprayAck		=0x242,
+	idIOC_AuxAck			=0x243,					// Tlsb Tmsb xx xx xx xx xx xx
 	idCAN2COM					=0x20B,
   idCOM2CAN					=0x24B,
 	idCAN2FOOT				=0x20C,

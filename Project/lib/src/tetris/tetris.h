@@ -1,6 +1,9 @@
 #ifndef TETRIS_H
 # define TETRIS_H
 
+void			*_thread_loop(void);
+void			_wait(int,void *(*)(void));
+
 struct tetris;
 
 void tetris_cleanup_io(void);

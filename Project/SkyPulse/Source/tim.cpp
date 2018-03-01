@@ -14,15 +14,12 @@
 #include <string.h>
 #include <math.h>
 #include <isr.h>
-
-
-
-
-
-
-
-// TIM4,10 
-void ttttt(void) {
+//___________________________________________________________________________________
+// fan rmp timer setup, 25 khz pwm
+// V1=PD12
+// V2=PB8
+//___________________________________________________________________________________
+void tim4_10_setup(void) {
 //___________________________________________________________________________________
 GPIO_InitTypeDef					GPIO_InitStructure;
 TIM_TimeBaseInitTypeDef		TIM_TimeBaseStructure;
@@ -155,7 +152,7 @@ GPIO_InitTypeDef					GPIO_InitStructure;
 				
 			memset(t1, 0, sizeof(t1)); 
 			memset(t2, 0, sizeof(t2)); 
-			ttttt();
+			tim4_10_setup();
 }
 /*******************************************************************************
 * Function Name	: 
@@ -375,23 +372,24 @@ void	TIM3_IRQHandler(void) {
 /**
 * @}
 */ 
+#ifdef __IOC_V2__	
 /*******************************************************************************
 * Function Name	:
 * Description		:	TIM9 pump && fan tacho IC
 * Output				:
 * Return				:
 *******************************************************************************/
-_TIM9 *_TIM9::Instance[]={NULL,NULL};
+_TIM9 *_TIM9::Instance=NULL;
 /*******************************************************************************
 */
-_TIM9::_TIM9(int n) {
+_TIM9::_TIM9() {
 
 GPIO_InitTypeDef GPIO_InitStructure;
 TIM_TimeBaseInitTypeDef		TIM_TimeBaseStructure;
 TIM_ICInitTypeDef					TIM_ICInitStructure;
 //
 // if called first time ???
-		if(!Instance[0] && !Instance[1]) {
+		if(!Instance) {
 // gpio		
 			GPIO_StructInit(&GPIO_InitStructure);
 			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
@@ -415,7 +413,7 @@ TIM_ICInitTypeDef					TIM_ICInitStructure;
 			TIM_TimeBaseInit(TIM9,&TIM_TimeBaseStructure);
 // input Compares
 			TIM_ICStructInit(&TIM_ICInitStructure);	
-			TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_BothEdge;
+			TIM_ICInitStructure.TIM_ICPolarity = TIM_ICPolarity_Falling;
 			TIM_ICInitStructure.TIM_ICSelection = TIM_ICSelection_DirectTI;
 			TIM_ICInitStructure.TIM_ICPrescaler = TIM_ICPSC_DIV1;
 			TIM_ICInitStructure.TIM_ICFilter = 0x000f;
@@ -430,11 +428,10 @@ TIM_ICInitTypeDef					TIM_ICInitStructure;
 			NVIC_EnableIRQ(TIM1_BRK_TIM9_IRQn);
 		}
 		
-		Instance[n]=this;
-		to=timeout=0;
-		tauN=32;
-		while(tauN--)
-			tau[tauN]=0;
+		Instance=this;
+		Flow=0;
+		Tau1=Tau2=0;
+		Led1=Led2=0;
 }
 /*******************************************************************************
 * Function Name	:
@@ -446,41 +443,6 @@ _TIM9::~_TIM9() {
 		NVIC_DisableIRQ(TIM1_BRK_TIM9_IRQn);
 }
 /*******************************************************************************
-* Function Name	: ISR
-* Description		:	TIM9 input capture interrupt service
-* Input					: capture register value
-* Return				: None, tau parameter set to dt value, usecs
-********************************************************************************/
-void	_TIM9::ISR(int t) {
-			to=t-to;
-			if(to < 0)
-				to += (1<<16);
-			if(to > 100) {
-int			a=tau[tauN];
-				tau[tauN]=to;
-				tauN=++tauN % 32;
-				tau[tauN]=a-tau[tauN]+to;				
-			}
-			to=t;
-			timeout=__time__ + 50;
-}
-/*******************************************************************************
-* Function Name	: ISR
-* Description		:	TIM9 input capture interrupt service
-* Input					: capture register value
-* Return				: None, tau parameter set to dt value, usecs
-*******************************************************************************/
-int		_TIM9::Tau(void) {
-			NVIC_DisableIRQ(TIM1_BRK_TIM9_IRQn);
-int		i=tau[tauN]/32;
-			NVIC_EnableIRQ(TIM1_BRK_TIM9_IRQn);
-
-			if(__time__ > timeout)
-				return EOF;
-			else
-				return i;
-}
-/*******************************************************************************
 * Function Name	:
 * Description		:	TIM9 pump && fan tacho IC
 * Output				:
@@ -489,13 +451,20 @@ int		i=tau[tauN]/32;
 extern	"C" {
 void	TIM1_BRK_TIM9_IRQHandler(void) {
 			if(TIM_GetITStatus(TIM9,TIM_IT_CC1)==SET) {
-				_TIM9::Instance[0]->ISR(TIM_GetCapture1(TIM9));
 				TIM_ClearITPendingBit(TIM9, TIM_IT_CC1);
+				
+				_TIM9::Instance->Tau1++;
+				if(_TIM9::Instance->Led1++ % 50 == 0)
+					_YELLOW2(30);
 			}
+			
 			if(TIM_GetITStatus(TIM9,TIM_IT_CC2)==SET) {
-				_TIM9::Instance[1]->ISR(TIM_GetCapture2(TIM9));
 				TIM_ClearITPendingBit(TIM9, TIM_IT_CC2);
+				_TIM9::Instance->Tau2++;
+				if(_TIM9::Instance->Led2++ % 50 == 0)
+					_BLUE2(30);
 			}
 }
 }
+#endif
 

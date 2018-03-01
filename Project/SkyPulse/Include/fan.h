@@ -16,7 +16,7 @@ class	_FAN:_ADC,_TIM3 {
 #endif
 
 	private:
-int		idx,led,timeout;
+int		idx,timeout;
 int		fpl, fph, ftl, fth;
 _FIT	*tacho;
 	
@@ -25,7 +25,7 @@ _FIT	*tacho;
 
 int		Poll(void);
 int		Rpm(void);
-int		Increment(int, int);
+void	Increment(int, int);
 void	LoadSettings(FILE *);
 void	SaveSettings(FILE *);
 void	Enable(void),Disable(void);

@@ -110,6 +110,10 @@ _io				*io;
 								case __CtrlY:
 									NVIC_SystemReset();
 								break;
+								case __CtrlT:
+									tetris_run(12,18);
+									break;
+
 								case __f12:
 								case __F12:
 									return NULL;

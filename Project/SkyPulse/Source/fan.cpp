@@ -14,15 +14,14 @@
 #include	"limits.h"
 #include	"math.h"
 #include	"ioc.h"
-/*******************************************************************************/
-/**
-	* @brief	TIM3 IC2 ISR
-	* @param	: None
-	* @retval : None
-	*/
-/*******************************************************************************/
+/*******************************************************************************
+* Function Name	:
+* Description		: 
+* Output				:
+* Return				: None
+*******************************************************************************/
 #ifdef __IOC_V2__	
-_FAN::_FAN() :_TIM9(0) {
+_FAN::_FAN() :_TIM9() {
 #else
 _FAN::_FAN() :_TIM3(1) {
 #endif
@@ -38,28 +37,37 @@ _FAN::_FAN() :_TIM3(1) {
 * Function Name	:
 * Description		: 
 * Output				:
-* Return				: None
+* Return				: None 2200
 *******************************************************************************/
 int			_FAN::Poll() {
 int			e=_NOERR;
-				if(timeout==INT_MAX)
-					_fTIM->CCR1=_fTIM->ARR;
-				else {
-					_fTIM->CCR1=(int)((_fTIM->ARR*__ramp(Th2o(),ftl*100,fth*100,fpl,fph))/100);
-					if(tacho && __time__ > timeout) {
-						if(abs(tacho->Eval(Rpm()) - Tau()) > Tau()/10)
-							e |= _fanTacho;
-					}
-					if(__time__ % (5*(Tau()/100)) == 0)
-						_YELLOW2(20);
+	
+#ifndef __IOC_V2__	
+				if(tacho && __time__ > timeout) {
+					if(abs(tacho->Eval(Rpm()) - Tau()) > Tau()/10)
+						e |= _fanTacho;
 				}
+				if(__time__ % (5*(Tau()/100)) == 0)
+					_YELLOW2(20);
+#else
+				if(__time__ > timeout) {
+					timeout=__time__+100;
+					if(!Tau1)
+						e |= _fanTacho;
+					if(!Tau2)
+						e |= _flowTacho;
+					Flow=Tau2*600;
+					Tau1=Tau2=0;
+				}
+#endif
+				_fTIM->CCR1=_fTIM->ARR*Rpm()/100;
 				return e;
 }
 /*******************************************************************************/
 /**
-	* @brief	TIM3 IC2 ISR
+	* @brief	:	Evaluates cooling water temp
 	* @param	: None
-	* @retval : None
+	* @retval : (int) 100*T(C°)
 	*/
 /*******************************************************************************/
 int			_FAN::Rpm(void) {
@@ -67,7 +75,7 @@ int			_FAN::Rpm(void) {
 }
 /*******************************************************************************/
 /**
-	* @brief	TIM3 IC2 ISR
+	* @brief	:	Loads the fan settings from ini file
 	* @param	: None
 	* @retval : None
 	*/
@@ -78,7 +86,7 @@ char		c[128];
 }
 /*******************************************************************************/
 /**
-	* @brief	TIM3 IC2 ISR
+	* @brief	:	Appends the fan settings from ini file
 	* @param	: None
 	* @retval : None
 	*/
@@ -87,34 +95,11 @@ void		_FAN::SaveSettings(FILE *f) {
 }
 /*******************************************************************************/
 /**
-	* @brief	TIM3 IC2 ISR
-	* @param	: None
+	* @brief	:	Prints the fan setup line on currently active terminal console  
+	* @param	: left/rignt(a), up/down increment value (1), otherwise 0
 	* @retval : None
 	*/
-void		_FAN::LoadLimits(FILE *f) {
-char		c[128];
-				tacho = new _FIT(4,FIT_POW);
-	
-				fgets(c,sizeof(c),f);
-				sscanf(c,"%lf,%lf,%lf,%lf",&tacho->rp[0],&tacho->rp[1],&tacho->rp[2],&tacho->rp[3]);
-}
-/*******************************************************************************/
-/**
-	* @brief	TIM3 IC2 ISR
-	* @param	: None
-	* @retval : None
-	*/
-void		_FAN::SaveLimits(FILE *f) {
-				fprintf(f,"%lf,%lf,%lf,%lf\r\n",tacho->rp[0],		tacho->rp[1],		tacho->rp[2],		tacho->rp[3]);
-}
-/*******************************************************************************/
-/**
-	* @brief	TIM3 IC2 ISR
-	* @param	: None
-	* @retval : None
-	*/
-/*******************************************************************************/
-int			_FAN::Increment(int a, int b) {
+void		_FAN::Increment(int a, int b) {
 				idx= __min(__max(idx+b,0),4);
 
 				if(a)
@@ -139,7 +124,6 @@ int			_FAN::Increment(int a, int b) {
 				if(idx>0)
 					printf("        %2d%c-%2d%c,%2d'C-%2d'C",fpl,'%',fph,'%',ftl,fth);
 				for(int i=4*(5-idx);idx && i--;printf("\b"));
-				return Rpm();
 }
 /*******************************************************************************/
 /**
@@ -148,6 +132,7 @@ int			_FAN::Increment(int a, int b) {
 	* @retval : None
 	*/
 bool		_FAN::Align(void) {
+#ifndef __IOC_V2__	
 _FIT		*t;
 	
 int			_fpl=fpl,
@@ -180,6 +165,7 @@ int			_fpl=fpl,
 					return false;
 				else
 					tacho=t;
+#endif
 					return true;
 			}		
 /*******************************************************************************/
@@ -189,6 +175,7 @@ int			_fpl=fpl,
 	* @retval : None
 	*/
 bool		_FAN::Test(void) {
+#ifndef __IOC_V2__	
 int			_fpl=fpl,
 				_fph=fph;
 _FIT		*t;
@@ -199,26 +186,49 @@ _FIT		*t;
 				tacho=NULL;
 
 				do {
-				for(int i=_fpl; i<_fph; ++i) {
-					fpl=fph=i;
-					_wait(200,_thread_loop);
-					printf("\r\n%4.3lf,%4.3lf",
-																					t->Eval(Rpm()),(double)Tau());				
-				}
-				for(int i=_fph; i>_fpl; --i) {
-					fpl=fph=i;
-					fpl=fph=i;
-					_wait(200,_thread_loop);
-					printf("\r\n%4.3lf,%4.3lf",
-																					t->Eval(Rpm()),(double)Tau());				
-				}
+					for(int i=_fpl; i<_fph; ++i) {
+						fpl=fph=i;
+						_wait(200,_thread_loop);
+						printf("\r\n%4.3lf,%4.3lf",
+							t->Eval(Rpm()),(double)Tau());				
+					}
+					for(int i=_fph; i>_fpl; --i) {
+						fpl=fph=i;
+						fpl=fph=i;
+						_wait(200,_thread_loop);
+						printf("\r\n%4.3lf,%4.3lf",
+							t->Eval(Rpm()),(double)Tau());				
+					}
 			} while(getchar() == EOF);
 				printf("\r\n:");
 				fpl=_fpl;
 				fph=_fph;
 				tacho=t;
+#endif	
 				return true;
-			}/**
+			}
+/*******************************************************************************/
+/**
+	* @brief	:	
+	* @param	: None
+	* @retval : None
+	*/
+void		_FAN::LoadLimits(FILE *f) {
+char		c[128];
+				tacho = new _FIT(4,FIT_POW);
+				fgets(c,sizeof(c),f);
+				sscanf(c,"%lf,%lf,%lf,%lf",&tacho->rp[0],&tacho->rp[1],&tacho->rp[2],&tacho->rp[3]);
+}
+/*******************************************************************************/
+/**
+	* @brief	:	
+	* @param	: None
+	* @retval : None
+	*/
+void		_FAN::SaveLimits(FILE *f) {
+				fprintf(f,"%lf,%lf,%lf,%lf\r\n",tacho->rp[0],		tacho->rp[1],		tacho->rp[2],		tacho->rp[3]);
+}
+/**
 * @}
 */ 
 

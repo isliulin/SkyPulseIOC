@@ -79,7 +79,7 @@ int				_err=_NOERR;
 //					Bottle_ref	= offset.bottle + AirLevel*waterGain*(100+4*WaterLevel)/100/10;
 //------------------------------------------------------------------------------
 					if(AirLevel || WaterLevel) {
-						Bottle_P += (Bottle_ref - (int)buffer.bottle)/16;
+						Bottle_P += (Bottle_ref - (int)adf.bottle)/16;
 						if(Bottle_P < -_P_THRESHOLD) {
 							Bottle_P=0;
 							BottleIn->Close();
@@ -112,7 +112,7 @@ int				_err=_NOERR;
 						Water->Close();	
 
 					if(AirLevel && mode.Air) {
-						Air_P += (Air_ref-(int)buffer.air);
+						Air_P += (Air_ref-(int)adf.air);
 						Air_P=__max(0,__min(_A_THRESHOLD*_PWM_RATE, Air_P));
 						if(mode.Vibrate && __time__ % 50 < 10)
 							Air->Open();
@@ -280,17 +280,17 @@ bool			_SPRAY::Simulator(void) {
 	if(BottleIn->Closed()) {
 		I12=0;
 		if(I23 < 0)
-			plot.Colour(&_ADC::buffer.bottle,LCD_COLOR_GREEN);
+			plot.Colour(&_ADC::adf.bottle,LCD_COLOR_GREEN);
 		else
-			plot.Colour(&_ADC::buffer.bottle,LCD_COLOR_GREY);
+			plot.Colour(&_ADC::adf.bottle,LCD_COLOR_GREY);
 			
 	} else
-		plot.Colour(&_ADC::buffer.bottle,LCD_COLOR_RED);
+		plot.Colour(&_ADC::adf.bottle,LCD_COLOR_RED);
 
 	if(BottleOut->Closed())
 		Iout=0;
 	else
-		plot.Colour(&_ADC::buffer.bottle,LCD_COLOR_BLUE);
+		plot.Colour(&_ADC::adf.bottle,LCD_COLOR_BLUE);
 
 	if(Water->Closed())
 		I23=0;
@@ -299,15 +299,15 @@ bool			_SPRAY::Simulator(void) {
 	Uc2 += (I12-I23-Iout)/C2*dt;
 	Uc3 += (I23+I13-I3)/C3*dt;	
 
-	buffer.compressor	=_BAR(pComp);
-	buffer.bottle			=_BAR(pBott + 0.05*I12*R2 + 0.03);
-	buffer.air				=_BAR(pNozz + I13*Ra - 0.01);
+	adf.compressor	=_BAR(pComp);
+	adf.bottle			=_BAR(pBott + 0.05*I12*R2 + 0.03);
+	adf.air				=_BAR(pNozz + I13*Ra - 0.01);
 
-	buffer.V5		= _V5to16X;
-	buffer.V12	= _V12to16X;
-	buffer.V24	= _V24to16X;
+	adf.V5		= _V5to16X;
+	adf.V12	= _V12to16X;
+	adf.V24	= _V24to16X;
 
-	buffer.T2=(unsigned short)0xafff;
+	adf.T2=(unsigned short)0xafff;
 	if(simrate && __time__ < simrate)
 		return false;
 	simrate = __time__ + 10;
