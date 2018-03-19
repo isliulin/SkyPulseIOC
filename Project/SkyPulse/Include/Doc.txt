@@ -162,8 +162,14 @@ f error.led
 -c l,2
 -c r,5
 
-
 15.12.2017
 - handpiece crowbar, doorswitch & emergency 
 - footsw nova koda
 - nova plata 2 issue: izpustni ventil driver !!
+
+19.3.2018
+- curr. limit in slow start za pumpo
+- curr. limit se nastavi +25% oz. briše na 0 z UP-DOWN z kurzorjem na izpisu toka 
+- limit je +30% na trenutno vrednost toka, se shranjuje !!!
+- bug pri warn mask
+- mode za izpis pretoka/pritiska (UP-DOWN za kurzor na na izpisu)

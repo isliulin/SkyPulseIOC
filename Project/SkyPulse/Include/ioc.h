@@ -93,12 +93,12 @@ typedef __packed struct _IOC_State {
 	}
 } _IOCstatus;
 //_____________________________________________________________________
-typedef __packed struct _IOC_FootAck {
+typedef __packed struct _IOC_FswAck {
 	_Footsw State;
-	_IOC_FootAck() : State(_OFF)	{}	
+	_IOC_FswAck() : State(_OFF)	{}	
 	void	Send() {
-		CanTxMsg	m={idIOC_FootAck,0,CAN_ID_STD,CAN_RTR_DATA,sizeof(_IOC_FootAck),0,0,0,0,0,0,0,0};
-		memcpy(m.Data,(const void *)&State,sizeof(_IOC_FootAck));
+		CanTxMsg	m={idIOC_FootAck,0,CAN_ID_STD,CAN_RTR_DATA,sizeof(_IOC_FswAck),0,0,0,0,0,0,0,0};
+		memcpy(m.Data,(const void *)&State,sizeof(_IOC_FswAck));
 		_CAN::Instance()->Send(&m);
 	}
 } IOC_FootAck;

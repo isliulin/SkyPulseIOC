@@ -122,8 +122,8 @@ void		_FAN::Increment(int a, int b) {
 
 				printf("\r:fan   %3d%c,%4.1lf'C",Rpm(),'%',(double)Th2o()/100);
 				if(idx>0)
-					printf("        %2d%c-%2d%c,%2d'C-%2d'C",fpl,'%',fph,'%',ftl,fth);
-				for(int i=4*(5-idx);idx && i--;printf("\b"));
+					printf("        %2d%c-%2d%c,%2d'-%2d'",fpl,'%',fph,'%',ftl,fth);
+				for(int i=4*(5-idx)-1;idx && i--;printf("\b"));
 }
 /*******************************************************************************/
 /**

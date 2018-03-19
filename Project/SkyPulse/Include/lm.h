@@ -1,6 +1,5 @@
 #ifndef					LM_H
 #define					LM_H
-
 /**
 	******************************************************************************
 	* @file		lm.cpp
@@ -47,34 +46,34 @@ class	_LM {
 		_LM();
 		~_LM();
 
-		_io						*io;
-		_TERM					console; 
-		static int		debug, error_mask, warn_mask;
-		static 				string ErrMsg[];
-		double				plotA,plotB,plotC;
+		_io					*io;
+		_TERM				console; 
+		static int	debug, error_mask, warn_mask;
+		static 			string ErrMsg[];
+		double			plotA,plotB,plotC;
 	
-		_SPRAY				spray;
-		_CAN					can;
-		_PUMP					pump;
-		_FAN					fan;
-		_WS2812				ws;
-		_IOC_State		IOC_State;
-		_IOC_FootAck	IOC_FootAck;
+		_SPRAY			spray;
+		_CAN				can;
+		_PUMP				pump;
+		_FAN				fan;
+		_WS2812			ws;
+		_IOC_State	IOC_State;
+		_IOC_FswAck	IOC_FootAck;
 		
-		void 					Increment(int, int);
-		void 					Select(_ITEM);
-		void 					Submit(string);
+		void 				Increment(int, int);
+		void 				Select(_ITEM);
+		void 				Submit(string);
 		
-		bool					Parse(FILE *),
-									Parse(int);
+		bool				Parse(FILE *),
+								Parse(int);
 
-		void					ErrParse(int);
+		void				ErrParse(int);
 		
-		void					CanConsole(int, int);
-		void					Foot2Can(void);
+		void				CanConsole(int, int);
+		void				Foot2Can(void);
 		
-		static void		Poll(void *),
-									Print(void *),
-									Display(void *);
+		static void	Poll(void *),
+								Print(void *),
+								Display(void *);
 };
 #endif

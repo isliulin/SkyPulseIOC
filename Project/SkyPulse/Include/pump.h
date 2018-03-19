@@ -7,16 +7,19 @@
 #include				"tim.h"
 #include				"fit.h"
 
+typedef enum		{PUMP_FLOW, PUMP_ERR_STOP} _MODE_;
+
 class	_PUMP:public _ADC,_DAC,_TIM3 {
 	private:
 
-int		idx,led,timeout;
+int		idx,led,timeout,mode;
 int		fpl,fph,ftl,fth;
 _FIT	*tacho,*pressure,*current;
 	
 	public:
 _PUMP();
 
+int		curr_limit;
 int		Poll(void);
 int		Rpm(void);
 int		Increment(int, int);

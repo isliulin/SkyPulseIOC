@@ -85,31 +85,6 @@ _LM::~_LM() {
 * Output				:
 * Return				:
 *******************************************************************************/
-//void	_LM::ErrParse(int e) {
-//	
-//			e &= ~error_mask;
-//			e ? _RED1(3000): _GREEN1(20);
-//			e = (e ^ IOC_State.Error) & e;
-//			IOC_State.Error = (_Error)(IOC_State.Error | e);
-
-//			if(e) {
-//				_SYS_SHG_DISABLE;
-//				IOC_State.State = _ERROR;
-//				IOC_State.Send();
-//				if(IOC_State.State != _ERROR)
-//					Submit("@error.led");
-//			}
-
-//			for(int n=0; e && _BIT(_LM::debug, DBG_ERR); e >>= 1, ++n)
-//				if(_BIT(e, 0))
-//					printf("\r\nerror %03d: %s",n, ErrMsg[n].c_str());	
-//}
-/*******************************************************************************
-* Function Name	:
-* Description		:
-* Output				:
-* Return				:
-*******************************************************************************/
 void	_LM::ErrParse(int e) {
 	
 int		ee = (e ^ IOC_State.Error) & e & ~error_mask;
@@ -117,6 +92,8 @@ int		ee = (e ^ IOC_State.Error) & e & ~error_mask;
 				_SYS_SHG_DISABLE;
 				if(IOC_State.State != _ERROR)
 					Submit("@error.led");
+				if(e & IOC_State.Error)
+					pump.Disable();
 				IOC_State.Error = (_Error)(IOC_State.Error | ee);
 				IOC_State.State = _ERROR;
 				IOC_State.Send();
@@ -313,7 +290,7 @@ int		_LM::DecodeMinus(char *c) {
 				case 'w':
 				case 'W':
 					for(c=strchr(c,' '); c && *c;) {
-						_CLEAR_BIT(error_mask,strtoul(++c,&c,10));
+						_CLEAR_BIT(warn_mask,strtoul(++c,&c,10));
 					}
 					break;
 				case 'c':
@@ -351,15 +328,6 @@ int		_LM::DecodeWhat(char *c) {
 				case 's':
 					printf("\r\npI=%1.3lf,pB=%1.3lf,pA=%1.3lf,pC=%1.3lf",(double)_ADC::adf.compressor/_BAR(1),(double)_ADC::adf.bottle/_BAR(1),(double)_ADC::adf.air/_BAR(1),(double)_ADC::adf.cooler/_BAR(1));			
 					break;
-				case 'L':
-					printf(",%08X",*(unsigned int *)strtoul(++c,&c,16));
-					break;
-				case 'W':
-					printf(",%04X",*(unsigned short *)strtoul(++c,&c,16));
-					break;
-				case 'B':
-					printf(",%02X",*(unsigned char *)strtoul(++c,&c,16));
-					break;
 				case 'd':
 				case 'D':
 					printf(" %0*X ",2*sizeof(debug)/sizeof(char),debug);
@@ -367,9 +335,16 @@ int		_LM::DecodeWhat(char *c) {
 				case 'e':
 				case 'E':
 					for(int n=0,e=IOC_State.Error; e; e >>= 1, ++n)
-						if(_BIT(e, 0))
+						if(_BIT(e,0)   && (~error_mask & (1<<n)))
 							printf("\r\nerror %03d: %s",n, ErrMsg[n].c_str());	
 						printf("\r\nerror mask=%08X\r\n:",error_mask);	
+					break;
+				case 'w':
+				case 'W':
+					for(int n=0,e=IOC_State.Error; e; e >>= 1, ++n)
+						if(_BIT(e,0) && warn_mask & (1<<n))
+							printf("\r\nwarning %03d: %s",n, ErrMsg[n].c_str());	
+						printf("\r\nwarning mask=%08X\r\n:",warn_mask);	
 					break;
 				case 'c':
 					return ws.GetColor(atoi(strchr(c,' ')));

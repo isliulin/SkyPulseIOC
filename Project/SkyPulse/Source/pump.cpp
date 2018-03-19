@@ -36,6 +36,8 @@ _PUMP::_PUMP() :_TIM3(0)  {
 				offset.cooler=_BAR(1);
 				gain.cooler=_BAR(1);
 				idx=0;
+				mode=(1<<PUMP_FLOW);
+				curr_limit=0;
 }
 /*******************************************************************************/
 /**
@@ -49,19 +51,24 @@ int			e=_NOERR;
 				if(timeout==INT_MAX) {
 					DAC_SetChannel1Data(DAC_Align_12b_R,0);
 				} else {
-					DAC_SetChannel1Data(DAC_Align_12b_R,__ramp(Th2o(),ftl*100,fth*100,fpl*0xfff/100,fph*0xfff/100));
-					if(tacho && pressure && current && __time__ > timeout) {
-						if(abs(tacho->Eval(Rpm()) - Tau()) > Tau()/10)    
-							e |= _pumpTacho;
-						if(abs(pressure->Eval(Rpm()) - adf.cooler) > adf.cooler/10)
-							e |= _pumpPressure;
-						if(abs(current->Eval(Rpm()) - adf.Ipump) > adf.Ipump/10)
-							e |= _pumpCurrent;
-					}
-#ifndef __IOC_V2__	
-					if(__time__ % (5*(Tau()/100)) == 0)
-						_BLUE2(20);
-#endif
+					if(DAC_GetDataOutputValue(0) < __ramp(Th2o(),ftl*100,fth*100,fpl*0xfff/100,fph*0xfff/100))
+						DAC_SetChannel1Data(DAC_Align_12b_R,DAC_GetDataOutputValue(0) + 1);
+					else
+						DAC_SetChannel1Data(DAC_Align_12b_R,DAC_GetDataOutputValue(0) - 1);
+//					if(tacho && pressure && current && __time__ > timeout) {
+//						if(abs(tacho->Eval(Rpm()) - Tau()) > Tau()/10)    
+//							e |= _pumpTacho;
+//						if(abs(pressure->Eval(Rpm()) - adf.cooler) > adf.cooler/10)
+//							e |= _pumpPressure;
+//						if(abs(current->Eval(Rpm()) - adf.Ipump) > adf.Ipump/10)
+//							e |= _pumpCurrent;
+//					}
+//#ifndef __IOC_V2__	
+//					if(__time__ % (5*(Tau()/100)) == 0)
+//						_BLUE2(20);
+//#endif
+					if(curr_limit && adf.Ipump > (curr_limit + curr_limit/4))
+						e |= _pumpCurrent;
 				} 
 				return e;
 }
@@ -84,7 +91,7 @@ int			_PUMP::Rpm(void) {
 void		_PUMP::LoadSettings(FILE *f) {
 char		c[128];
 				fgets(c,sizeof(c),f);
-				sscanf(c,"%d,%d,%d,%d",&fpl,&fph,&ftl,&fth);
+				sscanf(c,"%d,%d,%d,%d,%d",&fpl,&fph,&ftl,&fth,&curr_limit);
 }
 /*******************************************************************************/
 /**
@@ -93,7 +100,7 @@ char		c[128];
 	* @retval : None
 	*/
 void		_PUMP::SaveSettings(FILE *f) {
-				fprintf(f,"%5d,%5d,%5d,%5d                 /.. pump\r\n",fpl,fph,ftl,fth);
+				fprintf(f,"%5d,%5d,%5d,%5d,%5d           /.. pump\r\n",fpl,fph,ftl,fth,curr_limit);
 }
 /*******************************************************************************/
 /**
@@ -122,12 +129,19 @@ void		_PUMP::Disable() {
 	*/
 /*******************************************************************************/
 int			_PUMP::Increment(int a, int b)	{
-				idx= __min(__max(idx+b,0),4);
+				idx= __min(__max(idx+b,0),5);
 	
-				if(a)
-					timeout=__time__ + _PUMP_ERR_DELAY;
-
 				switch(idx) {
+					case 0:
+						if(a) {
+							mode ^= (1<<PUMP_FLOW);
+							if(mode & (1<<PUMP_FLOW))
+								printf("\b\b\b\b lpm");
+							else
+								printf("\b\b\b\b bar");
+							return Rpm();
+						}
+						break;
 					case 1:
 						fpl= __min(__max(fpl+a,5),fph);
 						break;
@@ -140,17 +154,26 @@ int			_PUMP::Increment(int a, int b)	{
 					case 4:
 						fth= __min(__max(fth+a,ftl),50);
 						break;
+					case 5:
+						if(a > 0) {
+							curr_limit=adf.Ipump + adf.Ipump/4;
+							printf("\r\n: current limit set to %4.3lfA\r\n:",(double)curr_limit/4096.0*3.3/2.1/16);
+						}
+						if(a < 0) {
+							curr_limit=0;
+							printf("\r\n: current reset.... \r\n:");
+						}
+						break;
 				}
-
-#ifdef __IOC_V2__	
-				printf("\r:pump  %3d%c,%4.1lf'C,%4.1lf",Rpm(),'%',(double)Th2o()/100,(double)_TIM9::Instance->Flow/2200);
-#else
-				printf("\r:pump  %3d%c,%4.1lf'C,%4.1lf",Rpm(),'%',(double)Th2o()/100,(double)(adf.cooler-offset.cooler)/gain.cooler);
-#endif
+				
+				if(mode & (1<<PUMP_FLOW))
+					printf("\r:pump  %3d%c,%4.1lf'C,%4.1lf",Rpm(),'%',(double)Th2o()/100,(double)_TIM9::Instance->Flow/22000);
+				else
+					printf("\r:pump  %3d%c,%4.1lf'C,%4.1lf",Rpm(),'%',(double)Th2o()/100,(double)(adf.cooler-offset.cooler)/gain.cooler);
 
 				if(idx>0)
-					printf("   %2d%c-%2d%c,%2d'C-%2d'C,%4.3lf",fpl,'%',fph,'%',ftl,fth,(double)adf.Ipump/4096.0*3.3/2.1/16);		
-				for(int i=4*(5-idx)+6;idx && i--;printf("\b"));
+					printf("   %2d%c-%2d%c,%2d'-%2d',%4.3lf",fpl,'%',fph,'%',ftl,fth,(double)adf.Ipump/4096.0*3.3/2.1/16);		
+				for(int i=4*(5-idx)+5;idx && i--;printf("\b"));
 				return Rpm();
 }
 /*******************************************************************************/

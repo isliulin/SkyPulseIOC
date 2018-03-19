@@ -264,15 +264,18 @@ CanTxMsg			txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 										case	_STANDBY:
 											lm->IOC_State.State = _STANDBY;
 											lm->IOC_State.Error = _NOERR;
+											lm->pump.Enable();
 											lm->Submit("@standby.led");
 											_SYS_SHG_ENABLE;
 											break;
 										case	_READY:
 											lm->IOC_State.State = _READY;
+											lm->pump.Enable();
 											lm->Submit("@ready.led");
 											break;
 										case	_ACTIVE:
 											lm->IOC_State.State = _ACTIVE;
+											lm->pump.Enable();
 											lm->Submit("@active.led");
 											break;
 										case	_ERROR:
