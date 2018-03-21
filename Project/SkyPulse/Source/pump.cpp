@@ -165,10 +165,12 @@ int			_PUMP::Increment(int a, int b)	{
 						}
 						break;
 				}
-				
+
+#ifndef __DISCO__				
 				if(mode & (1<<PUMP_FLOW))
 					printf("\r:pump  %3d%c,%4.1lf'C,%4.1lf",Rpm(),'%',(double)Th2o()/100,(double)_TIM9::Instance->Flow/22000);
 				else
+#endif
 					printf("\r:pump  %3d%c,%4.1lf'C,%4.1lf",Rpm(),'%',(double)Th2o()/100,(double)(adf.cooler-offset.cooler)/gain.cooler);
 
 				if(idx>0)

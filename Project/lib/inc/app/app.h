@@ -243,7 +243,7 @@ int							sDump(char *,int);
 int							hex2asc(int);
 int							asc2hex(int);
 int 						wcard(char *, char *);
-void						PrintVersion(int);
+void						PrintVersion(int, char *);
 void						PrintRtc(void);
 void						print_date_time(uint32_t d,uint32_t t);
 void						SetCompileTime(void);

@@ -7,7 +7,7 @@
 extern		"C" {
 
 extern	volatile int __time__;
-void		PrintVersion(int);
+void		PrintVersion(int, char *);
 void		Watchdog(void);
 void		_led(int, int),
 				_lightshow(void);

@@ -11,7 +11,7 @@
 #define				CAN_GPIO					GPIOD
 #define				CAN_RXPIN					0
 #define				CAN_TXPIN					1
-#define 			GPIO_AF_CAN 			GPIO_AF_CAN1	
+#define 			GPIO_AF_CAN 			GPIO_AF_CAN1
 #endif
 #if defined   (__IOC_V0__) || defined  (__IOC_V1__) || defined  (__IOC_V2__)
 #define				__CAN__						CAN2

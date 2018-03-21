@@ -92,7 +92,7 @@ int		ee = (e ^ IOC_State.Error) & e & ~error_mask;
 				_SYS_SHG_DISABLE;
 				if(IOC_State.State != _ERROR)
 					Submit("@error.led");
-				if(e & IOC_State.Error)
+				if(ee & _pumpCurrent)
 					pump.Disable();
 				IOC_State.Error = (_Error)(IOC_State.Error | ee);
 				IOC_State.State = _ERROR;
@@ -101,7 +101,7 @@ int		ee = (e ^ IOC_State.Error) & e & ~error_mask;
 
 int		ww=(e ^ IOC_State.Error) & warn_mask;
 			if(ww && __time__ > 3000) {
-				IOC_State.Error = (_Error)(IOC_State.Error ^ ww);
+				IOC_State.Error = (_Error)(IOC_State.Error | ww);
 				IOC_State.Send();
 			} 
 			
@@ -437,7 +437,7 @@ int		_LM::Decode(char *c) {
 				case '-':
 					return DecodeMinus(++c);
 				case 'v':
-					PrintVersion(SW_version);
+					PrintVersion(SW_version,(char *)__DATE__);
 					break;
 				case 'w':
 					for(c=strchr(c,' '); c && *c;)

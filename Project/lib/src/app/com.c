@@ -527,7 +527,7 @@ int				DecodeCom(char *c) {
 						switch(*c) {
 //__________________________________________________SW version query____________________
 					case 'v':
-						PrintVersion(SW_version);
+						PrintVersion(SW_version,__DATE__);
 					break;
 //__________________________________________________single interger read/write__________
 					case 'B':
