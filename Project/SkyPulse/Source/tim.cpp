@@ -429,7 +429,6 @@ TIM_ICInitTypeDef					TIM_ICInitStructure;
 		}
 		
 		Instance=this;
-		Flow=0;
 		Tau1=Tau2=0;
 		Led1=Led2=0;
 }

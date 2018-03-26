@@ -146,7 +146,7 @@ _LM		*lm = static_cast<_LM *>(v);
 		tau2 += (0 - tau2) / 100.0f;
 		adf.Ipump=0;
 	}
-	lm->pump.Tau2 = tau2*100;								// 50& = 500Hz 
+	lm->fan.Tau2 = tau2*100;								// 50& = 500Hz 
 }
 /**
 * @}

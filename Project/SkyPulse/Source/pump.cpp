@@ -25,7 +25,7 @@
 	*/
 /*******************************************************************************/
 #ifdef __IOC_V2__	
-_PUMP::_PUMP() :_TIM9()  {
+_PUMP::_PUMP() {
 #else
 _PUMP::_PUMP() :_TIM3(0)  {
 #endif
@@ -41,6 +41,7 @@ _PUMP::_PUMP() :_TIM3(0)  {
 				idx=0;
 				mode=(1<<PUMP_FLOW);
 				curr_limit=0;
+				flow=0;
 				Enabled=true;
 }
 /*******************************************************************************/
@@ -60,12 +61,13 @@ int			e=_NOERR;
 				} else	
 						DAC_SetChannel1Data(DAC_Align_12b_R,0);
 				if(__time__ > timeout) {
+					timeout=__time__+100;
 					if(curr_limit && adf.Ipump > curr_limit)
 						e |= _pumpCurrent;
-					if(Tau2==0)
+					if(_TIM9::Instance->Tau2==0)
 						e |= _flowTacho;
-					Tau2=0;
-					Flow=Tau2*600;					
+					flow=_TIM9::Instance->Tau2*600;					
+					_TIM9::Instance->Tau2=0;
 				} 	
 
 				return e;
@@ -168,7 +170,7 @@ int			_PUMP::Increment(int a, int b)	{
 				}
 		
 				if(mode & (1<<PUMP_FLOW))
-					printf("\r:pump  %3d%c,%4.1lf'C,%4.1lf",Rpm(),'%',(double)Th2o()/100,(double)Flow/22000);
+					printf("\r:pump  %3d%c,%4.1lf'C,%4.1lf",Rpm(),'%',(double)Th2o()/100,(double)flow/22000);
 				else
 					printf("\r:pump  %3d%c,%4.1lf'C,%4.1lf",Rpm(),'%',(double)Th2o()/100,(double)(adf.cooler-offset.cooler)/gain.cooler);
 
