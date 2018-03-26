@@ -29,7 +29,6 @@ _FAN::_FAN() :_TIM3(1) {
 				fph=95;
 				ftl=25;
 				fth=40;
-				tacho = NULL;
 				timeout=__time__ + _FAN_ERR_DELAY;
 				idx=0;
 }
@@ -52,12 +51,9 @@ int			e=_NOERR;
 #else
 				if(__time__ > timeout) {
 					timeout=__time__+100;
-					if(!Tau1)
+					if(Tau1==0)
 						e |= _fanTacho;
-					if(!Tau2)
-						e |= _flowTacho;
-					Flow=Tau2*600;
-					Tau1=Tau2=0;
+					Tau1=0;
 				}
 #endif
 				_fTIM->CCR1=_fTIM->ARR*Rpm()/100;
@@ -124,109 +120,6 @@ void		_FAN::Increment(int a, int b) {
 				if(idx>0)
 					printf("        %2d%c-%2d%c,%2d'-%2d'",fpl,'%',fph,'%',ftl,fth);
 				for(int i=4*(5-idx)-1;idx && i--;printf("\b"));
-}
-/*******************************************************************************/
-/**
-	* @brief	TIM3 IC2 ISR
-	* @param	: None
-	* @retval : None
-	*/
-bool		_FAN::Align(void) {
-#ifndef __IOC_V2__	
-_FIT		*t;
-	
-int			_fpl=fpl,
-				_fph=fph;
-
-				if(tacho) {
-					t=tacho; 
-					tacho=NULL;
-				} else {
-					t = new _FIT(4,FIT_POW);
-				}
-				printf("\rfan  ");
-				for(int i=_fpl; i<_fph; i+=10) {
-					fpl=fph=i;
-					_wait(3000,_thread_loop);
-					t->Sample(i,Tau());
-					printf(".");
-				}
-				for(int i=_fph; i>_fpl; i-=10) {
-					fpl=fph=i;
-					_wait(3000,_thread_loop);
-					t->Sample(i,Tau());
-					printf("\b \b");
-				}
-				
-				fpl=_fpl;
-				fph=_fph;
-				
-				if(!t->Compute())
-					return false;
-				else
-					tacho=t;
-#endif
-					return true;
-			}		
-/*******************************************************************************/
-/**
-	* @brief	TIM3 IC2 ISR
-	* @param	: None
-	* @retval : None
-	*/
-bool		_FAN::Test(void) {
-#ifndef __IOC_V2__	
-int			_fpl=fpl,
-				_fph=fph;
-_FIT		*t;
-
-				if(!tacho)
-					return false;
-				t=tacho;
-				tacho=NULL;
-
-				do {
-					for(int i=_fpl; i<_fph; ++i) {
-						fpl=fph=i;
-						_wait(200,_thread_loop);
-						printf("\r\n%4.3lf,%4.3lf",
-							t->Eval(Rpm()),(double)Tau());				
-					}
-					for(int i=_fph; i>_fpl; --i) {
-						fpl=fph=i;
-						fpl=fph=i;
-						_wait(200,_thread_loop);
-						printf("\r\n%4.3lf,%4.3lf",
-							t->Eval(Rpm()),(double)Tau());				
-					}
-			} while(getchar() == EOF);
-				printf("\r\n:");
-				fpl=_fpl;
-				fph=_fph;
-				tacho=t;
-#endif	
-				return true;
-			}
-/*******************************************************************************/
-/**
-	* @brief	:	
-	* @param	: None
-	* @retval : None
-	*/
-void		_FAN::LoadLimits(FILE *f) {
-char		c[128];
-				tacho = new _FIT(4,FIT_POW);
-				fgets(c,sizeof(c),f);
-				sscanf(c,"%lf,%lf,%lf,%lf",&tacho->rp[0],&tacho->rp[1],&tacho->rp[2],&tacho->rp[3]);
-}
-/*******************************************************************************/
-/**
-	* @brief	:	
-	* @param	: None
-	* @retval : None
-	*/
-void		_FAN::SaveLimits(FILE *f) {
-				fprintf(f,"%lf,%lf,%lf,%lf\r\n",tacho->rp[0],		tacho->rp[1],		tacho->rp[2],		tacho->rp[3]);
 }
 /**
 * @}

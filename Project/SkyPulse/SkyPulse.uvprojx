@@ -10,12 +10,13 @@
       <TargetName>IOC_V2</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
+      <pCCUsed>5060528::V5.06 update 5 (build 528)::ARMCC</pCCUsed>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407VGTx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.9.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.11.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000,0x20000) IRAM2(0x10000000,0x10000) IROM(0x08000000,0x100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -444,76 +445,11 @@
               <FileType>8</FileType>
               <FilePath>.\Source\term.cpp</FilePath>
             </File>
-            <File>
-              <FileName>fit.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\fit.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>lcd.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\lcd.cpp</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>System</GroupName>
           <Files>
-            <File>
-              <FileName>arm_cortexM3l_math.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\Libraries\DSP-Lib\CMSIS\Lib\ARM\arm_cortexM3l_math.lib</FilePath>
-            </File>
             <File>
               <FileName>libSkyPulseV1.lib</FileName>
               <FileType>4</FileType>
@@ -570,6 +506,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>Simulator</GroupName>
+          <Files>
+            <File>
+              <FileName>simulator.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\simulator.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\lcd.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>Doc</GroupName>
           <Files>
             <File>
@@ -586,11 +537,12 @@
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407VGTx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.9.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.11.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000,0x20000) IRAM2(0x10000000,0x10000) IROM(0x08000000,0x100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1019,76 +971,11 @@
               <FileType>8</FileType>
               <FilePath>.\Source\term.cpp</FilePath>
             </File>
-            <File>
-              <FileName>fit.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\fit.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>lcd.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\lcd.cpp</FilePath>
-              <FileOption>
-                <CommonProperty>
-                  <UseCPPCompiler>2</UseCPPCompiler>
-                  <RVCTCodeConst>0</RVCTCodeConst>
-                  <RVCTZI>0</RVCTZI>
-                  <RVCTOtherData>0</RVCTOtherData>
-                  <ModuleSelection>0</ModuleSelection>
-                  <IncludeInBuild>0</IncludeInBuild>
-                  <AlwaysBuild>2</AlwaysBuild>
-                  <GenerateAssemblyFile>2</GenerateAssemblyFile>
-                  <AssembleAssemblyFile>2</AssembleAssemblyFile>
-                  <PublicsOnly>2</PublicsOnly>
-                  <StopOnExitCode>11</StopOnExitCode>
-                  <CustomArgument></CustomArgument>
-                  <IncludeLibraryModules></IncludeLibraryModules>
-                  <ComprImg>1</ComprImg>
-                </CommonProperty>
-                <FileArmAds>
-                  <Cads>
-                    <interw>2</interw>
-                    <Optim>0</Optim>
-                    <oTime>2</oTime>
-                    <SplitLS>2</SplitLS>
-                    <OneElfS>2</OneElfS>
-                    <Strict>2</Strict>
-                    <EnumInt>2</EnumInt>
-                    <PlainCh>2</PlainCh>
-                    <Ropi>2</Ropi>
-                    <Rwpi>2</Rwpi>
-                    <wLevel>0</wLevel>
-                    <uThumb>2</uThumb>
-                    <uSurpInc>2</uSurpInc>
-                    <uC99>2</uC99>
-                    <useXO>2</useXO>
-                    <v6Lang>0</v6Lang>
-                    <v6LangP>0</v6LangP>
-                    <vShortEn>2</vShortEn>
-                    <vShortWch>2</vShortWch>
-                    <v6Lto>2</v6Lto>
-                    <v6WtE>2</v6WtE>
-                    <v6Rtti>2</v6Rtti>
-                    <VariousControls>
-                      <MiscControls></MiscControls>
-                      <Define></Define>
-                      <Undefine></Undefine>
-                      <IncludePath></IncludePath>
-                    </VariousControls>
-                  </Cads>
-                </FileArmAds>
-              </FileOption>
-            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>System</GroupName>
           <Files>
-            <File>
-              <FileName>arm_cortexM3l_math.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\Libraries\DSP-Lib\CMSIS\Lib\ARM\arm_cortexM3l_math.lib</FilePath>
-            </File>
             <File>
               <FileName>libSkyPulseV1.lib</FileName>
               <FileType>4</FileType>
@@ -1145,6 +1032,21 @@
           </Files>
         </Group>
         <Group>
+          <GroupName>Simulator</GroupName>
+          <Files>
+            <File>
+              <FileName>simulator.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\simulator.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\lcd.cpp</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
           <GroupName>Doc</GroupName>
           <Files>
             <File>
@@ -1161,11 +1063,12 @@
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
       <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407VGTx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.9.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.11.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000,0x20000) IRAM2(0x10000000,0x10000) IROM(0x08000000,0x100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1594,26 +1497,11 @@
               <FileType>8</FileType>
               <FilePath>.\Source\term.cpp</FilePath>
             </File>
-            <File>
-              <FileName>fit.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\fit.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>lcd.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\lcd.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>System</GroupName>
           <Files>
-            <File>
-              <FileName>arm_cortexM3l_math.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\Libraries\DSP-Lib\CMSIS\Lib\ARM\arm_cortexM3l_math.lib</FilePath>
-            </File>
             <File>
               <FileName>libSkyPulseV1.lib</FileName>
               <FileType>4</FileType>
@@ -1628,6 +1516,21 @@
               <FileName>libDiscovery.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\lib\MDK-ARM\output\libDiscovery.lib</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Simulator</GroupName>
+          <Files>
+            <File>
+              <FileName>simulator.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\simulator.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\lcd.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1647,12 +1550,13 @@
       <TargetName>IOC_Discovery</TargetName>
       <ToolsetNumber>0x4</ToolsetNumber>
       <ToolsetName>ARM-ADS</ToolsetName>
-      <pCCUsed>5060422::V5.06 update 4 (build 422)::ARMCC</pCCUsed>
+      <pCCUsed>5060528::V5.06 update 5 (build 528)::ARMCC</pCCUsed>
+      <uAC6>0</uAC6>
       <TargetOption>
         <TargetCommonOption>
           <Device>STM32F407VGTx</Device>
           <Vendor>STMicroelectronics</Vendor>
-          <PackID>Keil.STM32F4xx_DFP.2.9.0</PackID>
+          <PackID>Keil.STM32F4xx_DFP.2.11.0</PackID>
           <PackURL>http://www.keil.com/pack</PackURL>
           <Cpu>IRAM(0x20000000,0x20000) IRAM2(0x10000000,0x10000) IROM(0x08000000,0x100000) CPUTYPE("Cortex-M4") FPU2 CLOCK(12000000) ELITTLE</Cpu>
           <FlashUtilSpec></FlashUtilSpec>
@@ -1970,7 +1874,7 @@
             <v6Rtti>0</v6Rtti>
             <VariousControls>
               <MiscControls>--exceptions</MiscControls>
-              <Define>USE_STDPERIPH_DRIVER,__DISCO__,ARM_MATH_CM3,USE_LCD</Define>
+              <Define>USE_STDPERIPH_DRIVER,__DISCO__,__IOC_V2__,ARM_MATH_CM3</Define>
               <Undefine></Undefine>
               <IncludePath>..\lib\inc;.\Include;..\..\Libraries\CMSIS\Include;..\..\Libraries\CMSIS\Device\ST\STM32F4xx\Include;..\..\Libraries\STM32F4xx_StdPeriph_Driver\inc;..\..\Utilities\STM32F4-Discovery;..\..\Utilities\FatFs_R0.10b\src</IncludePath>
             </VariousControls>
@@ -2081,26 +1985,11 @@
               <FileType>8</FileType>
               <FilePath>.\Source\term.cpp</FilePath>
             </File>
-            <File>
-              <FileName>fit.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\fit.cpp</FilePath>
-            </File>
-            <File>
-              <FileName>lcd.cpp</FileName>
-              <FileType>8</FileType>
-              <FilePath>.\Source\lcd.cpp</FilePath>
-            </File>
           </Files>
         </Group>
         <Group>
           <GroupName>System</GroupName>
           <Files>
-            <File>
-              <FileName>arm_cortexM3l_math.lib</FileName>
-              <FileType>4</FileType>
-              <FilePath>..\..\Libraries\DSP-Lib\CMSIS\Lib\ARM\arm_cortexM3l_math.lib</FilePath>
-            </File>
             <File>
               <FileName>libSkyPulseV1.lib</FileName>
               <FileType>4</FileType>
@@ -2153,6 +2042,21 @@
               <FileName>libDiscovery.lib</FileName>
               <FileType>4</FileType>
               <FilePath>..\lib\MDK-ARM\output\libDiscovery.lib</FilePath>
+            </File>
+          </Files>
+        </Group>
+        <Group>
+          <GroupName>Simulator</GroupName>
+          <Files>
+            <File>
+              <FileName>simulator.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\simulator.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>lcd.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\lcd.cpp</FilePath>
             </File>
           </Files>
         </Group>

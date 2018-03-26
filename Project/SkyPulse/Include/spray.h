@@ -24,7 +24,7 @@ class	_SPRAY:public _ADC {
 	private:
 		int			Bottle_ref, Bottle_P;
 		int			Air_ref, Air_P;
-		int			idx,simrate;
+		int			idx;
 
 	public:
 		_SPRAY();
@@ -37,12 +37,6 @@ class	_SPRAY:public _ADC {
 		void		LoadSettings(FILE *);
 		void		SaveSettings(FILE *);
 		void		Increment(int, int);
-	
-		_LCD		*lcd;
-		_PLOT<unsigned short>  plot;	
-	
-		bool		Simulator(void);
-		double	pComp,pBott,pNozz,Pin,Pout;
 };
 
 #endif

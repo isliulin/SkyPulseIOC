@@ -384,7 +384,7 @@ _TIM9 *_TIM9::Instance=NULL;
 */
 _TIM9::_TIM9() {
 
-GPIO_InitTypeDef GPIO_InitStructure;
+GPIO_InitTypeDef					GPIO_InitStructure;
 TIM_TimeBaseInitTypeDef		TIM_TimeBaseStructure;
 TIM_ICInitTypeDef					TIM_ICInitStructure;
 //

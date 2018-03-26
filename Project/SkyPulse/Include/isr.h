@@ -34,8 +34,9 @@ void 		tetris_run(int , int );
 #define	__CtrlF			0x06
 
 #define	__CtrlI			0x09
-#define	__CtrlK			0x09
-#define	__CtrlO			0x0f
+#define	__CtrlK			0x0B
+#define	__CtrlL			0x0C
+#define	__CtrlO			0x0F
 #define	__CtrlP			0x10
 #define	__CtrlQ			0x11
 #define	__CtrlR			0x12
@@ -128,10 +129,6 @@ _thread	*_thread_add(void *,void *,char *,int),
 
 void		_wait(int,void (*)(void));
 _io			*ParseCom(_io *);
-
-void 		gen_crc_table(void);
-int 		update_crc(int, char *, char);
-int 		crc(int, int);
 }
 
 #ifndef	__max				

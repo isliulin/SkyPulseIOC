@@ -9,16 +9,15 @@
 
 #ifdef __IOC_V2__
 	#define _fTIM	TIM10
-class	_FAN:_ADC,_TIM9 {
+class	_FAN: public _ADC, public _TIM9 {
 #else
 	#define _fTIM	TIM4
-class	_FAN:_ADC,_TIM3 {
+class	_FAN: public _ADC, public _TIM3 {
 #endif
 
 	private:
 int		idx,timeout;
 int		fpl, fph, ftl, fth;
-_FIT	*tacho;
 	
 	public:
 		_FAN();
@@ -29,11 +28,6 @@ void	Increment(int, int);
 void	LoadSettings(FILE *);
 void	SaveSettings(FILE *);
 void	Enable(void),Disable(void);
-bool	Align(void);
-void	LoadLimits(FILE *);
-void	SaveLimits(FILE *);
-bool	Test(void);
-
 };
 
 #endif

@@ -29,8 +29,8 @@ string _LM::ErrMsg[] = {
 };
 
 int			_LM::debug=0,
-				_LM::warn_mask	=	_sprayInPressure	+ _sprayNotReady + _flowTacho,
-				_LM::error_mask	=	_sprayInPressure	+ _sprayNotReady + _flowTacho;
+				_LM::warn_mask	=	_sprayInPressure	+ _sprayNotReady,
+				_LM::error_mask	=	_sprayInPressure	+ _sprayNotReady;
 
 /*******************************************************************************/
 /**
@@ -41,6 +41,7 @@ int			_LM::debug=0,
 /*******************************************************************************/
 _LM::_LM() {
 			_thread_add((void *)Poll,this,(char *)"lm",1);
+			sim=NULL;
 	
 			FIL f;
 			if(f_open(&f,"0:/lm.ini",FA_READ) == FR_OK) {
@@ -54,14 +55,9 @@ _LM::_LM() {
 				f_close(&f);	
 			}	
 
-			if(f_open(&f,"0:/limits.ini",FA_READ) == FR_OK) {
-				pump.LoadLimits((FILE *)&f);
-				fan.LoadLimits((FILE *)&f);
-				f_close(&f);	
-			}	
-
-			_12Voff_ENABLE;
+			_12V_ENABLE;
 			_SYS_SHG_ENABLE;
+			
 			Parse(__F1);
 			
       io=_stdio(NULL);
@@ -92,14 +88,14 @@ int		ee = (e ^ IOC_State.Error) & e & ~error_mask;
 				_SYS_SHG_DISABLE;
 				if(IOC_State.State != _ERROR)
 					Submit("@error.led");
-				if(ee & _pumpCurrent)
+				if(ee & (_pumpCurrent | _flowTacho))
 					pump.Disable();
 				IOC_State.Error = (_Error)(IOC_State.Error | ee);
 				IOC_State.State = _ERROR;
 				IOC_State.Send();
 			} 
 
-int		ww=(e ^ IOC_State.Error) & warn_mask;
+int		ww=(e ^ IOC_State.Error) & e & warn_mask;
 			if(ww && __time__ > 3000) {
 				IOC_State.Error = (_Error)(IOC_State.Error | ww);
 				IOC_State.Send();
@@ -132,10 +128,15 @@ int		err  = _ADC::Status();								// collecting error data
 			err |= lm->fan.Poll();
 			err |= lm->spray.Poll();
 			lm->ErrParse(err);										// parsing error data
+	
 
 			_TIM::Instance()->Poll();
 			lm->can.Parse(lm);
 			lm->Foot2Can();
+	
+			if(lm->sim)
+				lm->sim->Poll(lm);
+			
 			_stdio(temp);
 }
 /*******************************************************************************
@@ -248,18 +249,6 @@ int		_LM::DecodePlus(char *c) {
 					break;
 				case 'c':
 					return ws.ColorOn(strchr(c,' '));
-				case 'l':
-				case 'L':
-					ADC_DeInit();
-#ifdef USE_LCD
-					spray.plot.Clear();
-					spray.plot.Add(&_ADC::adf.compressor,_BAR(1.0),_BAR(0.02), LCD_COLOR_YELLOW);
-					spray.plot.Add(&_ADC::adf.bottle,_BAR(1.0),_BAR(0.02), LCD_COLOR_GREY);
-					spray.plot.Add(&_ADC::adf.air,_BAR(1.0),_BAR(0.02), LCD_COLOR_MAGENTA);
-					spray.lcd=new _LCD;
-#endif
-					spray.mode.Simulator=true;
-					break;
 				default:
 					*c=0;
 					return PARSE_SYNTAX;
@@ -295,15 +284,6 @@ int		_LM::DecodeMinus(char *c) {
 					break;
 				case 'c':
 					return ws.ColorOff(strchr(c,' '));
-				case 'l':
-				case 'L':
-					new _ADC;
-					spray.mode.Simulator=false;
-					if(spray.lcd) {
-						LCD_Clear(LCD_COLOR_BLACK);
-						spray.lcd=NULL;
-					}
-					break;
 				default:
 					*c=0;
 					return PARSE_SYNTAX;
@@ -348,20 +328,7 @@ int		_LM::DecodeWhat(char *c) {
 					break;
 				case 'c':
 					return ws.GetColor(atoi(strchr(c,' ')));
-				case 'x':
-				{
-					RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC, ENABLE);
-					CRC_ResetDR();
-					int i=EOF;
-					while(*c) {
-						int j=strtoul(++c,&c,16);
-						i=crc(i,j);
-						printf("\r\n%08X,%08X",CRC_CalcCRC(j),i);
-						Watchdog();
-					}
-					printf("\r\n");
-					break;
-				}
+
 				default:
 					*c=0;
 					return PARSE_SYNTAX;
@@ -612,37 +579,25 @@ bool	_LM::Parse(int i) {
 						Select(SPRAY);
 					}
 					break;
-				case __CtrlR:
-					if(item == SPRAY && spray.mode.Simulator) {
-//						srand(__time__);
-//						_ADC::offset.air += rand() % 1000 - 500;
-//						_ADC::offset.bottle += rand() % 1000 - 500;
-//						_ADC::offset.compressor += rand() % 1000 - 500;
-//						printf("\r\n: offset randomized.... \r\n:");
-//						Select(SPRAY);
+				case __CtrlS:					
+					if(sim) {
+						delete sim;
+						new _ADC;
+						printf("\r\n: simulator deactivated...\r\n:");
+					} else {
+						ADC_DeInit();
+						sim = new _SIMULATOR;
+						printf("\r\n: simulator active     ...\r\n:");
 					}
 					break;
-				case __CtrlQ:
-					pump.Test();
-					fan.Test();
-					break;
-				case __CtrlP:
-					if(!pump.Align())
-						printf("\r\n pump processing error...\r\n:");
-					else if(!fan.Align()) 
-						printf("\r\n fan processing error...\r\n:");
-					else {
-						FIL f;
-						if(f_open(&f,"0:/limits.ini",FA_WRITE | FA_OPEN_ALWAYS) == FR_OK) {
-							pump.SaveLimits((FILE *)&f);
-							fan.SaveLimits((FILE *)&f);
-							f_sync(&f);
-							f_close(&f);							
-							printf("\r\n saved...\r\n:");
-						}	else				
-							printf("\r\n file error...\r\n:");
+				case __CtrlL:					
+					if(sim) {
+						sim->lcd=new _LCD;
+					} else {
+						printf("\r\n: simulator deactivated...\r\n:");
 					}
 					break;
+
 				case __FOOT_OFF:
 					IOC_FootAck.State=_OFF;
 					IOC_FootAck.Send();

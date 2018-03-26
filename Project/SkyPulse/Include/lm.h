@@ -25,6 +25,7 @@
 #include				"can.h"
 #include				"ws2812.h"
 #include				"ioc.h"
+#include				"simulator.h"
 
 #define					SW_version	13
 
@@ -59,7 +60,8 @@ class	_LM {
 		_WS2812			ws;
 		_IOC_State	IOC_State;
 		_IOC_FswAck	IOC_FootAck;
-		
+		_SIMULATOR	*sim;
+	
 		void 				Increment(int, int);
 		void 				Select(_ITEM);
 		void 				Submit(string);

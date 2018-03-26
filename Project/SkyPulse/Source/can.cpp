@@ -238,13 +238,13 @@ void			_CAN::Parse(void *v) {
 _LM				*lm = (_LM *)v;
 CanRxMsg	rxm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};		
 //________ flushing com buffer/not echoed if debug_________ 
-						if(com && io->tx->size - _buffer_count(io->tx) > sizeof(CanTxMsg)) {
-CanTxMsg			txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};		
-							txm.StdId=idCOM2CAN;
-							txm.DLC=_buffer_pull(com->tx,txm.Data,sizeof(txm.Data));
-							if(txm.DLC)
-								Send(&txm);
-						}
+					if(com && io->tx->size - _buffer_count(io->tx) > sizeof(CanTxMsg)) {
+CanTxMsg		txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};		
+						txm.StdId=idCOM2CAN;
+						txm.DLC=_buffer_pull(com->tx,txm.Data,sizeof(txm.Data));
+						if(txm.DLC)
+							Send(&txm);
+					}
 //______________________________________________________________________________________					
 					if(_buffer_count(io->rx) && _buffer_pull(io->rx,&rxm,sizeof(CanTxMsg))) {
 //________ debug print__________________________________________________________________

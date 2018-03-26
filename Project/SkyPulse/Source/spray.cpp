@@ -14,7 +14,6 @@
 #include	<stdio.h>
 #include	<stdlib.h>
 #include	"spray.h"
-#include	"lcd.h"
 #include	"ioc.h"
 /*******************************************************************************
 * Function Name	:
@@ -38,7 +37,6 @@ _SPRAY::_SPRAY() {
 					Bottle_ref=Air_ref=													_BAR(1);
 					waterGain=																	_BAR(1.2);
 	
-					mode.Simulator=false;
 					mode.Vibrate=false;
 					mode.Water=false;
 					mode.Air=false;
@@ -50,10 +48,6 @@ _SPRAY::_SPRAY() {
 					Water->Close();
 					readyTimeout=0;
 					offsetTimeout=__time__ + 5000;
-					
-					Pin=4.0;
-					pComp= pBott=pNozz=Pout=1.0;
-					simrate=0;
 }
 /*******************************************************************************
 * Function Name :
@@ -121,13 +115,6 @@ int				_err=_NOERR;
 					}
 					else
 						Air->Close();
-
-					if(mode.Simulator && Simulator()) {
-#ifdef USE_LCD
-						if(lcd && plot.Refresh())
-							lcd->Grid();
-#endif
-					}
 					return _err;
 }
 /*******************************************************************************/
@@ -183,14 +170,14 @@ void			_SPRAY::Increment(int a, int b) {
 							gain.bottle	= __min(__max(_BAR(0.5),gain.bottle	+100*a),_BAR(2.5));
 							break;
 						case 4:
-							if(mode.Simulator) {
-								Pout 				= __min(__max(0.5,Pout+(double)a/10.0),1.5);
-								if(a) {
-									AirLevel = WaterLevel;
-									mode.Air = mode.Water = false;
-									offsetTimeout = __time__ + 3000;
-								}
-							}
+//							if(mode.Simulator) {
+//								Pout 				= __min(__max(0.5,Pout+(double)a/10.0),1.5);
+//								if(a) {
+//									AirLevel = WaterLevel;
+//									mode.Air = mode.Water = false;
+//									offsetTimeout = __time__ + 3000;
+//								}
+//							}
 							break;
 						case 5:
 							if(a < 0)
@@ -206,19 +193,19 @@ void			_SPRAY::Increment(int a, int b) {
 							break;
 					}
 					
-					if(mode.Simulator) {
-						printf("\r:spray %3d,%5d,%5.2lf,%5.2lf,%5.2lf",
-							AirLevel,WaterLevel,
-								(double)(adf.air-offset.air)/_BAR(1),
-									(double)(adf.bottle-offset.bottle)/_BAR(1),
-										Pout-1.0);
-					} else {
+//					if(mode.Simulator) {
+//						printf("\r:spray %3d,%5d,%5.2lf,%5.2lf,%5.2lf",
+//							AirLevel,WaterLevel,
+//								(double)(adf.air-offset.air)/_BAR(1),
+//									(double)(adf.bottle-offset.bottle)/_BAR(1),
+//										Pout-1.0);
+//					} else {
 						printf("\r:spray %3d,%5d,%5.2lf,%5.2lf,%5.2lf",
 							AirLevel,WaterLevel,
 								(double)(adf.air-offset.air)/_BAR(1),
 									(double)(adf.bottle-offset.bottle)/_BAR(1),
 										(double)(adf.compressor-offset.compressor)/_BAR(1));
-					}
+//					}
 					if(mode.Air) 
 						printf("   Air"); 
 					else 
@@ -229,89 +216,6 @@ void			_SPRAY::Increment(int a, int b) {
 						printf("   ---"); 
 					
 					for(int i=1+6*(6-idx); i--; printf("\b"));
-}
-/*******************************************************************************
-* Function Name	:
-* Description		: 
-* Output				:
-* Return				: 
-********************************************************************************
-
-                         ///------R2----Uc2-----///-----Rout----Pout
-                          |              |
-                          |             ///
-                          |              |
-         Pin-----Rin-----Uc1              \____Rw_____
-                          |                            \
-                          |                            Uc3-----Rsp----Pout
-                         XXX___________________Ra______/
-
-*******************************************************************************/
-
-bool			_SPRAY::Simulator(void) {
-					
-	_TIM		*tim=_TIM::Instance();
-
-	#define Uc1		pComp
-	#define Uc2		pBott
-	#define Uc3		pNozz
-	
-	#define Rin		10
-	#define Rout	100
-	
-	#define R2		100
-	#define Rw		300
-	#define Ra		300
-	#define Rsp		100
-	#define C1		1e-2
-	#define C3		100e-6
-	#define C2		50e-3
-	#define dt		1e-3
-	
-	double	Iin=(Pin-Uc1)/Rin;
-	double	I12=(Uc1-Uc2)/R2;
-	double	I13=(Uc1-Uc3)/Ra;
-	double	I23=(Uc2-Uc3)/Rw;
-	double	I3=(Uc3-Pout)/Rsp;
-	double	Iout=(Uc2 - Pout)/Rout;
-
-	I13 = I13*tim->Pwm(6)/_PWM_RATE;
-
-	if(BottleIn->Closed()) {
-		I12=0;
-		if(I23 < 0)
-			plot.Colour(&_ADC::adf.bottle,LCD_COLOR_GREEN);
-		else
-			plot.Colour(&_ADC::adf.bottle,LCD_COLOR_GREY);
-			
-	} else
-		plot.Colour(&_ADC::adf.bottle,LCD_COLOR_RED);
-
-	if(BottleOut->Closed())
-		Iout=0;
-	else
-		plot.Colour(&_ADC::adf.bottle,LCD_COLOR_BLUE);
-
-	if(Water->Closed())
-		I23=0;
-
-	Uc1 += (Iin-I12-I13)/C1*dt;
-	Uc2 += (I12-I23-Iout)/C2*dt;
-	Uc3 += (I23+I13-I3)/C3*dt;	
-
-	adf.compressor	=_BAR(pComp);
-	adf.bottle			=_BAR(pBott + 0.05*I12*R2 + 0.03);
-	adf.air				=_BAR(pNozz + I13*Ra - 0.01);
-
-	adf.V5		= _V5to16X;
-	adf.V12	= _V12to16X;
-	adf.V24	= _V24to16X;
-
-	adf.T2=(unsigned short)0xafff;
-	if(simrate && __time__ < simrate)
-		return false;
-	simrate = __time__ + 10;
-	return true;
 }
 
 

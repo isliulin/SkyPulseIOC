@@ -40,7 +40,7 @@ _DAC::_DAC() {
 		DAC_InitStructure.DAC_OutputBuffer = DAC_OutputBuffer_Enable;
 		DAC_Init(DAC_Channel_1, &DAC_InitStructure);
 		DAC_Cmd(DAC_Channel_1, ENABLE);
-#if defined (__DISCO__) || defined (__IOC_V0__)
+#if defined (__IOC_V0__)
 		DAC_SetChannel1Data(DAC_Align_12b_R,0xfff);	
 		DAC_SetChannel2Data(DAC_Align_12b_R,0xfff);	
 		DAC_Init(DAC_Channel_2, &DAC_InitStructure);
