@@ -151,6 +151,18 @@ void			_SPRAY::SaveSettings(FILE *f) {
 	* @retval : None
 	*/
 /*******************************************************************************/
+void			_SPRAY::Increment(int key) {
+					_ADC::offset.air = _ADC::adf.air;
+					_ADC::offset.bottle = _ADC::adf.bottle;
+					printf("\r\n: air/water offset.... \r\n:");			
+}
+/*******************************************************************************/
+/**
+	* @brief	TIM3 IC2 ISR
+	* @param	: None
+	* @retval : None
+	*/
+/*******************************************************************************/
 void			_SPRAY::Increment(int a, int b) {
 
 					idx= __min(__max(idx+b,0),6);

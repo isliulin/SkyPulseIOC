@@ -30,6 +30,7 @@ _FAN::_FAN() :_TIM3(1) {
 				ftl=25;
 				fth=40;
 				timeout=__time__ + _FAN_ERR_DELAY;
+				tacho=tacho_limit=0;
 				idx=0;
 }
 /*******************************************************************************
@@ -50,10 +51,11 @@ int			e=_NOERR;
 					_YELLOW2(20);
 #else
 				if(__time__ > timeout) {
-					timeout=__time__+100;
-					if(Tau1==0)
-						e |= _fanTacho;
+					tacho=Tau1*600;					
 					Tau1=0;
+					timeout=__time__+100;
+					if(tacho <= tacho_limit)
+						e |= _fanTacho;
 				}
 #endif
 				_fTIM->CCR1=_fTIM->ARR*Rpm()/100;
@@ -78,7 +80,7 @@ int			_FAN::Rpm(void) {
 void		_FAN::LoadSettings(FILE *f) {
 char		c[128];
 				fgets(c,sizeof(c),f);
-				sscanf(c,"%d,%d,%d,%d",&fpl,&fph,&ftl,&fth);
+				sscanf(c,"%d,%d,%d,%d,%d",&fpl,&fph,&ftl,&fth,&tacho_limit);
 }
 /*******************************************************************************/
 /**
@@ -87,7 +89,7 @@ char		c[128];
 	* @retval : None
 	*/
 void		_FAN::SaveSettings(FILE *f) {
-				fprintf(f,"%5d,%5d,%5d,%5d                 /.. fan\r\n",fpl,fph,ftl,fth);
+				fprintf(f,"%5d,%5d,%5d,%5d,%5d           /.. fan\r\n",fpl,fph,ftl,fth,tacho_limit);
 }
 /*******************************************************************************/
 /**
@@ -120,6 +122,22 @@ void		_FAN::Increment(int a, int b) {
 				if(idx>0)
 					printf("        %2d%c-%2d%c,%2d'-%2d'",fpl,'%',fph,'%',ftl,fth);
 				for(int i=4*(5-idx)-1;idx && i--;printf("\b"));
+}
+/*******************************************************************************/
+/**
+	* @brief	TIM3 IC2 ISR
+	* @param	: None
+	* @retval : None
+	*/
+/*******************************************************************************/
+void		_FAN::Increment(int key)	{
+						if(tacho_limit) {
+							tacho_limit=0;
+						printf("\r\n: tacho limit reset.... \r\n:");
+						}	else {
+							tacho_limit=tacho/2;
+							printf("\r\n: flow limit set to %3.1lf rpm\r\n:",(double)tacho_limit);
+						}
 }
 /**
 * @}

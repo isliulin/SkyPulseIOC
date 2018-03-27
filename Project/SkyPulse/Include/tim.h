@@ -58,8 +58,8 @@ class	_TIM9 {
 	public:
 		_TIM9(void);
 		~_TIM9(void);
-		static _TIM9 *Instance;
-		int Tau1,Tau2;
-		int Led1,Led2;
+		static _TIM9 *instance;
+		static int Tau1,Tau2;
+		static int Led1,Led2;
 };
 #endif

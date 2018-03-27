@@ -18,12 +18,13 @@ class	_FAN: public _ADC, public _TIM3 {
 	private:
 int		idx,timeout;
 int		fpl, fph, ftl, fth;
-	
+int		tacho_limit,tacho;	
 	public:
 		_FAN();
 
 int		Poll(void);
 int		Rpm(void);
+void	Increment(int);
 void	Increment(int, int);
 void	LoadSettings(FILE *);
 void	SaveSettings(FILE *);

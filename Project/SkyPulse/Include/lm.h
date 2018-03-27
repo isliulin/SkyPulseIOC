@@ -62,6 +62,7 @@ class	_LM {
 		_IOC_FswAck	IOC_FootAck;
 		_SIMULATOR	*sim;
 	
+		void 				Increment(int);
 		void 				Increment(int, int);
 		void 				Select(_ITEM);
 		void 				Submit(string);

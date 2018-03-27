@@ -25,7 +25,7 @@
 	*/
 /*******************************************************************************/
 #ifdef __IOC_V2__	
-_PUMP::_PUMP() {
+_PUMP::_PUMP() :_TIM9() {
 #else
 _PUMP::_PUMP() :_TIM3(0)  {
 #endif
@@ -40,8 +40,7 @@ _PUMP::_PUMP() :_TIM3(0)  {
 				gain.cooler=_BAR(1);
 				idx=0;
 				mode=(1<<PUMP_FLOW);
-				curr_limit=0;
-				flow=0;
+				curr_limit=flow_limit=flow=0;
 				Enabled=true;
 }
 /*******************************************************************************/
@@ -61,15 +60,14 @@ int			e=_NOERR;
 				} else	
 						DAC_SetChannel1Data(DAC_Align_12b_R,0);
 				if(__time__ > timeout) {
-					timeout=__time__+100;
-					if(curr_limit && adf.Ipump > curr_limit)
+					flow=Tau2*600;					
+					Tau2=0;
+					if(flow_limit && flow <= flow_limit)
 						e |= _pumpCurrent;
-					if(_TIM9::Instance->Tau2==0)
+					if(curr_limit && adf.Ipump > curr_limit)
 						e |= _flowTacho;
-					flow=_TIM9::Instance->Tau2*600;					
-					_TIM9::Instance->Tau2=0;
+					timeout=__time__+100;
 				} 	
-
 				return e;
 }
 /*******************************************************************************/
@@ -91,7 +89,7 @@ int			_PUMP::Rpm(void) {
 void		_PUMP::LoadSettings(FILE *f) {
 char		c[128];
 				fgets(c,sizeof(c),f);
-				sscanf(c,"%d,%d,%d,%d,%d",&fpl,&fph,&ftl,&fth,&curr_limit);
+				sscanf(c,"%d,%d,%d,%d,%d,%d",&fpl,&fph,&ftl,&fth,&curr_limit,&flow_limit);
 }
 /*******************************************************************************/
 /**
@@ -100,7 +98,7 @@ char		c[128];
 	* @retval : None
 	*/
 void		_PUMP::SaveSettings(FILE *f) {
-				fprintf(f,"%5d,%5d,%5d,%5d,%5d           /.. pump\r\n",fpl,fph,ftl,fth,curr_limit);
+				fprintf(f,"%5d,%5d,%5d,%5d,%5d,%5d     /.. pump\r\n",fpl,fph,ftl,fth,curr_limit,flow_limit);
 }
 /*******************************************************************************/
 /**
@@ -114,7 +112,6 @@ void		_PUMP::Enable() {
 					Enabled=true;
 				}
 }
-
 /*******************************************************************************/
 /**
 	* @brief	TIM3 IC2 ISR
@@ -157,16 +154,6 @@ int			_PUMP::Increment(int a, int b)	{
 					case 4:
 						fth= __min(__max(fth+a,ftl),50);
 						break;
-					case 5:
-						if(a > 0) {
-							curr_limit=adf.Ipump + adf.Ipump/4;
-							printf("\r\n: current limit set to %4.3lfA\r\n:",(double)curr_limit/4096.0*3.3/2.1/16);
-						}
-						if(a < 0) {
-							curr_limit=0;
-							printf("\r\n: current reset.... \r\n:");
-						}
-						break;
 				}
 		
 				if(mode & (1<<PUMP_FLOW))
@@ -178,6 +165,37 @@ int			_PUMP::Increment(int a, int b)	{
 					printf("   %2d%c-%2d%c,%2d'-%2d',%4.3lf",fpl,'%',fph,'%',ftl,fth,(double)adf.Ipump/4096.0*3.3/2.1/16);		
 				for(int i=4*(5-idx)+5;idx && i--;printf("\b"));
 				return Rpm();
+}
+/*******************************************************************************/
+/**
+	* @brief	TIM3 IC2 ISR
+	* @param	: None
+	* @retval : None
+	*/
+/*******************************************************************************/
+void		_PUMP::Increment(int key)	{
+					switch(idx) {
+						case 0:
+							if(flow_limit) {
+								flow_limit=0;
+								printf("\r\n: flow limit reset.... \r\n:");
+							}	else {
+								flow_limit=flow/2;
+								printf("\r\n: flow limit set to %3.1lf l/min\r\n:",(double)flow_limit/22000);
+							}
+							break;
+						case 5:
+							if(curr_limit) {
+								curr_limit=0;
+								printf("\r\n: current limit reset.... \r\n:");
+							}	else {
+								curr_limit=adf.Ipump + adf.Ipump/4;
+								printf("\r\n: current limit set to %4.3lfA\r\n:",(double)curr_limit/4096.0*3.3/2.1/16);
+							}
+							break;
+						default:
+							break;
+					}
 }
 /**
 * @}

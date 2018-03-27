@@ -6,7 +6,7 @@
 
 #define	_ADC_ERR_DELAY	200
 #define _PUMP_ERR_DELAY	1000
-#define _FAN_ERR_DELAY	1000
+#define _FAN_ERR_DELAY	3000
 #define _EC20_EM_DELAY	5
 
 typedef	enum {

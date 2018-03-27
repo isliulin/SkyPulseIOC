@@ -379,7 +379,9 @@ void	TIM3_IRQHandler(void) {
 * Output				:
 * Return				:
 *******************************************************************************/
-_TIM9 *_TIM9::Instance=NULL;
+_TIM9 *_TIM9::instance=NULL;
+int _TIM9::Tau1,_TIM9::Tau2;
+int _TIM9::Led1,_TIM9::Led2;
 /*******************************************************************************
 */
 _TIM9::_TIM9() {
@@ -389,7 +391,8 @@ TIM_TimeBaseInitTypeDef		TIM_TimeBaseStructure;
 TIM_ICInitTypeDef					TIM_ICInitStructure;
 //
 // if called first time ???
-		if(!Instance) {
+		if(!instance) {
+			instance=this;
 // gpio		
 			GPIO_StructInit(&GPIO_InitStructure);
 			GPIO_InitStructure.GPIO_Mode = GPIO_Mode_AF;
@@ -427,8 +430,6 @@ TIM_ICInitTypeDef					TIM_ICInitStructure;
 			TIM_ITConfig(TIM9, TIM_IT_CC2,ENABLE);
 			NVIC_EnableIRQ(TIM1_BRK_TIM9_IRQn);
 		}
-		
-		Instance=this;
 		Tau1=Tau2=0;
 		Led1=Led2=0;
 }
@@ -452,15 +453,15 @@ void	TIM1_BRK_TIM9_IRQHandler(void) {
 			if(TIM_GetITStatus(TIM9,TIM_IT_CC1)==SET) {
 				TIM_ClearITPendingBit(TIM9, TIM_IT_CC1);
 				
-				_TIM9::Instance->Tau1++;
-				if(_TIM9::Instance->Led1++ % 50 == 0)
+				_TIM9::Tau1++;
+				if(_TIM9::Led1++ % 50 == 0)
 					_YELLOW2(30);
 			}
 			
 			if(TIM_GetITStatus(TIM9,TIM_IT_CC2)==SET) {
 				TIM_ClearITPendingBit(TIM9, TIM_IT_CC2);
-				_TIM9::Instance->Tau2++;
-				if(_TIM9::Instance->Led2++ % 50 == 0)
+				_TIM9::Tau2++;
+				if(_TIM9::Led2++ % 50 == 0)
 					_BLUE2(30);
 			}
 }

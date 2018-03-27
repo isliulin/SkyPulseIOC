@@ -179,6 +179,30 @@ void	_LM::Select(_ITEM i) {
 * Output				:	
 * Return				:
 *******************************************************************************/
+void	_LM::Increment(int key) {
+			switch(item) {
+				case PUMP:
+					pump.Increment(key);
+					Select(PUMP);
+					break;
+				case FAN:
+					fan.Increment(key);
+					Select(FAN);
+					break;
+				case SPRAY:
+					spray.Increment(key);
+					Select(SPRAY);
+				break;
+				default:
+					break;
+				}
+	}
+/*******************************************************************************
+* Function Name	: 
+* Description		: 
+* Output				:	
+* Return				:
+*******************************************************************************/
 void	_LM::Increment(int i, int j) {
 			switch(item) {
 				case PUMP:
@@ -451,7 +475,8 @@ bool	ret=Parse(fgetc(f));
 * Return				:
 *******************************************************************************/
 bool	_LM::Parse(int i) {
-			switch(console.Esc(i)) {
+	int key=console.Esc(i);
+			switch(key) {
 				case EOF:
 					break;
 				case __F1:
@@ -549,7 +574,9 @@ bool	_LM::Parse(int i) {
 				case __CtrlE: 
 					CanConsole(idCAN2COM,__CtrlE);
 					break;	
-				
+				case __Delete: 
+					Increment(__Delete);
+					break;	
 				case __PageUp:
 					if(item == SPRAY) {
 						spray.waterGain=__min(spray.waterGain+1000,_BAR(2.5));
@@ -569,15 +596,6 @@ bool	_LM::Parse(int i) {
 						else
 							spray.mode.Vibrate=true;
 				}
-					break;
-				case __Delete:
-				case __CtrlI:
-					if(item == SPRAY) {
-						_ADC::offset.air = _ADC::adf.air;
-						_ADC::offset.bottle = _ADC::adf.bottle;
-						printf("\r\n: air/water offset.... \r\n:");
-						Select(SPRAY);
-					}
 					break;
 				case __CtrlS:					
 					if(sim) {

@@ -13,7 +13,7 @@
 /** @addtogroup
 * @{
 */
-_ADC		*_ADC::instance=NULL;		
+_ADC	 *_ADC::instance=NULL;		
 _ADMA		_ADC::adc[16],_ADC::adf,_ADC::offset,_ADC::gain;
 _DIODE	_ADC::diode[160];
 /**

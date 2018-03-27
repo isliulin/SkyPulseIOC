@@ -9,21 +9,20 @@
 
 typedef enum		{PUMP_FLOW, PUMP_ERR_STOP} _MODE_;
 #ifdef __IOC_V2__
-class	_PUMP:public _ADC, _DAC {
+class	_PUMP: public _ADC, public _TIM9, _DAC {
 #else
-class	_PUMP:public _ADC, public _TIM3, _DAC {
+class	_PUMP: public _ADC, public _TIM3, _DAC {
 #endif
 	private:
 
 int		idx,led,timeout,mode;
 int		fpl,fph,ftl,fth;
-	
+int		curr_limit,flow_limit,flow;
 	public:
 _PUMP();
-
-int		curr_limit,flow;
 int		Poll(void);
 int		Rpm(void);
+void	Increment(int);
 int		Increment(int, int);
 void	LoadSettings(FILE *);
 void	SaveSettings(FILE *);

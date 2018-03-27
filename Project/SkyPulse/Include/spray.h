@@ -20,7 +20,7 @@ typedef	struct {
 	bool	Simulator:1;
 }	mode;
 
-class	_SPRAY:public _ADC {
+class	_SPRAY: public _ADC {
 	private:
 		int			Bottle_ref, Bottle_P;
 		int			Air_ref, Air_P;
@@ -36,6 +36,7 @@ class	_SPRAY:public _ADC {
 		int			Poll(void);
 		void		LoadSettings(FILE *);
 		void		SaveSettings(FILE *);
+		void		Increment(int);
 		void		Increment(int, int);
 };
 
