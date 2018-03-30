@@ -81,37 +81,73 @@ _LM::~_LM() {
 * Output				:
 * Return				:
 *******************************************************************************/
-void	_LM::ErrParse(int e) {
-	
-int		ee = (e ^ IOC_State.Error) & e & ~error_mask;
-			if(ee && __time__ > 3000) {
-				_SYS_SHG_DISABLE;
-				if(IOC_State.State != _ERROR)
-					Submit("@error.led");
-				if(ee & (_pumpCurrent | _flowTacho))
-					pump.Disable();
-				IOC_State.Error = (_Error)(IOC_State.Error | ee);
-				IOC_State.State = _ERROR;
-				IOC_State.Send();
-			} 
+void	_LM::ErrParse(int err) {
 
-int		ww=(e ^ IOC_State.Error) & e & warn_mask;
-			if(ww && __time__ > 3000) {
-				IOC_State.Error = (_Error)(IOC_State.Error | ww);
-				IOC_State.Send();
-			} 
-			
-			if(_SYS_SHG_ENABLED)
-				_GREEN1(200);
-			else
-				_RED1(200);
+int		w = (err ^ IOC_State.Error) & err & warn_mask;
+int		e = (err ^ IOC_State.Error) & err & ~error_mask;
+			if(__time__ > 3000) {
+				if(e) {
+					_SYS_SHG_DISABLE;
+					if(e & (_pumpCurrent | _flowTacho))
+						pump.Disable();
+					if(IOC_State.State != _ERROR)
+						Submit("@error.led");
+					IOC_State.State = _ERROR;
+				}
+				if(e | w) {
+					IOC_State.Error = (_Error)(IOC_State.Error | e |w );
+					IOC_State.Send();
+				}
 
-			if(ee && _BIT(_LM::debug, DBG_ERR)) {
-				for(int n=0; n<32; ++n)
-					if(ee & (1<<n))
-						printf("\r\nerror %03d: %s",n, ErrMsg[n].c_str());	
-			} 	
+				if(_SYS_SHG_ENABLED)
+					_GREEN1(200);
+				else
+					_RED1(200);
+
+				if(e && _BIT(_LM::debug, DBG_ERR)) {
+					for(int n=0; n<32; ++n)
+						if(e & (1<<n))
+							printf("\r\nerror %03d: %s",n, ErrMsg[n].c_str());	
+				} 	
+			}
 }
+///*******************************************************************************
+//* Function Name	:
+//* Description		:
+//* Output				:
+//* Return				:
+//*******************************************************************************/
+//void	_LM::ErrParse(int e) {
+//	
+//int		ee = (e ^ IOC_State.Error) & e & ~error_mask;
+//			if(ee && __time__ > 3000) {
+//				_SYS_SHG_DISABLE;
+//				if(IOC_State.State != _ERROR)
+//					Submit("@error.led");
+//				if(ee & (_pumpCurrent | _flowTacho))
+//					pump.Disable();
+//				IOC_State.Error = (_Error)(IOC_State.Error | ee);
+//				IOC_State.State = _ERROR;
+//				IOC_State.Send();
+//			} 
+
+//int		ww=(e ^ IOC_State.Error) & e & warn_mask;
+//			if(ww && __time__ > 3000) {
+//				IOC_State.Error = (_Error)(IOC_State.Error | ww);
+//				IOC_State.Send();
+//			} 
+//			
+//			if(_SYS_SHG_ENABLED)
+//				_GREEN1(200);
+//			else
+//				_RED1(200);
+
+//			if(ee && _BIT(_LM::debug, DBG_ERR)) {
+//				for(int n=0; n<32; ++n)
+//					if(ee & (1<<n))
+//						printf("\r\nerror %03d: %s",n, ErrMsg[n].c_str());	
+//			} 	
+//}
 /*******************************************************************************
 * Function Name	:
 * Description		:

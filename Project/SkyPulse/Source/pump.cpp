@@ -63,9 +63,9 @@ int			e=_NOERR;
 					flow=Tau2*600;					
 					Tau2=0;
 					if(flow_limit && flow <= flow_limit)
-						e |= _pumpCurrent;
-					if(curr_limit && adf.Ipump > curr_limit)
 						e |= _flowTacho;
+					if(curr_limit && adf.Ipump > curr_limit)
+						e |= _pumpCurrent;
 					timeout=__time__+100;
 				} 	
 				return e;

@@ -262,8 +262,9 @@ CanTxMsg		txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 								if(rxm.DLC) {
 									switch((_State)rxm.Data[0]) {
 										case	_STANDBY:
+											if(lm->IOC_State.State == _ERROR)
+												lm->IOC_State.Error = _NOERR;
 											lm->IOC_State.State = _STANDBY;
-											lm->IOC_State.Error = _NOERR;
 											lm->pump.Enable();
 											lm->Submit("@standby.led");
 											_SYS_SHG_ENABLE;
@@ -286,8 +287,8 @@ CanTxMsg		txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 										default:
 											break;
 									}
-								}
-								lm->IOC_State.Send();
+								} else
+									lm->IOC_State.Send();
 								break;
 							case idIOC_SprayParm:
 								lm->spray.AirLevel 		= __min(rxm.Data[0],10);
