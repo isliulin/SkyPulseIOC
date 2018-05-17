@@ -35,55 +35,36 @@ CanTxMsg		tx={_ID_IAP_ACK,0,CAN_ID_STD,CAN_RTR_DATA,1,0,0,0,0,0,0,0,0};
 /******************************************************************************/
 int					main(void) {
 int					*p=(int *)*_FW_START;
-
-// pfm fan & trigger off
-#if		defined (__PFM6__)
-{
 						GPIO_InitTypeDef GPIO_InitStructure;   
-						Watchdog_init(4000);
 						RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOB|RCC_AHB1Periph_GPIOC|RCC_AHB1Periph_GPIOD|RCC_AHB1Periph_GPIOE|RCC_AHB1Periph_GPIOF|RCC_AHB1Periph_GPIOG,ENABLE);	
+						Watchdog_init(4000);
 						GPIO_StructInit(&GPIO_InitStructure);
 						GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
 						GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
-						GPIO_Init(GPIOA, &GPIO_InitStructure);
-						GPIO_ResetBits(GPIOA,GPIO_Pin_6);
-
+//// pfm fan off
+//						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
+//						GPIO_Init(GPIOA, &GPIO_InitStructure);
+//						GPIO_ResetBits(GPIOA,GPIO_Pin_6);
+// pfm trigger transmitters off
+#if		defined (__PFM6__)
+{
 						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_12 | GPIO_Pin_13;
-						GPIO_Init(GPIOD, &GPIO_InitStructure);
 						GPIO_SetBits(GPIOD,GPIO_Pin_12 | GPIO_Pin_13);
-
-// red, yellow, blue		
-						GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_2 | GPIO_Pin_3;
 						GPIO_Init(GPIOD, &GPIO_InitStructure);
-
-						GPIO_SetBits(GPIOD,GPIO_Pin_0 | GPIO_Pin_2 | GPIO_Pin_3);
 }			
 #elif	defined (__PFM8__)
 {
-						GPIO_InitTypeDef GPIO_InitStructure;   
-						Watchdog_init(4000);
-						RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOA|RCC_AHB1Periph_GPIOB|RCC_AHB1Periph_GPIOC|RCC_AHB1Periph_GPIOD|RCC_AHB1Periph_GPIOE|RCC_AHB1Periph_GPIOF|RCC_AHB1Periph_GPIOG,ENABLE);	
-						GPIO_StructInit(&GPIO_InitStructure);
-						GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT;
-						GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
-						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_6;
-						GPIO_Init(GPIOA, &GPIO_InitStructure);
-						GPIO_ResetBits(GPIOA,GPIO_Pin_6);
-
-						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6;
+						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_4 | GPIO_Pin_5;
+						GPIO_SetBits(GPIOE,GPIO_Pin_4 | GPIO_Pin_5);
 						GPIO_Init(GPIOE, &GPIO_InitStructure);
-						GPIO_SetBits(GPIOE,GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_6);
-
-// red, yellow, blue		
-						GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
-						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_2 | GPIO_Pin_3;
-						GPIO_Init(GPIOD, &GPIO_InitStructure);
-
-						GPIO_SetBits(GPIOD,GPIO_Pin_0 | GPIO_Pin_2 | GPIO_Pin_3);
 }			
 #endif
+// red, yellow, blue		
+						GPIO_InitStructure.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_2 | GPIO_Pin_3;
+						GPIO_InitStructure.GPIO_OType = GPIO_OType_OD;
+						GPIO_Init(GPIOD, &GPIO_InitStructure);
+						GPIO_SetBits(GPIOD,GPIO_Pin_0 | GPIO_Pin_2 | GPIO_Pin_3);
+
 						if(RCC_GetFlagStatus(RCC_FLAG_SFTRST) != RESET && !crcError()) {
 							NVIC_SetVectorTable(NVIC_VectTab_FLASH,(uint32_t)p-_BOOT_TOP);				
 							__set_MSP(*p++);
@@ -229,14 +210,14 @@ int 				i;
 						return(-1);
 }
 /*******************************************************************************/
-int					crcSIGN(void) {
+int					crcSIGN(int flag) {
 int 				i=-1,crc;
 
 						RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_CRC, ENABLE);	
-#ifdef	__DISCO__	
-						_Words32Received=(STORAGE_TOP-_FLASH_TOP)/sizeof(uint32_t);
-						_minAddress=_FLASH_TOP;				
-#endif						
+						if(flag) {
+							_Words32Received=(STORAGE_TOP-_FLASH_TOP)/sizeof(uint32_t);
+							_minAddress=_FLASH_TOP;				
+						}
 						if(_Words32Received)
 						{
 							i=FlashErase(_SIGN_PAGE);
@@ -298,7 +279,7 @@ CanRxMsg		rx;
 //----------------------------------------------------------------------------------------------
 // client - sign FW
 							case _ID_IAP_SIGN:
-								ret=crcSIGN();
+								ret=crcSIGN(*rx.Data);
 								if(!p)
 									SendAck(ret);
 							break;
@@ -632,7 +613,7 @@ char	s[128];
 								strncpy(_Iap_string,&s[1],63);
 								CanHexProg(NULL);
 							}
-							crcSIGN();
+							crcSIGN(0);
 						}
 						f_close(&f);
 						f_mount(0,NULL);

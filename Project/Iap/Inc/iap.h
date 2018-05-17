@@ -56,7 +56,7 @@ int					FlashErase(int);
 #define			_Eof						-1
 
 int					crcError(void);
-int					crcSIGN(void);
+int					crcSIGN(int);
 int	 				ParseCAN(CanRxMsg *);
 int					HexChecksumError(char *);
 int					CanHexProg(char *);

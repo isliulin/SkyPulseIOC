@@ -111,7 +111,7 @@ GPIO_InitTypeDef					GPIO_InitStructure;
 			TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
 			TIM_TimeBaseStructure.TIM_Prescaler = 0;
 			TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-			TIM_TimeBaseStructure.TIM_Period = 74;
+			TIM_TimeBaseStructure.TIM_Period = _TP;
 
 			TIM_TimeBaseInit(TIM4,&TIM_TimeBaseStructure);
 // ________________________________________________________________________________
@@ -181,7 +181,6 @@ GPIO_InitTypeDef					GPIO_InitStructure;
 			DMA_InitStructure.DMA_Channel = DMA_Channel_3;
 			DMA_InitStructure.DMA_PeripheralBaseAddr = (uint32_t)TIM2_BASE + 0x4C;	//~~~
 			DMA_Init(DMA1_Stream1, &DMA_InitStructure);
-			
 // ________________________________________________________________________________
 // TIMebase setup
 			TIM_DeInit(TIM2);
@@ -190,7 +189,7 @@ GPIO_InitTypeDef					GPIO_InitStructure;
 			TIM_TimeBaseStructInit(&TIM_TimeBaseStructure);
 			TIM_TimeBaseStructure.TIM_Prescaler = 0;
 			TIM_TimeBaseStructure.TIM_CounterMode = TIM_CounterMode_Up;
-			TIM_TimeBaseStructure.TIM_Period = 74;
+			TIM_TimeBaseStructure.TIM_Period = _TP;
 
 			TIM_TimeBaseInit(TIM2,&TIM_TimeBaseStructure);
 // ________________________________________________________________________________
@@ -221,34 +220,36 @@ void		_WS2812::trigger() {
 int			i,j,k;
 dma			*p;
 RGB_set	q;
-						
+	
+
 #ifdef __IOC_V2__		
+	
 int				imax=sizeof(ws)/sizeof(ws2812);
 					for(i=0; i<imax/2; ++i) {
 						for(j=0; j<ws[i].size; ++j) {
 							if(ws[i].cbuf) {
 								HSV2RGB(ws[i].cbuf[j], &q);
 								for(k=0,p=ws[i].lbuf; k<8; ++k) {
-									(q.b & (0x80>>k)) ? (p[j].b[k][0]=53)	: (p[j].b[k][0]=20);
-									(q.g & (0x80>>k)) ? (p[j].g[k][0]=53)	: (p[j].g[k][0]=20);
-									(q.r & (0x80>>k)) ? (p[j].r[k][0]=53)	: (p[j].r[k][0]=20);
+									(q.b & (0x80>>k)) ? (p[j].b[k][0]=_TH)	: (p[j].b[k][0]=_TL);
+									(q.g & (0x80>>k)) ? (p[j].g[k][0]=_TH)	: (p[j].g[k][0]=_TL);
+									(q.r & (0x80>>k)) ? (p[j].r[k][0]=_TH)	: (p[j].r[k][0]=_TL);
 								}
 							}
 								else
 									for(k=0,p=ws[i].lbuf; k<24; ++k)
-										p[j].g[k][0]=20;
+										p[j].g[k][0]=_TL;
 
 							if(ws[i+imax/2].cbuf) {
 								HSV2RGB(ws[i+imax/2].cbuf[j], &q);
 								for(k=0,p=ws[i].lbuf; k<8; ++k) {
-									(q.b & (0x80>>k)) ? (p[j].b[k][1]=53)	: (p[j].b[k][1]=20);
-									(q.g & (0x80>>k)) ? (p[j].g[k][1]=53)	: (p[j].g[k][1]=20);
-									(q.r & (0x80>>k)) ? (p[j].r[k][1]=53)	: (p[j].r[k][1]=20);
+									(q.b & (0x80>>k)) ? (p[j].b[k][1]=_TH)	: (p[j].b[k][1]=_TL);
+									(q.g & (0x80>>k)) ? (p[j].g[k][1]=_TH)	: (p[j].g[k][1]=_TL);
+									(q.r & (0x80>>k)) ? (p[j].r[k][1]=_TH)	: (p[j].r[k][1]=_TL);
 								}
 							}
 								else
 									for(k=0,p=ws[i].lbuf; k<24; ++k)
-										p[j].g[k][1]=20;
+										p[j].g[k][1]=_TL;
 					}
 				}
 
@@ -267,14 +268,14 @@ int				imax=sizeof(ws)/sizeof(ws2812);
 						if(ws[i].cbuf) {
 							HSV2RGB(ws[i].cbuf[j], &q);
 							for(k=0,p=ws[i].lbuf; k<8; ++k) {
-								(q.b & (0x80>>k)) ? (p[j].b[k]=53)	: (p[j].b[k]=20);
-								(q.g & (0x80>>k)) ? (p[j].g[k]=53)	: (p[j].g[k]=20);
-								(q.r & (0x80>>k)) ? (p[j].r[k]=53)	: (p[j].r[k]=20);
+								(q.b & (0x80>>k)) ? (p[j].b[k]=_TH)	: (p[j].b[k]=_TL);
+								(q.g & (0x80>>k)) ? (p[j].g[k]=_TH)	: (p[j].g[k]=_TL);
+								(q.r & (0x80>>k)) ? (p[j].r[k]=_TH)	: (p[j].r[k]=_TL);
 							}
 						}
 						else
 							for(k=0,p=ws[i].lbuf; k<24; ++k)
-									p[j].g[k]=20;
+									p[j].g[k]=_TL;
 
 				DMA_Cmd(DMA1_Stream1, DISABLE);
 				TIM_Cmd(TIM2,DISABLE);

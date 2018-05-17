@@ -19,6 +19,10 @@ inline bool operator != (HSV_set &a, HSV_set &b) {
     return !(a==b);
 }
 
+#define	_TP		104 // 74	//
+#define _TH		75	// 53	//
+#define _TL		29	// 20	//
+
 typedef enum		{ noCOMM,
 										SWITCH_ON, SWITCH_OFF, 
 										FILL_ON, FILL_OFF, 

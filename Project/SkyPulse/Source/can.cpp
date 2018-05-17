@@ -288,7 +288,7 @@ CanTxMsg		txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 											break;
 									}
 								} else
-									lm->IOC_State.Send();
+								lm->IOC_State.Send();
 								break;
 							case idIOC_SprayParm:
 								lm->spray.AirLevel 		= __min(rxm.Data[0],10);

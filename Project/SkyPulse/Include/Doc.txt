@@ -180,3 +180,6 @@ f error.led
 - error set delay in pump poll ... to prevent immediate flow sensor error at pump startup
 - old code (pump/fan response test) cleaning, separate simulator class....
 
+5.4.2018
+- State ack. send, when error state requested from host....
+- OD output of LEDs

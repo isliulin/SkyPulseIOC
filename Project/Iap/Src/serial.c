@@ -67,6 +67,9 @@ char	*p;
 				case '2':
 					CanHexMessage(_ID_IAP_SIGN,0);
 					break;
+				case '9':
+					CanHexMessage(_ID_IAP_SIGN,9);
+					break;
 				case '3':
 					CanHexMessage(_ID_IAP_GO,0);
 					break;
