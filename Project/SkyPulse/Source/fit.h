@@ -9,15 +9,15 @@ class _FIT {
 		float	det(float *,int,int,int);
 	public:
 		int			n,typ;
-		float		*rp;			
+		float	*rp;			
 		_FIT(int = 3, _fittype=FIT_POW);
 		_FIT(const _FIT &);
 		~_FIT();
 		
 		int			Sample(float, float);
 		int			Sample(float, float, float);
-		float		*Compute(void);
-		float		Eval(float);
+		float	*Compute(void);
+		float	Eval(float);
 	
 	};
 #endif

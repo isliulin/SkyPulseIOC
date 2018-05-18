@@ -9,9 +9,9 @@
 * Output				:
 * Return				: None
 *******************************************************************************/
-double	_FIT::det(double *p, int x,int y, int n) {
+float	_FIT::det(float *p, int x,int y, int n) {
 				int			sign=1;
-				double 	D=0;
+				float 	D=0;
 
 				for(int i=1,j=0;j<n;++j,i*= 2) {
 					if(!(i & y)) {
@@ -34,9 +34,9 @@ double	_FIT::det(double *p, int x,int y, int n) {
 _FIT::_FIT(int degree, _fittype type) {
 				n=degree;
 				typ=type;
-				tp=new double[4*n*n]();
-				fp=new double[2*n]();
-				rp=new double[2*n]();		
+				tp=new float[4*n*n]();
+				fp=new float[2*n]();
+				rp=new float[2*n]();		
 }
 /*******************************************************************************
 * Function Name	: 
@@ -48,9 +48,9 @@ _FIT::_FIT(const _FIT &obj)
 {
 				n=obj.n;
 				typ=obj.typ;
-				tp=new double[4*n*n]();
-				fp=new double[2*n]();
-				rp=new double[2*n]();		
+				tp=new float[4*n*n]();
+				fp=new float[2*n]();
+				rp=new float[2*n]();		
 }
 /*******************************************************************************
 * Function Name	: 
@@ -69,8 +69,8 @@ _FIT::~_FIT() {
 * Output				: 
 * Return				: None
 *******************************************************************************/
-int		_FIT::Sample(double t, double f) {
-double	*q = new double(2*n * sizeof(double));
+int		_FIT::Sample(float t, float f) {
+float	*q = new float(2*n * sizeof(float));
 				if(!tp || !fp || !rp)
 					return 0;
 
@@ -88,7 +88,7 @@ double	*q = new double(2*n * sizeof(double));
 					case FIT_NEXP:
 						q[0]=1;
 						for(int i=1; i<n; ++i)
-							q[i]=1.0/exp(pow(t,i));
+							q[i]=exp(-pow(t,i));
 						break;
 					case FIT_TRIG:
 						for(int i=0; i < n/2+1; ++i)
@@ -111,7 +111,7 @@ double	*q = new double(2*n * sizeof(double));
 * Output				: 
 * Return				: None
 *******************************************************************************/
-int			_FIT::Sample(double t, double f, double period) {
+int			_FIT::Sample(float t, float f, float period) {
 				per=period;
 				return Sample(t,f);
 }
@@ -124,16 +124,16 @@ int			_FIT::Sample(double t, double f, double period) {
 * Output				: 
 * Return				: None
 *******************************************************************************/
-double	*_FIT::Compute() {
+float	*_FIT::Compute() {
 				if(!tp || !fp || !rp)
 					return(NULL);					
-				double	*c,d=det(tp,0,0,n);
+				float	*c,d=det(tp,0,0,n);
 				if(!d)
 					return(NULL);
 				if((int)tp[0] < n)
 					return(NULL);
 
-				c=new double(n * n);
+				c=new float(n * n);
 				for(int i=0; i<n; ++i) {
 					for(int j=0;j< n * n; ++j)
 						if(j % n  ==  i)
@@ -151,10 +151,10 @@ double	*_FIT::Compute() {
 * Output				: 
 * Return				: None
 *******************************************************************************/
-double	_FIT::Eval(double t) {			
+float	_FIT::Eval(float t) {			
 				if(!tp || !fp || !rp)
 					return(0);					
-				double ft=rp[0];
+				float ft=rp[0];
 				switch(typ) {
 					case FIT_POW:
 						for(int i=1; i<n; ++i)

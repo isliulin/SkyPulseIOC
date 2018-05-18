@@ -9,6 +9,7 @@
 #include				"lcd.h"
 #include				"ioc.h"
 #include				"spray.h"
+#include				"fit.h"
 
 #define					_SPRAY_READY_T	500
 extern void			Simulate(void);					
@@ -25,6 +26,7 @@ class	_SPRAY: public _ADC {
 		int			Bottle_ref, Bottle_P;
 		int			Air_ref, Air_P;
 		int			idx;
+		_FIT		*pFit;
 
 	public:
 		_SPRAY();

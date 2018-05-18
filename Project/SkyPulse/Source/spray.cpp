@@ -28,7 +28,7 @@ _SPRAY::_SPRAY() {
 					BottleOut=	new _VALVE(4,false);
 	
 					offset.air=offset.bottle=offset.compressor=	_BAR(1);
-					gain.air=																		_BAR(2.5);
+					gain.air=																		_BAR(2.0);
 					gain.bottle=																_BAR(0.5);											
 					gain.compressor=														_BAR(1);
 	
@@ -48,6 +48,11 @@ _SPRAY::_SPRAY() {
 					Water->Close();
 					readyTimeout=0;
 					offsetTimeout=__time__ + 5000;
+					
+					pFit=new _FIT();
+					pFit->rp[0]=18049;
+					pFit->rp[1]=11544*1e-4f;
+					pFit->rp[2]=-1603*1e-8f;
 }
 /*******************************************************************************
 * Function Name :
@@ -69,7 +74,8 @@ int				_err=_NOERR;
 					}
 //------------------------------------------------------------------------------
 					Air_ref			= offset.air + AirLevel*gain.air/10;
-					Bottle_ref	= offset.bottle + (Air_ref - offset.air)*waterGain/0x10000 + gain.bottle*WaterLevel/10;
+					Bottle_ref	= offset.bottle + (Air_ref - offset.air)*pFit->Eval(Air_ref - offset.air)/0x10000 + gain.bottle*WaterLevel/10;
+//				Bottle_ref	= offset.bottle + (Air_ref - offset.air)*waterGain/0x10000 + gain.bottle*WaterLevel/10;
 //					Bottle_ref	= offset.bottle + AirLevel*waterGain*(100+4*WaterLevel)/100/10;
 //------------------------------------------------------------------------------
 					if(AirLevel || WaterLevel) {
@@ -93,7 +99,7 @@ int				_err=_NOERR;
 							BottleOut->Open();
 					}
 
-					if(10*(adf.compressor-offset.compressor)/gain.compressor < 25)
+					if(!(adf.compressor-offset.compressor)/gain.compressor)
 						_err |= _sprayInPressure;		
 					if(readyTimeout && __time__ < readyTimeout)
 						_err |= _sprayNotReady;
@@ -131,7 +137,6 @@ char			c[128];
 					sscanf(c,"%hu,%hu,%hu,%hu",&gain.cooler,&gain.bottle,&gain.compressor,&gain.air);
 					fgets(c,sizeof(c),f);
 					sscanf(c,"%d",&waterGain);
-	
 }
 /*******************************************************************************/
 /**
@@ -142,7 +147,7 @@ char			c[128];
 void			_SPRAY::SaveSettings(FILE *f) {
 					fprintf(f,"%5d,%5d,%5d,%5d                 /.. offset\r\n", offset.cooler, offset.bottle, offset.compressor, offset.air);
 					fprintf(f,"%5d,%5d,%5d,%5d                 /.. gain\r\n", gain.cooler,gain.bottle,gain.compressor, gain.air);
-					fprintf(f,"%5d                                   /.. gain\r\n", waterGain);
+					fprintf(f,"%5d                                   /..Wgain\r\n", waterGain);
 }
 /*******************************************************************************/
 /**

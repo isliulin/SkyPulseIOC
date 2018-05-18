@@ -85,12 +85,8 @@ f standby.led
 -c r,3
 
 f ready.led
--c l,2
-w 200
--c l,3
-+c l,2
-w 200
-+c l,3
++c r,2
++c l,5
 
 f error.led
 -c r,0,5

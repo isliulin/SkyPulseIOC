@@ -409,6 +409,11 @@
               <FileType>8</FileType>
               <FilePath>.\Source\isr.cpp</FilePath>
             </File>
+            <File>
+              <FileName>fit.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\fit.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -933,6 +938,11 @@
               <FileName>isr.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Source\isr.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>fit.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\fit.cpp</FilePath>
             </File>
           </Files>
         </Group>
@@ -1459,6 +1469,11 @@
               <FileType>8</FileType>
               <FilePath>.\Source\isr.cpp</FilePath>
             </File>
+            <File>
+              <FileName>fit.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\fit.cpp</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -1945,6 +1960,11 @@
               <FileName>isr.cpp</FileName>
               <FileType>8</FileType>
               <FilePath>.\Source\isr.cpp</FilePath>
+            </File>
+            <File>
+              <FileName>fit.cpp</FileName>
+              <FileType>8</FileType>
+              <FilePath>.\Source\fit.cpp</FilePath>
             </File>
           </Files>
         </Group>

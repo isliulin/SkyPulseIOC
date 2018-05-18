@@ -161,9 +161,9 @@
 #endif
 
 #ifdef __PFM6__
-#define PLL_N      336
+#define PLL_N      240
 #define PLL_P      2
-#define PLL_Q      7
+#define PLL_Q      5
 #endif
 
 /******************************************************************************/

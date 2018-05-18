@@ -260,34 +260,35 @@ CanTxMsg		txm={0,0,CAN_ID_STD,CAN_RTR_DATA,0,0,0,0,0,0,0,0,0};
 						switch(rxm.StdId) {
 							case idIOC_State:
 								if(rxm.DLC) {
-									switch((_State)rxm.Data[0]) {
-										case	_STANDBY:
-											if(lm->IOC_State.State == _ERROR)
-												lm->IOC_State.Error = _NOERR;
-											lm->IOC_State.State = _STANDBY;
-											lm->pump.Enable();
-											lm->Submit("@standby.led");
-											_SYS_SHG_ENABLE;
-											break;
-										case	_READY:
-											lm->IOC_State.State = _READY;
-											lm->pump.Enable();
-											lm->Submit("@ready.led");
-											break;
-										case	_ACTIVE:
-											lm->IOC_State.State = _ACTIVE;
-											lm->pump.Enable();
-											lm->Submit("@active.led");
-											break;
-										case	_ERROR:
-											lm->IOC_State.State = _ERROR;
-											lm->Submit("@error.led");
-											_SYS_SHG_DISABLE;
-											break;
-										default:
-											break;
-									}
-								} else
+									lm->SetState((_State)rxm.Data[0]);
+//									switch((_State)rxm.Data[0]) {
+//										case	_STANDBY:
+//											if(lm->IOC_State.State == _ERROR)
+//												lm->IOC_State.Error = _NOERR;
+//											lm->IOC_State.State = _STANDBY;
+//											lm->pump.Enable();
+//											lm->Submit("@standby.led");
+//											_SYS_SHG_ENABLE;
+//											break;
+//										case	_READY:
+//											lm->IOC_State.State = _READY;
+//											lm->pump.Enable();
+//											lm->Submit("@ready.led");
+//											break;
+//										case	_ACTIVE:
+//											lm->IOC_State.State = _ACTIVE;
+//											lm->pump.Enable();
+//											lm->Submit("@active.led");
+//											break;
+//										case	_ERROR:
+//											lm->IOC_State.State = _ERROR;
+//											lm->Submit("@error.led");
+//											_SYS_SHG_DISABLE;
+//											break;
+//										default:
+//											break;
+//									}
+								} 
 								lm->IOC_State.Send();
 								break;
 							case idIOC_SprayParm:
